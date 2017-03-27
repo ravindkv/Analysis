@@ -1,26 +1,26 @@
 # Analysis
    
 ### Download and compile the package   
-    * git clone https://github.com/ravindkv/Analysis.git 
+* git clone https://github.com/ravindkv/Analysis.git 
 
-    * cd Analysis/src
-    
-    * make clean
+* cd Analysis/src
 
-    * make
+* make clean
 
-    * cd .. 
+* make
+
+* cd .. 
 
 ### Compile and run the code
-    * root -l 
+* root -l 
 
-    * .L hplusAnalyzer.C+
+* .L hplusAnalyzer.C+
 
-    * hplusAnalyzer t;
+* hplusAnalyzer t;
 
-    * t.processEvents();
+* t.processEvents();
 
 
 ### Compile and run, in one go
-    * root -l 'runme.C("hplusAnalyzer")'
+* root -l 'runme.C("hplusAnalyzer")'
 
