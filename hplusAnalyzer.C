@@ -148,7 +148,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, stri
 void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType, bool isData, TFile *outFile_, string Cat){
     int input_count = 0;
   
-  coutfile_<<"///// Begin processing "<<cutflowType<<"  selection ///////"<<endl;
+  outfile_<<"///// Begin processing "<<cutflowType<<"  selection ///////"<<endl;
   cout <<"///// Begin processing "<<cutflowType<<"  selection ///////"<<endl;
   
   bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
@@ -192,6 +192,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   CreateAnalHistos(cutflowType, outFile_);
 
   double sampleWeight(1.0);
+  cout<<"sampleWeight = "<<sampleWeight<<endl;
 
   MyEvent *ev;
   int nTriggEvent = 0, nSelEvents = 0, matchjetcount= 0, threepairjet = 0;
@@ -226,6 +227,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         sampleWeight = xss[sampleName] * Lumi / initialEvents;
         outfile_<<"Scale factor for lumi "<<Lumi<<" pb is "<< sampleWeight<<endl;
       }
+      
       evtWeight *= sampleWeight; // upto this only sigma*lumi weight is applied
       //vector<double>puweights = ev->sampleInfo.puWeights;  // this line and below this line applies the pile up corrections
       //if(puweights.size() > 0) evtWeight *= puweights[0];
@@ -264,7 +266,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     TotalTopPtWeights += topPtWeights_offline;
     TotalLplusJEvents++;
     evtWeight *= topPtWeights_offline; //Multiply to the total weights
-
 
     double nCutPass = 0.0;// double nCutPass_plus = 0.0; double nCutPass_minus = 0.0;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
@@ -463,7 +464,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     int nJet = j_final.size();
     fillHisto("multi_jet", cutflowType, nJet, evtWeight);
     if(nJet < 4)continue;  // this condition implies event should contains at least 4 jets
-    cout<<cutflowType<<"\t"<<nJet<<"\t"<<evtWeight<<endl;
     fillHisto("final_multi_jet", cutflowType, nJet, evtWeight);
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
@@ -487,8 +487,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(!metuc)metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
     else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
     fillHisto("pt_met", cutflowType, metPt, evtWeight);
-
+//-----------------    
+   /*
     if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+    */
     fillHisto("final_pt_met", cutflowType, metPt, evtWeight);
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
@@ -532,8 +534,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     }
 
     //    if(count_CSVL <= 2) continue; // Atfirst demanding for ATLAS 3L and then 0M
+   /*
     if(count_CSVM <= 1) continue; // Demanding for 2M b-tagged jets
-
+    */
     fillHisto("CSVL_count", cutflowType, count_CSVL, evtWeight);
     fillHisto("CSVM_count", cutflowType, count_CSVM, evtWeight);
     //    fillHisto("btagmulti_jet", cutflowType, count, evtWeight);
@@ -558,8 +561,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("wmt", cutflowType+"/BTag", mt, evtWeight);
 
         input_count++;
-        cout << "input count:  " << input_count << endl;
-
+        cout << "\033[01;32minput count: \033[00m"<< input_count << endl;
     //    if(chi2OfKinFit > 9.0) continue;
 
     bool foundkfMuon = false;
@@ -1138,8 +1140,9 @@ void hplusAnalyzer::CreateAnalHistos(TString cutflowType, TFile* outFile_)
 void hplusAnalyzer::processEvents(){ 
 
   // New kinfit11 samples
-  //CutFlowAnalysis("SingleElectron_ntuple_2017-03-26_muons.root", "PF",false, "wh_M_120");
-  CutFlowAnalysis("W1JetsToLNu_muons.root", "PF",false, "wh_M_120");
+  //CutFlowAnalysis("EleRunBver2v2_EleData_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
+  //CutFlowAnalysis("DY1JetsToLL_EleMC_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
+  CutFlowAnalysis("TTJets_ntuple_2017-03-28_muons.root", "PF",false, "wh_M_120");
 
   //  CutFlowAnalysis("rfio:/dpm/indiacms.res.in/home/cms/user/gouranga/ChargedHiggs/8TeV/kinfit_v11/Merged/MC/tree_ttbar_su12_kinefit11.root", "PF",false, "ttbar");
 
