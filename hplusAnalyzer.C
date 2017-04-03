@@ -14,7 +14,6 @@
 #include "TTimeStamp.h"
 #include "Math/VectorUtil.h"
 
-
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/MomentumVec.h"
@@ -32,61 +31,38 @@ public :
     DRMIN_JET = 0.5;
     DRMIN_ELE = 0.5;
     METCUT_   = 30.0;
-
     //    LumiWeights_ = reweight::LumiReWeighting("MC_Pileup_Summer2012_600bins.root","Data_Pileup_2012B_600bins.root", "pileup", "pileup");
     LumiWeights_ = reweight::LumiReWeighting("mcPileup.root","dataPileup.root", "pileup", "pileup");
-      
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
-    
     //cross sections
-    xss["WJETS"] = 36257.0;
-    xss["TTBAR"] = 245.8;
-    xss["ZJETS"] = 3504.0;
-    xss["QCD"]   = 134680;
+    xss["WJETS"] = 36257.0;  xss["TTBAR"] = 245.8; xss["ZJETS"] = 3504.0; xss["QCD"] = 134680;
     // stop sample 
-    xss["TOPS"]  = 3.79;
-    xss["TOPT"]  = 56.4;
-    xss["TOPW"]  = 11.1;
+    xss["TOPS"]  = 3.79; xss["TOPT"]  = 56.4; xss["TOPW"]  = 11.1;
     // sbar sample 
-    xss["TBARS"]  = 1.76;
-    xss["TBART"]  = 30.7;
-    xss["TBARW"]  = 11.1;
+    xss["TBARS"]  = 1.76; xss["TBART"]  = 30.7; xss["TBARW"]  = 11.1;
     // di-boson samples
-    
-    xss["WW"] = 33.61;
-    xss["WZ"] = 12.63;
-    xss["ZZ"] = 5.196;
+    xss["WW"] = 33.61; xss["WZ"] = 12.63; xss["ZZ"] = 5.196;
     // signal sample 
-
-    xss["WH"] = 245.8;
-    xss["HH"] = 245.8;
+    xss["WH"] = 245.8; xss["HH"] = 245.8;
 
     //muon Trigger/ID/ISo SFs, in bins of eta (from muon POG)
-                                                                                                
     //SFs for different lumi period are weighted by lumi fraction.
                                                                                            
     double lumiA = 808.411; double lumiB = 4044.0;
     double lumiC = 495.003+6432.0; double lumiD = 7274.0;
     double lumiTotal = lumiA+lumiB+lumiC+lumiD;
     //Trigger SF for HLT_IsoMu24_eta2p1
-                                                                                                                      
     double sfEta1 = (lumiA*0.956+lumiB*0.9798+lumiC*0.9841+lumiD*0.98151)/lumiTotal; // 0<|eta|<0.9 
-                                                         
     double sfEta2 = (lumiA*0.9528+lumiB*0.9618+lumiC*0.9688+lumiD*0.96156)/lumiTotal; // 0.9<|eta|<1.2
-                                                       
     double sfEta3 = (lumiA*0.9809+lumiB*0.9814+lumiC*1.0021+lumiD*0.99721)/lumiTotal; // 1.2<|eta|<2.1
-
     //multiply mu ID/Iso SFs
-
     sfEta1 = sfEta1*0.9939*1.0004;
     sfEta2 = sfEta2*0.9902*1.0031;
     sfEta3 = sfEta3*0.9970*1.0050;
     muSF["sfEta1"] = sfEta1;
     muSF["sfEta2"] = sfEta2;
     muSF["sfEta3"] = sfEta3;
-
-
   };
   ~hplusAnalyzer() {
     delete evR;
@@ -96,7 +72,6 @@ public :
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", bool isData = true, TFile *outFile_=0, string Cat="");
   void CreateAnalHistos(TString flowType, TFile* outFile_);
   void processEvents();
-  
   float reweightHEPNUPWJets(int hepNUP);
   float reweightHEPNUPDYJets(int hepNUP);
 
@@ -111,11 +86,11 @@ private :
   std::map<string, double> muSF;
   ofstream outfile_;
 };
-
 void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, string evtType, string Cat){
   
-  ///TString outFile("8TeV/2M/kinfit11/v1/test1/");
-  TString outFile("");
+  //gSystem->Exec("mkdir ttjets")  
+  TString outFile("ttjets/");
+  //TString outFile("");
   //create the output file ////////////////////////////////
   TString Filename_ = outFile+evtType+"_selection_"+Cat+".root";
   TFile *outFile_ = TFile::Open( Filename_, "RECREATE" );
@@ -169,28 +144,22 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   else if (cutflowType.Contains("bTagMinus"))bscale = -1; 
 
   double Lumi = 1000.0;
-  
   evR = new Reader();
-  
   TFile *f = TFile::Open(url);
   if(f==0) return ;
   if(f->IsZombie()) { f->Close(); return; }
 
   int nEntries = evR->AssignEventTreeFrom(f);
   if( nEntries == 0) {return; }
-
   //get initial number of events
-
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"))->Clone("inputcf");
   double initialEvents = inputcf->GetBinContent(1);
 
   cout<<"Input file : "<<url<<endl;
   outfile_<<"Input file : "<<url<<endl;
   outfile_<<"Available input sample : "<<initialEvents<<endl;
-  
   //define histograms 
   CreateAnalHistos(cutflowType, outFile_);
-
   double sampleWeight(1.0);
   cout<<"sampleWeight = "<<sampleWeight<<endl;
 
@@ -964,9 +933,7 @@ void hplusAnalyzer::CreateAnalHistos(TString cutflowType, TFile* outFile_)
 
   //Define Histograms 
   InitHist(cutflowType, "", outFile_); 
-  
   addHisto("cutflow", cutflowType, 15, 0., 15.); 
-
   addHisto("Pre_RelIso",cutflowType, 40,0,0.5);
   addHisto("Final_RelIso",cutflowType, 40,0,0.5);
   addHisto("Muon_mult_final",cutflowType, 10,0,10);
@@ -1142,7 +1109,8 @@ void hplusAnalyzer::processEvents(){
   // New kinfit11 samples
   //CutFlowAnalysis("EleRunBver2v2_EleData_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
   //CutFlowAnalysis("DY1JetsToLL_EleMC_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
-  CutFlowAnalysis("TTJets_ntuple_2017-03-28_muons.root", "PF",false, "wh_M_120");
+  //CutFlowAnalysis("outFile_.root", "PF",false, "wh_M_120");
+  CutFlowAnalysis("outFile_.root", "PF",false, "ttjets");
 
   //  CutFlowAnalysis("rfio:/dpm/indiacms.res.in/home/cms/user/gouranga/ChargedHiggs/8TeV/kinfit_v11/Merged/MC/tree_ttbar_su12_kinefit11.root", "PF",false, "ttbar");
 
