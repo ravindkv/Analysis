@@ -89,7 +89,7 @@ private :
 void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, string evtType, string Cat){
   
   //gSystem->Exec("mkdir ttjets")  
-  TString outFile("ttjets/");
+  TString outFile("13TeV/outputDir/");
   //TString outFile("");
   //create the output file ////////////////////////////////
   TString Filename_ = outFile+evtType+"_selection_"+Cat+".root";
@@ -1110,7 +1110,7 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("EleRunBver2v2_EleData_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
   //CutFlowAnalysis("DY1JetsToLL_EleMC_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
   //CutFlowAnalysis("outFile_.root", "PF",false, "wh_M_120");
-  CutFlowAnalysis("outFile_.root", "PF",false, "ttjets");
+  CutFlowAnalysis("inputFile", "PF", false, "outputFile");
 
   //  CutFlowAnalysis("rfio:/dpm/indiacms.res.in/home/cms/user/gouranga/ChargedHiggs/8TeV/kinfit_v11/Merged/MC/tree_ttbar_su12_kinefit11.root", "PF",false, "ttbar");
 
@@ -1144,3 +1144,4 @@ float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
   else return 1 ;
 
 }
+
