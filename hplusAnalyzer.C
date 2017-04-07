@@ -907,7 +907,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
 	
       }//end of KinFit
-        if(input_count > 1500) break;
+        if(input_count > 10) break;
     
   }
   
@@ -1110,16 +1110,10 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("EleRunBver2v2_EleData_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
   //CutFlowAnalysis("DY1JetsToLL_EleMC_20170328_Ntuple_99.root", "PF",false, "wh_M_120");
   //CutFlowAnalysis("outFile_.root", "PF",false, "wh_M_120");
-  CutFlowAnalysis("inputFile", "PF", false, "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29march17/MuMC_20170329/WW_MuMC_20170329/WW_TuneCUETP8M1_13TeV-pythia8/WW_MuMC_20170329/170329_185719/0000/WW_MuMC_20170329_Ntuple_2.root", "PF", false, "outputFile");
 
   //  CutFlowAnalysis("rfio:/dpm/indiacms.res.in/home/cms/user/gouranga/ChargedHiggs/8TeV/kinfit_v11/Merged/MC/tree_ttbar_su12_kinefit11.root", "PF",false, "ttbar");
-
-//   CutFlowAnalysis("/tmp/gkole/tree_qcd_su12_kinefit9.root", "PF",false, "qcd");
-//   CutFlowAnalysis("/tmp/gkole/tree_z1jet_su12_kinefit9.root", "PF",false, "z1jet");
-//   CutFlowAnalysis("/tmp/gkole/tree_z2jet_su12_kinefit9.root", "PF",false, "z2jet");
-//   CutFlowAnalysis("/tmp/gkole/tree_z3jet_su12_kinefit9.root", "PF",false, "z3jet");
-//   CutFlowAnalysis("/tmp/gkole/tree_z4jet_su12_kinefit9.root", "PF",false, "z4jet");
-
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {

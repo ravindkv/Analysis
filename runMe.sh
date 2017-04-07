@@ -10,6 +10,14 @@ cp hplusAnalyzer.C ../
 sed -i "s:inputFile:$inNtupleFile:g" hplusAnalyzer.C
 sed -i "s:outputFile:$outAnalFile:g" hplusAnalyzer.C
 sed -i "s:outputDir:$outAnalDir:g" hplusAnalyzer.C
-root -l 'runMe.C("hplusAnalyzer")'
+
+root -l -b <<EOF
+.L hplusAnalyzer.C+
+hplusAnalyzer t
+t.processEvents()
+.q
+EOF
 echo "SUCCESSFULL"
+rm *.so
+rm *.d
 mv ../hplusAnalyzer.C .
