@@ -45,7 +45,7 @@ ls ${_CONDOR_SCRATCH_DIR}/Analysis/13TeV/$outAnalDir
 #Remove the package, after copying the output
 #------------------------------------------------
 
-xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/Analysis/13TeV/$outAnalDir root://se01.indiacms.res.in:1094//cms/store/user/rverma/
+xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/Analysis/13TeV/$outAnalDir root://se01.indiacms.res.in:1094//cms/store/user/rverma/13TeV/
 cd ${_CONDOR_SCRATCH_DIR}
 rm -rf Analysis
 echo "DONE"

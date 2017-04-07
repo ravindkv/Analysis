@@ -17,7 +17,6 @@ hplusAnalyzer t
 t.processEvents()
 .q
 EOF
-echo "SUCCESSFULL"
 rm *.so
 rm *.d
 mv ../hplusAnalyzer.C .

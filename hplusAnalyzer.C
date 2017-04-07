@@ -907,7 +907,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
 	
       }//end of KinFit
-        if(input_count > 10) break;
+        if(input_count > 100) break;
     
   }
   

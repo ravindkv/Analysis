@@ -9,7 +9,7 @@
 #---------------------------------------------
 
 Universe              = vanilla
-x509userproxy         = /tmp/x509up_u93032
+x509userproxy         = /afs/cern.ch/user/r/rverma/x509up_u93032
 #use_x509userproxy    = true
 Executable            = hplusAnalyzer.sh
 Arguments             = FNAME OUTPUTFILE OUTPUTDIR $(Process) $(Cluster)
