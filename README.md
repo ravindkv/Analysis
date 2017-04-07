@@ -13,3 +13,8 @@
 ### Compile and run, in one go ### 
 * root -l 'runme.C("hplusAnalyzer")'
 
+### Submit condor batch jobs  ###
+
+* voms-proxy-init -voms cms
+* cd condor
+* ./hplusRunCond.sh
