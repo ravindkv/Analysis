@@ -34,6 +34,7 @@ public :
   void add2DHisto(TString name, TString dirname, int range1, double min1, double max1, int range2, double min2, double max2);
   void fillHisto(TString name, TString dirname, double value, double weight=1.0);
   TH1* getHisto(TString name, TString dirname);
+  void CreateAnalHistos(TString flowType, TFile* outFile_);
 
 private :
   std::map<TString, TH1*> histos1_;

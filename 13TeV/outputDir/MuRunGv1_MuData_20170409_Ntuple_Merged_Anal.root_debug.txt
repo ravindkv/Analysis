@@ -1,0 +1,13 @@
+///// Begin processing base  selection ///////
+Input file : root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29march17/MuData_20170329/MuRunGv1_MuData_20170329/SingleMuon/MuRunGv1_MuData_20170329/MuRunGv1_MuData_20170329_Ntuple_Merged.root
+Available input sample : 6.88401e+06
+sampleWeight = 1.57072
+Number of times HadP and HadQ matches with jets0
+total number of selected events 332
+No of times three pair jet matched:    0
+No of correct jet pair assign to W:   0
+No of not correct jet pair assign to W:   0
+No of correct jet pair not assign to W but |eta| < 2.5 and pt > 25:   0
+No of correct jet matched to b (from top) :   0
+Average weights for top-reweighting : 100102/100102 = 1
+Efficiency Uncertainty on the SV finding : 0/0 = -nan

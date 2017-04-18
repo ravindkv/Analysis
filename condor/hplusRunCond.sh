@@ -14,12 +14,23 @@
 #create a directory where all the outputs will be
 #stored, for different merged ntuple input files
 #------------------------------------------------
+#outcond="outcond_MuRunBv1"
+#outcond="outcond_MuRunBv2"
+#outcond="outcond_MuRunBv3"
+#outcond="outcond_MuRunCv1"
+#outcond="outcond_MuRunDv1"
+#outcond="outcond_MuRunEv1"
+#outcond="outcond_MuRunFv1"
+#outcond="outcond_MuRunGv1"
+#outcond="outcond_MuRunHv1"
+#outcond="outcond_MuRunHv2"
+outcond="outcond_MuRunHv3"
 
-mkdir "outcond"
-cp hplusCond.sub "outcond"
-cp hplusAnalyzer.sh "outcond"
-cp mergedNtupleT2.txt "outcond"
-cd "outcond"
+mkdir $outcond
+cp hplusCond.sub $outcond
+cp hplusAnalyzer.sh $outcond
+cp mergedNtupleT2.txt $outcond
+cd $outcond
 
 #------------------------------------------------
 #read the file, where paths of ntuples are stored
@@ -42,7 +53,9 @@ do
   IFS='/ ' read -r -a array <<< "$ntupleT2Path"
   len=${#array[@]}
   sec_last=`expr $len - 1`
+  #sec_last=`expr $len`
   ntuple=${array[$sec_last]}
+  echo $ntuple
   iFile=${ntuple/.root/""}
  
   #----------------------------------------------
