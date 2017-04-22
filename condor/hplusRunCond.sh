@@ -14,17 +14,14 @@
 #create a directory where all the outputs will be
 #stored, for different merged ntuple input files
 #------------------------------------------------
-#outcond="outcond_MuRunBv1"
-#outcond="outcond_MuRunBv2"
 #outcond="outcond_MuRunBv3"
 #outcond="outcond_MuRunCv1"
 #outcond="outcond_MuRunDv1"
 #outcond="outcond_MuRunEv1"
 #outcond="outcond_MuRunFv1"
-#outcond="outcond_MuRunGv1"
-#outcond="outcond_MuRunHv1"
+outcond="outcond_MuRunGv1"
 #outcond="outcond_MuRunHv2"
-outcond="outcond_MuRunHv3"
+#outcond="outcond_MuRunHv3"
 
 mkdir $outcond
 cp hplusCond.sub $outcond

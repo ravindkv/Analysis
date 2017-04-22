@@ -63,7 +63,6 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     double dz =  fabs(zvertex-zmuon);
     
     if(dz > ZMAX_)continue;
-    
     if(passId && mD0 < M_D0_MAX_&&  mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mRelIso < M_RELISO_MAX_ ){ m_i->push_back(i);}
     
   }
@@ -162,10 +161,6 @@ bool ObjectSelector::looseElectronVeto(int selectedElectron, const vector<MyElec
         
     ///if(id && eEt > LOOSE_E_ET_MIN_ && eEta < LOOSE_E_ETA_MAX_ && eRelIso < LOOSE_E_RELISO_MAX_ && minDR2mu >0.1){ looseVeto = true;}
     if(id && eEt > LOOSE_E_ET_MIN_ && eEta < LOOSE_E_ETA_MAX_ && minDR2mu >0.1){ looseVeto = true;}
-    
-     
-    
-     
   }
   
   return looseVeto;
@@ -205,8 +200,11 @@ void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> 
       double delR = DeltaR(vJ[ijet].p4, vE[iele].p4);
       if(delR < delR2Ele)delR2Ele = delR;
     }
-    if(delR2Mu > DR && delR2Ele > DR )j_new->push_back(ijet);
-  }
+    if(delR2Mu > DR && delR2Ele > DR )
+    {
+        j_new->push_back(ijet);
+    }
+    }
 }
 
 double ObjectSelector::DeltaR(MyLorentzVector aV, MyLorentzVector bV){
