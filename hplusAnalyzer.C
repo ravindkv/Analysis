@@ -621,14 +621,14 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         if(input_count%10==0)
         cout << "input count: "<< input_count << endl;
         //if(input_count > 100000) break;
-        //if(i > 5000) break;
-  }//event loop
-  
-  outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
-  outfile_ << "total number of selected events " << nSelEvents <<endl; 
-  outfile_ << "No of times three pair jet matched:    " << threepairjet << endl;
-  outfile_ << "No of correct jet pair assign to W:   " << matchedJet_q << endl; 
-  outfile_ << "No of not correct jet pair assign to W:   " << not_matchedJet_q << endl;
+        if(i > 5000) break;
+      }//event loop
+      
+      outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
+      outfile_ << "total number of selected events " << nSelEvents <<endl; 
+      outfile_ << "No of times three pair jet matched:    " << threepairjet << endl;
+      outfile_ << "No of correct jet pair assign to W:   " << matchedJet_q << endl; 
+      outfile_ << "No of not correct jet pair assign to W:   " << not_matchedJet_q << endl;
   outfile_ << "No of correct jet pair not assign to W but |eta| < 2.5 and pt > 25:   " << matched_quark_eta_pt << endl;
   outfile_ << "No of correct jet matched to b (from top) :   " << matchedJet_b << endl;
   outfile_ << "Average weights for top-reweighting : "<<TotalTopPtWeights<<"/"<<TotalLplusJEvents<<" = "<<TotalTopPtWeights/TotalLplusJEvents<<endl; 
@@ -643,7 +643,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 
 void hplusAnalyzer::processEvents(){ 
 
-  //CutFlowAnalysis("../../../../TTJets_MuMC_20170409_Ntuple_Merged_28GB.root", "PF",false, "TTJets_28GB");
+  CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", true, "TTJets_MuMC_check"); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
   
   //MC samples
@@ -653,7 +653,7 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuData_20170429/MuRunHv3_MuData_20170429/SingleMuon/MuRunHv3_MuData_20170429/170429_110948/0000/MuRunHv3_MuData_20170429_Ntuple_9.root", "PF", true, "MuRunHv3");
   
   //for condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
