@@ -1,4 +1,3 @@
-// wjet_inc, zjet_inc, qcd, stop-all, diboson (cat migration unc)
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -31,80 +30,75 @@ public :
     DRMIN_JET = 0.5;
     DRMIN_ELE = 0.5;
     METCUT_   = 30.0;
-    //LumiWeights_ = reweight::LumiReWeighting("MC_Pileup_Summer2012_600bins.root","Data_Pileup_2012B_600bins.root", "pileup", "pileup");
-    LumiWeights_ = reweight::LumiReWeighting("mcPileup.root","dataPileup.root", "pileup", "pileup");
+    /////////////// Pileup reweigting //////////////////
+    //Pileup informations for Data: 
+    //
+    LumiWeights_ = reweight::LumiReWeighting("mcPileup_13TeV.root","dataPileup_13TeV.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
-    //MC cross sections at 13 TeV: 
+    
+    /////////////// MC cross sections at 13 TeV: /////// 
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV.py
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
-    xss["TTJets"]            =  831.76;
-    xss["ST_tW"]             =  35.6; 
-    xss["ST_t"]              =  136.2; 
-    xss["ST_s"]              =  7.3;
-    xss["WJetsToLNu"]        =  61526.7;  
-    xss["W1JetsToLNu"]       =  9493;
-    xss["W2JetsToLNu"]       =  3120;
-    xss["W3JetsToLNu"]       =  942.3;
-    xss["W4JetsToLNu"]       =  524.2;
-    xss["DYJetsToLL"]        =  6025.2;
-    xss["DY1JetsToLL"]       =  1016;
-    xss["DY2JetsToLL"]       =  331.3;
-    xss["DY3JetsToLL"]       =  96.6;
-    xss["DY4JetsToLL"]       =  51.4;
-    xss["WW"]                =  63.21;
-    xss["WZ"]                =  22.82;
-    xss["ZZ"]                =  10.32;
-    xss["QCD_Pt-15to20_Mu"]  =  3819570;
-    xss["QCD_Pt-20to30_EM"]  =  5352960;
-    xss["QCD_Pt-120to170_EM"]=  62964;
-    xss["QCD_Pt-170to300_EM"]=  18810;
-    xss["HplusM80"]          =  1;
-    xss["HplusM90"]          =  1;
-    xss["HplusM100"]         =  1;
-    xss["HplusM120"]         =  1; 
-    xss["HplusM140"]         =  1;
-    xss["HplusM150"]         =  1;
-    xss["HplusM155"]         =  1;
-    xss["HplusM160"]         =  1;
+    //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
+    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
+    xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
+    xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
+    xss["DYJetsToLL"]        =  6025.2;        evtDBS["DYJetsToLL"]        =  49144274;
+    xss["HplusM100"]         =  1;             evtDBS["HplusM100"]         =  996170; 
+    xss["HplusM120"]         =  1;             evtDBS["HplusM120"]         =  994498; 
+    xss["HplusM140"]         =  1;             evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM150"]         =  1;             evtDBS["HplusM150"]         =  990645;
+    xss["HplusM155"]         =  1;             evtDBS["HplusM155"]         =  952984;
+    xss["HplusM160"]         =  1;             evtDBS["HplusM160"]         =  992264;
+    xss["HplusM80"]          =  1;             evtDBS["HplusM80"]          =  976710;
+    xss["HplusM90"]          =  1;             evtDBS["HplusM90"]          =  988480;
+    xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
+    xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
+    xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
+    xss["QCD_Pt-50to80_Mu"]  =  437504;        evtDBS["QCD_Pt-50to80_Mu"]  =  19806915;
+    xss["QCD_Pt-80to120_Mu"] =  106033;        evtDBS["QCD_Pt-80to120_Mu"] =  13786971;
+    xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
+    xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
+    xss["ST_s"]              =  7.3;           evtDBS["ST_s"]              =  2989199;
+    xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
+    xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
+    xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  10139950;   
+    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
+    xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
+    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
+    xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
+    xss["WJetsToLNu"]        =  61526.7;       evtDBS["WJetsToLNu"]        =  29705748;
+    xss["WW"]                =  63.21;         evtDBS["WW"]                =  994012;
+    xss["WZ"]                =  22.82;         evtDBS["WZ"]                =  1000000;
+    xss["ZZ"]                =  10.32;         evtDBS["ZZ"]                =  990064; 
     
- xss["WJETS"] = 36257.0;  
-    //xss["TTBAR"] = 245.8; 
-    xss["ZJETS"] = 3504.0; 
-    xss["QCD"] = 134680;
-    //stop sample 
-    xss["TOPS"]  = 3.79; 
-    xss["TOPT"]  = 56.4; 
-    xss["TOPW"]  = 11.1;
-    //sbar sample 
-    xss["TBARS"]  = 1.76; 
-    xss["TBART"]  = 30.7; 
-    xss["TBARW"]  = 11.1;
-    //di-boson samples
-    xss["WW"] = 33.61; 
-    xss["WZ"] = 12.63; 
-    xss["ZZ"] = 5.196;
-    //signal sample 
-    xss["WH"] = 245.8; xss["HH"] = 245.8;
-
+    //Lumis(inverse pb) of single muon DATA at 13TeV
+    //https://docs.google.com/spreadsheets/d/1lQyfcY0gnG_IgFrtnbBES_HV1M7ARQM9qCw01vsnxSk/edit?usp=sharing
+    double lumiB = 5403; 
+    double lumiC = 2395;
+    double lumiD = 4255; 
+    double lumiE = 4053;
+    double lumiF = 3105;
+    double lumiG = 7544;
+    double lumiH = 8529+216;
+    double lumiTotal = lumiB+ lumiC+ lumiD+ lumiE+ lumiF+ lumiG+ lumiH;
+    
     //muon Trigger/ID/ISo SFs, in bins of eta (from muon POG)
     //SFs for different lumi period are weighted by lumi fraction.
-                                                                                           
-    double lumiA = 808.411; double lumiB = 4044.0;
-    double lumiC = 495.003+6432.0; double lumiD = 7274.0;
-    double lumiTotal = lumiA+lumiB+lumiC+lumiD;
     //Trigger SF for HLT_IsoMu24_eta2p1
-    double sfEta1 = (lumiA*0.956+lumiB*0.9798+lumiC*0.9841+lumiD*0.98151)/lumiTotal; // 0<|eta|<0.9 
-    double sfEta2 = (lumiA*0.9528+lumiB*0.9618+lumiC*0.9688+lumiD*0.96156)/lumiTotal; // 0.9<|eta|<1.2
-    double sfEta3 = (lumiA*0.9809+lumiB*0.9814+lumiC*1.0021+lumiD*0.99721)/lumiTotal; // 1.2<|eta|<2.1
+    double sfEta1 = (lumiE*0.956+lumiB*0.9798+lumiC*0.9841+lumiD*0.98151)/lumiTotal; // 0<|eta|<0.9 
+    double sfEta2 = (lumiE*0.9528+lumiB*0.9618+lumiC*0.9688+lumiD*0.96156)/lumiTotal; // 0.9<|eta|<1.2
+    double sfEta3 = (lumiE*0.9809+lumiB*0.9814+lumiC*1.0021+lumiD*0.99721)/lumiTotal; // 1.2<|eta|<2.1
     //multiply mu ID/Iso SFs
     sfEta1 = sfEta1*0.9939*1.0004;
     sfEta2 = sfEta2*0.9902*1.0031;
     sfEta3 = sfEta3*0.9970*1.0050;
-    muSF["sfEta1"] = sfEta1;
-    muSF["sfEta2"] = sfEta2;
-    muSF["sfEta3"] = sfEta3;
+    muSF["sfEta1"] = 1; //sfEta1;
+    muSF["sfEta2"] = 1; //sfEta2;
+    muSF["sfEta3"] = 1; //sfEta3;
   };
   ~hplusAnalyzer() {
     delete evR;
@@ -125,6 +119,7 @@ private :
   reweight::PoissonMeanShifter PShiftUp_;   //pileup syst up
   reweight::PoissonMeanShifter PShiftDown_; //pileup syst down 
   std::map<string, double> xss;
+  std::map<string, double> evtDBS;
   std::map<string, double> muSF;
   ofstream outfile_;
 };
@@ -188,29 +183,22 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   TFile *f = TFile::Open(url);
   if(f==0) return ;
   if(f->IsZombie()) { f->Close(); return; }
-
+  
+  double lumiTotal = 35500;
   int nEntries = evR->AssignEventTreeFrom(f);
   if( nEntries == 0) {return; }
   //get initial number of events
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"))->Clone("inputcf");
   double initialEvents = inputcf->GetBinContent(1);
 
-  cout<<"Input file : "<<url<<endl;
-  outfile_<<"Input file : "<<url<<endl;
-  outfile_<<"Available input sample : "<<initialEvents<<endl;
+  cout<<"input file: "<<url<<endl;
+  outfile_<<"input file: "<<url<<endl;
+  outfile_<<"totalEvents: "<<initialEvents<<endl;
   //define histograms 
   CreateAnalHistos(cutflowType, outFile_);
-  
+  fillHisto("totalEvents", cutflowType, initialEvents, 1);
   double sampleWeight(1.0);
-  //cross-sections (pb)
-  //double Lumi = 34390.0;
-  double Lumi = 2000.0;
-  //double sigma_TTJets = 831.76;
-  //double sigma_HplusM120 = 1;
-  //sampleWeight = sigma_TTJets *Lumi /1000000;
-  //sampleWeight = sigma_TTJets *Lumi / initialEvents;
-  ///sampleWeight = sigma_HplusM120 *Lumi / initialEvents;
-  outfile_<<"sampleWeight = "<<sampleWeight<<endl;
+  double Lumi = 34500;
 
   MyEvent *ev;
   int nTriggEvent = 0, nSelEvents = 0, matchjetcount= 0, threepairjet = 0;
@@ -234,7 +222,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(!isData){
       //get sample information
       string sampleName = ev->sampleInfo.sampleName;
-      //cout<<"sampleName = "<<sampleName<<endl;
+      sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
+      cout<<sampleName<<" = "<<sampleWeight<<endl;
+      if(i < 1){
+        outfile_<<"Sample weight for "<<sampleName<<" is= "<< sampleWeight<<endl;
+      }
+      evtWeight *= sampleWeight; // upto this only sigma*lumi weight is applied
+      //sampleWeight = xss[sampleName] * Lumi / initialEvents;
       if(sampleName.find("WJETS") != string::npos || sampleName.find("W1JETS") != string::npos || sampleName.find("W2JETS") != string::npos || sampleName.find("W3JETS") != string::npos || sampleName.find("W4JETS") != string::npos){
 	int hepNUP = ev->sampleInfo.hepNUP;
         sampleWeight = reweightHEPNUPWJets(hepNUP) * (Lumi/1000.0);
@@ -243,12 +237,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         int hepNUP = ev->sampleInfo.hepNUP;
         sampleWeight = reweightHEPNUPDYJets(hepNUP) * (Lumi/1000.0);
       }
-      if(i < 1){
-        sampleWeight = xss[sampleName] * Lumi / initialEvents;
-        outfile_<<"Scale factor for lumi "<<Lumi<<" pb is "<< sampleWeight<<endl;
-      }
       
-      evtWeight *= sampleWeight; // upto this only sigma*lumi weight is applied
       //vector<double>puweights = ev->sampleInfo.puWeights;  // this line and below this line applies the pile up corrections
       //if(puweights.size() > 0) evtWeight *= puweights[0];
 
@@ -385,8 +374,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       }
     }//-----------------------
     if(nLepton != 1)continue;
-    ///if( looseMuonVeto( m_init[0],pfMuons, isPFlow) ) continue;
-    ///if( looseElectronVeto(-1,pfElectrons, isPFlow) ) continue;
+    if( looseMuonVeto( m_init[0],pfMuons, isPFlow) ) continue;
+    if( looseElectronVeto(-1,pfElectrons, isPFlow) ) continue;
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
     
@@ -617,18 +606,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("nvtx", cutflowType+"/BTag", pri_vtxs, evtWeight);
     fillHisto("wmt", cutflowType+"/BTag", mt, evtWeight);
 
-        input_count++;
-        if(input_count%10==0)
-        cout << "input count: "<< input_count << endl;
-        //if(input_count > 100000) break;
-        if(i > 5000) break;
-      }//event loop
+    input_count++;
+    if(input_count%10==0)
+    cout << "input count: "<< input_count << endl;
+    //if(input_count > 100000) break;
+    //if(i > 500) break;
+    }//event loop
       
-      outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
-      outfile_ << "total number of selected events " << nSelEvents <<endl; 
-      outfile_ << "No of times three pair jet matched:    " << threepairjet << endl;
-      outfile_ << "No of correct jet pair assign to W:   " << matchedJet_q << endl; 
-      outfile_ << "No of not correct jet pair assign to W:   " << not_matchedJet_q << endl;
+  outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
+  outfile_ << "total number of selected events " << nSelEvents <<endl; 
+  outfile_ << "No of times three pair jet matched:    " << threepairjet << endl;
+  outfile_ << "No of correct jet pair assign to W:   " << matchedJet_q << endl; 
+  outfile_ << "No of not correct jet pair assign to W:   " << not_matchedJet_q << endl;
   outfile_ << "No of correct jet pair not assign to W but |eta| < 2.5 and pt > 25:   " << matched_quark_eta_pt << endl;
   outfile_ << "No of correct jet matched to b (from top) :   " << matchedJet_b << endl;
   outfile_ << "Average weights for top-reweighting : "<<TotalTopPtWeights<<"/"<<TotalLplusJEvents<<" = "<<TotalTopPtWeights/TotalLplusJEvents<<endl; 
@@ -643,17 +632,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 
 void hplusAnalyzer::processEvents(){ 
 
-  CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", true, "TTJets_MuMC_check"); 
+  //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", true, "TTJets_MuMC_check"); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
   
   //MC samples
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/TTJets_MuMC_20170429/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170429/170429_110042/0000/TTJets_MuMC_20170429_Ntuple_9.root", "PF", true, "TTJets_MuMC");
-  
+ // CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/TTJets_MuMC_20170429/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170429/170429_110042/0000/TTJets_MuMC_20170429_Ntuple_3.root", "PF", false, "TTJets_MuMC");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/W2JetsToLNu_MuMC_20170429/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/W2JetsToLNu_MuMC_20170429/170429_110120/0000/W2JetsToLNu_MuMC_20170429_Ntuple_2.root", "PF", false, "QCD120");
+
+ //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/DY1JetsToLL_MuMC_20170429/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY1JetsToLL_MuMC_20170429/170429_105323/0000/DY1JetsToLL_MuMC_20170429_Ntuple_20.root", "PF", false, "DY1");
+        
   //DATA samples
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuData_20170429/MuRunHv3_MuData_20170429/SingleMuon/MuRunHv3_MuData_20170429/170429_110948/0000/MuRunHv3_MuData_20170429_Ntuple_9.root", "PF", true, "MuRunHv3");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_02May17/MuData_20170502/MuRunCv1_MuData_20170502/SingleMuon/MuRunCv1_MuData_20170502/170502_125714/0000/MuRunCv1_MuData_20170502_Ntuple_2.root", "PF", true, "MuRunCv1_tot");
   
   //for condor submission
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
