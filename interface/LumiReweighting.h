@@ -248,25 +248,21 @@ namespace reweight {
 
 	  Data_distr_->Scale( 1.0/ Data_distr_->Integral() );
 	  MC_distr_->Scale( 1.0/ MC_distr_->Integral() );
-
 	  weights_ = new TH1F( *(Data_distr_)) ;
-
 	  // MC * data/MC = data, so the weights are data/MC:
-
 	  weights_->SetName("lumiWeights");
 
 	  TH1F* den = new TH1F(*(MC_distr_));
 
 	  weights_->Divide( den );  // so now the average weight should be 1.0
-
 	  std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
-
-/*
-	  int NBins = weights_->GetNbinsX();
-      for(int ibin = 1; ibin<NBins+1; ++ibin){
-	    std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
-	  }
-*/
+      weights_->Draw();
+///*
+   int NBins = weights_->GetNbinsX();
+   for(int ibin = 1; ibin<NBins+1; ++ibin){
+     std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
+   }
+//*/
       weightOOT_init();
 
 	  FirstWarning_ = true;
@@ -319,10 +315,11 @@ namespace reweight {
 	weights_->Divide( den );  // so now the average weight should be 1.0    
 
 	std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
-/*	for(int ibin = 1; ibin<NBins+1; ++ibin){
+///*	
+ 	for(int ibin = 1; ibin<NBins+1; ++ibin){
 	  std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
 	}
-*/
+//*/
     weightOOT_init();
 
 	FirstWarning_ = true;

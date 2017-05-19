@@ -11,6 +11,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   //Define Histograms 
   InitHist(cutflowType, "", outFile_, false); 
   addHisto("cutflow", cutflowType, 50 , 0., 10.); 
+  addHisto("totalEvents", cutflowType, 50 , 0., 100000000000.); 
   addHisto("Pre_RelIso",cutflowType, 40,0,0.5);
   addHisto("Final_RelIso",cutflowType, 40,0,0.5);
   addHisto("Muon_mult_final",cutflowType, 10,0,10);
@@ -368,7 +369,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("multi_jet", fullname, 100, 0., 20.);
   h1 = getHisto("multi_jet", fullname);
   h1->SetDirectory(d);
-  addHisto("btag_jet", fullname, 50, -10., 10.);
+  addHisto("btag_jet", fullname, 200, -5., 5.);
   h1 = getHisto("btag_jet", fullname);
   h1->SetDirectory(d);
   addHisto("btagmulti_jet", fullname, 100, 0., 10.);
