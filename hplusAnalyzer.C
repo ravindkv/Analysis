@@ -223,7 +223,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //get sample information
       string sampleName = ev->sampleInfo.sampleName;
       sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
-      cout<<sampleName<<" = "<<sampleWeight<<endl;
       if(i < 1){
         outfile_<<"Sample weight for "<<sampleName<<" is= "<< sampleWeight<<endl;
       }
