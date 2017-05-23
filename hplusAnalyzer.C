@@ -33,7 +33,7 @@ public :
     /////////////// Pileup reweigting //////////////////
     //Pileup informations for Data: 
     //
-    LumiWeights_ = reweight::LumiReWeighting("mcPileup_13TeV.root","dataPileup_13TeV.root", "pileup", "pileup");
+    LumiWeights_ = reweight::LumiReWeighting("trueInTimePU_mcDY.root","trueMinBiasPU_dataMu.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
     
@@ -136,20 +136,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, stri
   outfile_.open(debug_file.c_str());
 
   CutFlowProcessor(url, myKey, "base", isData, outFile_);
-  if(not isData){
-    
-//     CutFlowProcessor(url, myKey, "JESPlus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "JESMinus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "JERPlus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "JERMinus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "METUCPlus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "METUCMinus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "bTagPlus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "bTagMinus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "TopPtPlus", isData, outFile_, Cat);
-//     CutFlowProcessor(url, myKey, "TopPtMinus", isData, outFile_, Cat);
-
-  }
   outfile_.close();
   outFile_->Write(); 
   outFile_->Close(); 
@@ -163,71 +149,74 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   
   bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
 
-  string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("mets");
+  string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("METs");
   //  if(myKey.find("PFlow") != string::npos)jAlgo = "PFlow";
   //  else if(myKey.find("HPS") != string::npos)jAlgo = "JetsAK5PF";
   
   //Uncertainty variations, JES, JER, MET unclustered, bTag
   ///int jes = 0, jer = 0, metuc = 0, bscale = 0;
-  int jes = 1, jer = 1, metuc = 1, bscale = 0;
+  int jes = 1, jer = 1, metuc = 1; 
   if(cutflowType.Contains("JESPlus"))jes = 1;
   else if (cutflowType.Contains("JESMinus"))jes = -1;
   else if (cutflowType.Contains("JERPlus"))jer = 1;
   else if (cutflowType.Contains("JERMinus"))jer = -1;
   else if (cutflowType.Contains("METUCPlus"))metuc = 1;
   else if (cutflowType.Contains("METUCMinus"))metuc = -1;
-  else if (cutflowType.Contains("bTagPlus"))bscale = 1;
-  else if (cutflowType.Contains("bTagMinus"))bscale = -1; 
+  //else if (cutflowType.Contains("bTagPlus"))bscale = 1;
+  //else if (cutflowType.Contains("bTagMinus"))bscale = -1; 
 
   evR = new Reader();
   TFile *f = TFile::Open(url);
   if(f==0) return ;
   if(f->IsZombie()) { f->Close(); return; }
-  
+ 
+  //---------------------------------------------------//
+  //get initial number of events, from ntuples
+  //store initial informations, in a txt file
+  //---------------------------------------------------//
   double lumiTotal = 35500;
   int nEntries = evR->AssignEventTreeFrom(f);
   if( nEntries == 0) {return; }
-  //get initial number of events
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"))->Clone("inputcf");
   double initialEvents = inputcf->GetBinContent(1);
-
   cout<<"input file: "<<url<<endl;
   outfile_<<"input file: "<<url<<endl;
   outfile_<<"totalEvents: "<<initialEvents<<endl;
-  //define histograms 
   CreateAnalHistos(cutflowType, outFile_);
   fillHisto("totalEvents", cutflowType, initialEvents, 1);
-  double sampleWeight(1.0);
-  double Lumi = 34500;
-
   MyEvent *ev;
   int nTriggEvent = 0, nSelEvents = 0, matchjetcount= 0, threepairjet = 0;
   double nVerticesFailCount = 0.0;
-  double corr_jet_pair_cs = 0.0, corr_jet_pair_ud = 0.0;
+  ///double corr_jet_pair_cs = 0.0, corr_jet_pair_ud = 0.0;
   double matchedJet_q = 0.0, matchedJet_b = 0.0, matched_quark_eta_pt = 0.0, not_matchedJet_q = 0.0;
   double TotalTopPtWeights = 0, TotalLplusJEvents = 0; 
   double TotalSVEff = 0, TotalEvtsWithSV = 0.;
+  double sampleWeight(1.0);
+  
+  //---------------------------------------------------//
+  //loop over each event, of the ntuple
+  //---------------------------------------------------//
   for(int i=0; i<nEntries; ++i){
     Long64_t ientry = evR->LoadTree(i);
     if (ientry < 0) break;
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
-    
-    //print event number
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
  
-    //cout<<"sampleWeight basic = "<<sampleWeight<<endl;
-    // apply PU re-weighting
+    //---------------------------------------------------//
+    //apply lumi, k factor and pileup weight
+    //---------------------------------------------------//
     double evtWeight = 1.0;
     if(!isData){
-      //get sample information
+      //lumi weight
       string sampleName = ev->sampleInfo.sampleName;
       sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
       if(i < 1){
         outfile_<<"Sample weight for "<<sampleName<<" is= "<< sampleWeight<<endl;
       }
-      evtWeight *= sampleWeight; // upto this only sigma*lumi weight is applied
-      //sampleWeight = xss[sampleName] * Lumi / initialEvents;
+      evtWeight *= sampleWeight; 
+      //k factor weights for WJets samples (we have to update it ==========)
+      /*
       if(sampleName.find("WJETS") != string::npos || sampleName.find("W1JETS") != string::npos || sampleName.find("W2JETS") != string::npos || sampleName.find("W3JETS") != string::npos || sampleName.find("W4JETS") != string::npos){
 	int hepNUP = ev->sampleInfo.hepNUP;
         sampleWeight = reweightHEPNUPWJets(hepNUP) * (Lumi/1000.0);
@@ -236,29 +225,24 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         int hepNUP = ev->sampleInfo.hepNUP;
         sampleWeight = reweightHEPNUPDYJets(hepNUP) * (Lumi/1000.0);
       }
-      
-      //vector<double>puweights = ev->sampleInfo.puWeights;  // this line and below this line applies the pile up corrections
-      //if(puweights.size() > 0) evtWeight *= puweights[0];
-
+      */
+      //pileup weight 
       vector<double>pu = ev->sampleInfo.truepileup;
       if(pu.size() > 0) {
-	float npu = pu[0];
-	double weight = LumiWeights_.weight(npu);
-	//        if (cutflowType.Contains("PUPlus"))weight = weight*PShiftUp_.ShiftWeight( npu );
-	//        else if (cutflowType.Contains("PUMinus"))weight = weight*PShiftDown_.ShiftWeight( npu );
-	//cout<<"pu weight = "<<weight<<endl;
-    evtWeight *= weight;  // pile up weight is also applied
+	  float npu = pu[0];
+	  double weight = LumiWeights_.weight(npu);
+      evtWeight *= weight;  
       }
-    }
+    } 
 
-    //Apply Top re-weighting weights here (after pile pu weights).                       
+    //---------------------------------------------------//
+    // apply top re-weighting weight
+    //---------------------------------------------------//
     double topPtWeights_offline = 1.0;
     if(!isData){
-      //get sample information
       string sampleName = ev->sampleInfo.sampleName;
-
+      //(we have to update it ==========)
       if(sampleName.find("TTJets") != string::npos || sampleName.find("WH") != string::npos || sampleName.find("HplusM120") != string::npos){
-
         vector<double>topptweights = ev->sampleInfo.topPtWeights;
         if(topptweights.size() > 0){
           topPtWeights_offline = topptweights[0];
@@ -269,23 +253,16 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
       }
     }
-    //    outfile_<< "topPtWeights_offline" << topPtWeights_offline << endl;
-
     TotalTopPtWeights += topPtWeights_offline;
     //cout<<"topPtWeights_offline = "<<topPtWeights_offline<<endl;
     TotalLplusJEvents++;
     evtWeight *= topPtWeights_offline; //Multiply to the total weights
-    //cout<<"evtWeight = "<<evtWeight<<endl;
-    //cout<<endl;
-    //double evtWeight = 1.0;
-    /// for data, evtWeight = 1
-    //evtWeight *= sampleWeight;
     
-    double nCutPass = 0.0;// double nCutPass_plus = 0.0; double nCutPass_minus = 0.0;
+    //---------------------------------------------------//
+    //apply muon triggers
+    //---------------------------------------------------//
+    double nCutPass = 0.0;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
-    //    fillHisto("cutflow_plus", cutflowType, nCutPass_plus, evtWeight);
-    //    fillHisto("cutflow_minus", cutflowType, nCutPass_minus, evtWeight);
-    
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
@@ -299,20 +276,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
    
-    //get objects //
+    //---------------------------------------------------//
+    //get all objets e.g. leptons, jets, vertices etc.
+    //---------------------------------------------------//
     vector<MyVertex> Vertices = ev->PrimaryVtxs;
     if(Vertices.size() <= 0){
       nVerticesFailCount+=evtWeight;
       cout<<" no vertexes , exit"<<endl;
       continue;
     }
-    
     vector<MyMuon> pfMuons = evR->getMuons(ev, mAlgo);
     vector<MyMuon> pfMuons_noiso = evR->getMuons(ev, mAlgo);
     vector<MyElectron> pfElectrons = evR->getElectrons(ev, eAlgo);
     vector<MyJet> pfJets = evR->getJets(ev, jAlgo);
     MyMET met = evR->getMET(ev, metAlgo);
-    ///vector<MyTau>pfTaus; pfTaus.clear(); 
 
     // preselect objects 
     vector<int> m_init; m_init.clear();
@@ -350,45 +327,23 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       }
     }
     
-    ///
-    //Apply Lepton selection//////////////////////////////
+    //---------------------------------------------------//
+    //apply selection cuts on leptons
+    //---------------------------------------------------//
     if(m_init_noiso.size() > 0){
       int m_i_noiso = m_init_noiso[0];
       double mRelIso_no_iso = pfMuons_noiso[m_i_noiso].pfRelIso;
-      fillHisto("Pre_RelIso",cutflowType, mRelIso_no_iso, evtWeight);
+      fillHisto("pre_RelIso_mu",cutflowType, mRelIso_no_iso, evtWeight);
     }
     double pri_vtxs = Vertices.size();
-    fillHisto("nvtx_nocut", cutflowType, pri_vtxs, evtWeight);
+    double rho_vtxs = 0.0;
     int nLepton = m_init.size();  // this condition proof that only muon + jet events
-    //Variation with nvtx, before 1 muon ------------------------
-    for(int v=0; v<6; v++){
-      if(Vertices.size() >= 10*v && Vertices.size() <= 10*(v+1)){
-        TString nvtx_dir = Form("nvtx_%d", 10*(v+1)); 
-        fillHisto(Form("multi_mu_%d_b1mu", 10*(v+1)) , cutflowType+"/"+nvtx_dir, nLepton, evtWeight);
-        fillHisto(Form("pt_met_%d_b1mu", 10*(v+1)), cutflowType+"/"+nvtx_dir, met.p4.pt(), evtWeight);
-        for(int m=0; m<m_init.size(); m++){
-          fillHisto(Form("pt_mu_%d_b1mu", 10*(v+1)), cutflowType+"/"+nvtx_dir, pfMuons[m].p4.pt(), evtWeight); 
-          fillHisto(Form("eta_mu_%d_b1mu", 10*(v+1)) , cutflowType+"/"+nvtx_dir, pfMuons[m].p4.eta(), evtWeight);
-        }
-      }
-    }//-----------------------
     if(nLepton != 1)continue;
     if( looseMuonVeto( m_init[0],pfMuons, isPFlow) ) continue;
     if( looseElectronVeto(-1,pfElectrons, isPFlow) ) continue;
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
     
-    //Variation with nvtx, after 1 muon ------------------------
-    for(int v=0; v<6; v++){
-      if(Vertices.size() >= 10*v && Vertices.size() <= 10*(v+1)){
-        TString nvtx_dir = Form("nvtx_%d", 10*(v+1)); 
-        fillHisto(Form("pt_met_%d_a1mu", 10*(v+1)), cutflowType+"/"+nvtx_dir, met.p4.pt(), evtWeight);
-        for(int m=0; m<m_init.size(); m++){
-          fillHisto(Form("pt_mu_%d_a1mu", 10*(v+1)), cutflowType+"/"+nvtx_dir, pfMuons[m].p4.pt(), evtWeight); 
-          fillHisto(Form("eta_mu_%d_a1mu", 10*(v+1)) , cutflowType+"/"+nvtx_dir, pfMuons[m].p4.eta(), evtWeight);
-        }
-      }
-    }//-----------------------
     //apply muon SF to eventWeights 
     int m_i = m_init[0];
 /* 
@@ -400,13 +355,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //cout<<"evtWeight musf = "<<evtWeight<<endl;
 */   
     int count_muon = m_init.size();
-    int muCharge = pfMuons[m_i].charge;
+    ///int muCharge = pfMuons[m_i].charge;
 
     ///double nCutPass = 0.0;// double nCutPass_plus = 0.0; double nCutPass_minus = 0.0;
     double mRelIso = pfMuons[m_i].pfRelIso;
     fillHisto("pt_mu", cutflowType, pfMuons[m_i].p4.pt(), evtWeight);
-    fillHisto("Final_RelIso",cutflowType, mRelIso, evtWeight);
-    fillHisto("Muon_mult_final",cutflowType, count_muon, evtWeight);
+    fillHisto("final_RelIso_mu",cutflowType, mRelIso, evtWeight);
+    fillHisto("final_multi_mu",cutflowType, count_muon, evtWeight);
 
     //Apply Top re-weighting weights here (after lepton selection, such that we can use coefficients of l+jets events).
     ///double topPtWeights_offline = 1.0;
@@ -421,7 +376,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 	  topPtWeights_offline = 1.0;
       }
     }
-    //    cout << "topPtWeights_offline" << topPtWeights_offline << endl;
+    //cout << "topPtWeights_offline" << topPtWeights_offline << endl;
     TotalTopPtWeights += topPtWeights_offline; 
     TotalLplusJEvents++;
     evtWeight *= topPtWeights_offline; //Multiply to the total weights
@@ -433,81 +388,41 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     // vertex just after one lepton selection
     //double pri_vtxs = Vertices.size();
     fillHisto("nvtx", cutflowType, pri_vtxs, evtWeight);
-    fillHisto("nvtx_1mu", cutflowType, pri_vtxs, evtWeight);
-
-    // Apply Jet Selection
-    //Variation with nvtx, before 4 jet ------------------------
-    ///int threejet = 0;
-    ///float highestJetPt = 0;
-    for(int v=0; v<6; v++){
-      if(Vertices.size() >= 10*v && Vertices.size() <= 10*(v+1)){
-        TString nvtx_dir = Form("nvtx_%d", 10*(v+1)); 
-        fillHisto(Form("multi_jet_%d_b4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, j_final.size(), evtWeight);
-        fillHisto(Form("pt_met_%d_b4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, met.p4.pt(), evtWeight);
-        double bDiscr = 0.0;
-        for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-          int ind_jet = j_final[ijet];
-          bDiscr = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
-          //double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer); 
-          double jetPt = pfJets[ind_jet].p4.pt(); 
-          ///fillHisto("pt_jet", cutflowType, jetPt, evtWeight);
-          ///fillHisto("eta_jet", cutflowType, pfJets[ind_jet].p4.eta(), evtWeight);
-          ///fillHisto("phi_jet", cutflowType, pfJets[ind_jet].p4.phi(), evtWeight);
-          ///if(jetPt > 30 )threejet++;
-          ///if(jetPt > highestJetPt)highestJetPt=jetPt;
-          fillHisto(Form("pt_jet_%d_b4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, jetPt, evtWeight); 
-          fillHisto(Form("eta_jet_%d_b4jet", 10*(v+1)) , cutflowType+"/"+nvtx_dir, pfJets[ind_jet].p4.eta(), evtWeight);
-          fillHisto(Form("bdiscr_%d_b4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, bDiscr, evtWeight); 
-        }
+    for( std::size_t n=0; n<Vertices.size(); n++){
+      rho_vtxs = Vertices[n].rho;
+      fillHisto("rho", cutflowType, rho_vtxs, evtWeight);
       }
-    }//-----------------------
+    //---------------------------------------------------//
+    // Apply Jet Selection
+    //---------------------------------------------------//
 
     fillHisto("multi_jet", cutflowType, nJet, evtWeight);
     if(nJet < 4)continue;  // this condition implies event should contain at least 4 jets
+    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+      int ind_jet = j_final[ijet];
+      fillHisto("pt_jet", cutflowType, pfJets[ind_jet].p4.pt(), evtWeight);
+      fillHisto("eta_jet", cutflowType, pfJets[ind_jet].p4.eta(), evtWeight);
+      fillHisto("phi_jet", cutflowType, pfJets[ind_jet].p4.phi(), evtWeight);
+    }
     fillHisto("final_multi_jet", cutflowType, nJet, evtWeight);
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
-    fillHisto("nvtx_1mu_4jet", cutflowType, pri_vtxs, evtWeight);
-
-    //Variation with nvtx, after 4 jet ------------------------
-    int threejet = 0;
-    float highestJetPt = 0;
-    for(int v=0; v<6; v++){
-      if(Vertices.size() >= 10*v && Vertices.size() <= 10*(v+1)){
-        TString nvtx_dir = Form("nvtx_%d", 10*(v+1)); 
-        fillHisto(Form("multi_jet_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, j_final.size(), evtWeight);
-        fillHisto(Form("pt_met_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, met.p4.pt(), evtWeight);
-        double bDiscr = 0.0;
-        for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-          int ind_jet = j_final[ijet];
-          bDiscr = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
-          //double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer); 
-          double jetPt = pfJets[ind_jet].p4.pt(); 
-          fillHisto("pt_jet", cutflowType, jetPt, evtWeight);
-          fillHisto("eta_jet", cutflowType, pfJets[ind_jet].p4.eta(), evtWeight);
-          fillHisto("phi_jet", cutflowType, pfJets[ind_jet].p4.phi(), evtWeight);
-          if(jetPt > 30 )threejet++;
-          if(jetPt > highestJetPt)highestJetPt=jetPt;
-          fillHisto(Form("pt_jet_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, jetPt, evtWeight); 
-          fillHisto(Form("eta_jet_%d_a4jet", 10*(v+1)) , cutflowType+"/"+nvtx_dir, pfJets[ind_jet].p4.eta(), evtWeight);
-          fillHisto(Form("bdiscr_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, bDiscr, evtWeight); 
-        }
-      }
-    }//-----------------------
     
-    
-    //    if(threejet < 3) continue; // three jets should have pt > 30 GeV do not need for ATLAS selection
-    // Met distribution   
+    //---------------------------------------------------//
+    //apply MET selection   
+    //---------------------------------------------------//
     double   leptonPt(0), deltaPhi(0);
-    double metPt = 0; //met.p4.pt();
-    if(!metuc)metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
-    else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
+    double metPt = 0; 
+    metPt= met.p4.pt();
+    ///if(!metuc)metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
+    ///else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
     fillHisto("pt_met", cutflowType, metPt, evtWeight);
-//-----------------    
-    ////if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+    fillHisto("phi_met", cutflowType, met.p4.phi(), evtWeight);
+    if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
     fillHisto("final_pt_met", cutflowType, metPt, evtWeight);
-    ///nCutPass++;
-    ///fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
+    fillHisto("final_phi_met", cutflowType, met.p4.phi(), evtWeight);
+    nCutPass++;
+    fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
 
     int m_j = m_init[0];
     leptonPt = TMath::Abs(pfMuons[m_j].p4.pt());
@@ -520,17 +435,28 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight);
     */
     
-    // Here putting the criteria that event should contain at least one b-tagged jet  
+    //---------------------------------------------------//
+    //apply B-tagging, C-tagging
+    //---------------------------------------------------//
     int count_CSVL = 0; int count_CSVM = 0; //int count_CSVT = 0; 
     vector<int> j_final_nob; j_final_nob.clear();
-    double bDiscr = 0.0 ;
+    double pfCISV = 0.0; //pfCombinedInclusiveSecondaryVertexV2BJetTags
+    double pfCMVA = 0.0; //pfCombinedMVAV2BJetTags
+    double pfCCvsL = 0.0; //pfCombinedCvsLJetTags
+    double pfCCvs = 0.0; //pfCombinedCvsBJetTags
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
-      bDiscr = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
-      //cout<<"bDiscr = "<<bDiscr<<endl;
-      if(bDiscr > 0.5426){
+      pfCISV = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
+      pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
+      pfCCvsL= pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
+      pfCCvs = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
+      fillHisto("pfCISV", cutflowType, pfCISV , evtWeight); 
+      fillHisto("pfCMVA", cutflowType, pfCMVA , evtWeight); 
+      fillHisto("pfCCvsL", cutflowType, pfCCvsL, evtWeight); 
+      fillHisto("pfCCvs", cutflowType, pfCCvs , evtWeight); 
+      if(pfCISV > 0.5426){
         count_CSVL++;
-        fillHisto("btag_jet", cutflowType, bDiscr, evtWeight); 
+        fillHisto("bDiscr_Loose", cutflowType+"/BTag", pfCISV, evtWeight); 
       }
       else j_final_nob.push_back(ind_jet);  
     }
@@ -540,11 +466,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(j_final_nob.size() >= 2){
       int first_index = j_final_nob[0];
       int sec_index = j_final_nob[1];
-      fillHisto("pt_cjet", cutflowType, pfJets[first_index].p4.pt(), evtWeight);
       fillHisto("pt_sjet", cutflowType, pfJets[sec_index].p4.pt(), evtWeight);
       MyLorentzVector diJet = pfJets[first_index].p4 + pfJets[sec_index].p4;
-      //cout<<"diJet.M() = "<<diJet.M()<<endl;
-      fillHisto("diJet_Mass", cutflowType, diJet.M(), evtWeight);
+      fillHisto("mjj", cutflowType, diJet.M(), evtWeight);
     }
     /*
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
@@ -558,40 +482,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     */
     if(count_CSVL <= 1) continue; // Demanding for 2M b-tagged jets
     fillHisto("CSVM_count", cutflowType, count_CSVM, evtWeight);
-    //    fillHisto("btagmulti_jet", cutflowType, count, evtWeight);
     nCutPass++;
     fillHisto("cutflow", cutflowType, nCutPass, evtWeight); 
     nSelEvents++;  // this is the counter for counting final number of events  
-    fillHisto("nvtx_1mu_4jet_btag", cutflowType, pri_vtxs, evtWeight);
 
-    //Variation with nvtx, after b tagging ------------------------
-    ///int threejet = 0;
-    ///float highestJetPt = 0;
-    for(int v=0; v<6; v++){
-      if(Vertices.size() >= 10*v && Vertices.size() <= 10*(v+1)){
-        TString nvtx_dir = Form("nvtx_%d", 10*(v+1)); 
-        fillHisto(Form("multi_bjet_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, j_final.size(), evtWeight);
-        fillHisto(Form("pt_met_%d_a4jet_btag", 10*(v+1)), cutflowType+"/"+nvtx_dir, met.p4.pt(), evtWeight);
-        double bDiscr = 0.0 ;
-        for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-            int ind_jet = j_final[ijet];
-            //double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer); 
-            double jetPt = pfJets[ind_jet].p4.pt(); 
-            fillHisto(Form("pt_bjet_%d_a4jet", 10*(v+1)), cutflowType+"/"+nvtx_dir, jetPt, evtWeight); 
-            fillHisto(Form("eta_bjet_%d_a4jet", 10*(v+1)) , cutflowType+"/"+nvtx_dir, pfJets[ind_jet].p4.eta(), evtWeight);
-            bDiscr = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
-            //cout<<"bDiscr = "<<bDiscr<<endl;
-            if(bDiscr > 0.5426){
-            fillHisto(Form("bdiscr_%d_a4jet_btag", 10*(v+1)), cutflowType+"/"+nvtx_dir, bDiscr, evtWeight); 
-            }
-        }
-      }
-    }//-----------------------
-   
+    //---------------------------------------------------//
     // add set of plots after BTag:
+    //---------------------------------------------------//
     fillHisto("pt_mu", cutflowType+"/BTag", pfMuons[m_i].p4.pt(), evtWeight);
     fillHisto("eta_mu", cutflowType+"/BTag", pfMuons[m_i].p4.eta(), evtWeight);
     fillHisto("phi_mu", cutflowType+"/BTag", pfMuons[m_i].p4.phi(), evtWeight);
+    fillHisto("final_RelIso_mu",cutflowType+"/BTag", mRelIso, evtWeight);
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       //double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer);
@@ -603,13 +504,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("final_multi_jet", cutflowType+"/BTag", nJet, evtWeight);
     fillHisto("final_pt_met", cutflowType+"/BTag", metPt, evtWeight);
     fillHisto("nvtx", cutflowType+"/BTag", pri_vtxs, evtWeight);
+    for(std::size_t n=0; n<Vertices.size(); n++){
+      rho_vtxs = Vertices[n].rho;
+      fillHisto("rho", cutflowType+"/BTag", rho_vtxs, evtWeight);
+      }
     fillHisto("wmt", cutflowType+"/BTag", mt, evtWeight);
 
     input_count++;
     if(input_count%10==0)
     cout << "input count: "<< input_count << endl;
     //if(input_count > 100000) break;
-    //if(i > 500) break;
+    //if(i > 50000) break;
     }//event loop
       
   outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
@@ -630,21 +535,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 }
 
 void hplusAnalyzer::processEvents(){ 
-
+  
+  //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", true, "TTJets_MuMC_check"); 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
-  
-  //MC samples
- // CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/TTJets_MuMC_20170429/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170429/170429_110042/0000/TTJets_MuMC_20170429_Ntuple_3.root", "PF", false, "TTJets_MuMC");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/W2JetsToLNu_MuMC_20170429/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/W2JetsToLNu_MuMC_20170429/170429_110120/0000/W2JetsToLNu_MuMC_20170429_Ntuple_2.root", "PF", false, "QCD120");
-
- //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/DY1JetsToLL_MuMC_20170429/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY1JetsToLL_MuMC_20170429/170429_105323/0000/DY1JetsToLL_MuMC_20170429_Ntuple_20.root", "PF", false, "DY1");
-        
-  //DATA samples
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_02May17/MuData_20170502/MuRunCv1_MuData_20170502/SingleMuon/MuRunCv1_MuData_20170502/170502_125714/0000/MuRunCv1_MuData_20170502_Ntuple_2.root", "PF", true, "MuRunCv1_tot");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/TTJets_MuMC_20170429/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170429/170429_110042/0000/TTJets_MuMC_20170429_Ntuple_3.root", "PF", false, "TTJets_MuMC");
   
-  //for condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
+  //condor submission
+  //for Data 
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
+  //for MC
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {

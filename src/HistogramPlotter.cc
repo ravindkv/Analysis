@@ -9,173 +9,25 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
 {
 
   //Define Histograms 
-  InitHist(cutflowType, "", outFile_, false); 
+  InitHist(cutflowType, "", outFile_); 
   addHisto("cutflow", cutflowType, 50 , 0., 10.); 
   addHisto("totalEvents", cutflowType, 50 , 0., 100000000000.); 
-  addHisto("Pre_RelIso",cutflowType, 40,0,0.5);
-  addHisto("Final_RelIso",cutflowType, 40,0,0.5);
-  addHisto("Muon_mult_final",cutflowType, 10,0,10);
+  addHisto("pre_RelIso_mu",cutflowType, 40,0,0.5);
+  addHisto("final_RelIso_mu",cutflowType, 40,0,0.5);
+  addHisto("final_multi_mu",cutflowType, 10,0,10);
   addHisto("final_multi_jet", cutflowType, 100,0,10);
+  addHisto("pfCISV", cutflowType, 200, -5., 5.);
+  addHisto("pfCMVA", cutflowType, 200, -5., 5.);
+  addHisto("pfCCvsL",cutflowType, 200, -5., 5.);
+  addHisto("pfCCvs", cutflowType, 200, -5., 5.);
+
   addHisto("CSVL_count", cutflowType, 50,0,10);
   addHisto("CSVM_count", cutflowType, 50,0,10);
   addHisto("wmt", cutflowType, 50, 0., 200.);
-  addHisto("nvtx", cutflowType, 50, 0., 50.);
-  addHisto("nvtx_nocut", cutflowType, 50, 0., 50.);
-  addHisto("nvtx_1mu", cutflowType, 50, 0., 50.);
-  addHisto("nvtx_1mu_4jet", cutflowType, 50, 0., 50.);
-  addHisto("nvtx_1mu_4jet_btag", cutflowType, 50, 0., 50.);
-  addHisto("nvtx_1mu_4jet_btag_kinfit", cutflowType, 50, 0., 50.);
-  addHisto("diJet_Mass", cutflowType, 50, 20., 250.);
+  addHisto("nvtx", cutflowType, 60, 0., 60.);
+  addHisto("rho", cutflowType, 100, 0., 1.);
+  addHisto("mjj", cutflowType, 50, 20., 250.);
   
-  //NVTX FROM 0 To 10
-  InitHist("nvtx_10", cutflowType, outFile_, true); 
-  //befor 1 mu cut
-  addHisto("multi_mu_10_b1mu", cutflowType+"/nvtx_10", 100, 0., 20.);
-  addHisto("pt_mu_10_b1mu", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("eta_mu_10_b1mu", cutflowType+"/nvtx_10", 50, -5.0, 5.0);
-  addHisto("pt_met_10_b1mu", cutflowType+"/nvtx_10", 50, 0., 500.);
-  //after 1 mu cut
-  addHisto("pt_mu_10_a1mu", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("eta_mu_10_a1mu", cutflowType+"/nvtx_10", 50, -5.0, 5.0);
-  addHisto("pt_met_10_a1mu", cutflowType+"/nvtx_10", 50, 0., 500.);
-  //before 4 jet cut
-  addHisto("multi_jet_10_b4jet", cutflowType+"/nvtx_10", 100, 0., 20.);
-  addHisto("pt_jet_10_b4jet", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("eta_jet_10_b4jet", cutflowType+"/nvtx_10", 50, -5.0, 5.0);
-  addHisto("pt_met_10_b4jet", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("bdiscr_10_b4jet", cutflowType+"/nvtx_10", 50, 0, 2.0);
-  //after 4 jet cut
-  addHisto("multi_jet_10_a4jet", cutflowType+"/nvtx_10", 100, 0., 20.);
-  addHisto("pt_jet_10_a4jet", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("eta_jet_10_a4jet", cutflowType+"/nvtx_10", 50, -5.0, 5.0);
-  addHisto("pt_met_10_a4jet", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("bdiscr_10_a4jet", cutflowType+"/nvtx_10", 50, 0, 2.0);
-  addHisto("multi_bjet_10_a4jet", cutflowType+"/nvtx_10", 100, 0., 20.);
-  //after btag
-  addHisto("pt_bjet_10_a4jet", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("eta_bjet_10_a4jet", cutflowType+"/nvtx_10", 50, -5.0, 5.0);
-  addHisto("pt_met_10_a4jet_btag", cutflowType+"/nvtx_10", 50, 0., 500.);
-  addHisto("bdiscr_10_a4jet_btag", cutflowType+"/nvtx_10", 50, 0, 2.0);
-  
-  //NVTX FROM 10 To 20
-  InitHist("nvtx_20", cutflowType, outFile_, true); 
-  //befor 1 mu cut
-  addHisto("multi_mu_20_b1mu", cutflowType+"/nvtx_20", 100, 0., 20.);
-  addHisto("pt_mu_20_b1mu", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("eta_mu_20_b1mu", cutflowType+"/nvtx_20", 50, -5.0, 5.0);
-  addHisto("pt_met_20_b1mu", cutflowType+"/nvtx_20", 50, 0., 500.);
-  //after 1 mu cut
-  addHisto("pt_mu_20_a1mu", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("eta_mu_20_a1mu", cutflowType+"/nvtx_20", 50, -5.0, 5.0);
-  addHisto("pt_met_20_a1mu", cutflowType+"/nvtx_20", 50, 0., 500.);
-  //before 4 jet cut
-  addHisto("multi_jet_20_b4jet", cutflowType+"/nvtx_20", 100, 0., 20.);
-  addHisto("pt_jet_20_b4jet", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("eta_jet_20_b4jet", cutflowType+"/nvtx_20", 50, -5.0, 5.0);
-  addHisto("pt_met_20_b4jet", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("bdiscr_20_b4jet", cutflowType+"/nvtx_20", 50, 0, 2.0);
-  //after 4 jet cut
-  addHisto("multi_jet_20_a4jet", cutflowType+"/nvtx_20", 100, 0., 20.);
-  addHisto("pt_jet_20_a4jet", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("eta_jet_20_a4jet", cutflowType+"/nvtx_20", 50, -5.0, 5.0);
-  addHisto("pt_met_20_a4jet", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("bdiscr_20_a4jet", cutflowType+"/nvtx_20", 50, 0, 2.0);
-  addHisto("multi_bjet_20_a4jet", cutflowType+"/nvtx_20", 100, 0., 20.);
-  //after btag
-  addHisto("pt_bjet_20_a4jet", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("eta_bjet_20_a4jet", cutflowType+"/nvtx_20", 50, -5.0, 5.0);
-  addHisto("pt_met_20_a4jet_btag", cutflowType+"/nvtx_20", 50, 0., 500.);
-  addHisto("bdiscr_20_a4jet_btag", cutflowType+"/nvtx_20", 50, 0, 2.0);
-  
-  //NVTX FROM 20 To 30
-  InitHist("nvtx_30", cutflowType, outFile_, true); 
-  //befor 1 mu cut
-  addHisto("multi_mu_30_b1mu", cutflowType+"/nvtx_30", 100, 0., 20.);
-  addHisto("pt_mu_30_b1mu", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("pt_met_30_b1mu", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("eta_mu_30_b1mu", cutflowType+"/nvtx_30", 50, -5.0, 5.0);
-  //after 1 mu cut
-  addHisto("pt_mu_30_a1mu", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("pt_met_30_a1mu", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("eta_mu_30_a1mu", cutflowType+"/nvtx_30", 50, -5.0, 5.0);
-  //before 4 jet cut
-  addHisto("multi_jet_30_b4jet", cutflowType+"/nvtx_30", 100, 0., 20.);
-  addHisto("pt_jet_30_b4jet", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("eta_jet_30_b4jet", cutflowType+"/nvtx_30", 50, -5.0, 5.0);
-  addHisto("pt_met_30_b4jet", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("bdiscr_30_b4jet", cutflowType+"/nvtx_30", 50, 0, 2.0);
-  //after 4 jet cut
-  addHisto("multi_jet_30_a4jet", cutflowType+"/nvtx_30", 100, 0., 20.);
-  addHisto("pt_jet_30_a4jet", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("pt_met_30_a4jet", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("eta_jet_30_a4jet", cutflowType+"/nvtx_30", 50, -5.0, 5.0);
-  addHisto("bdiscr_30_a4jet", cutflowType+"/nvtx_30", 50, 0, 2.0);
-  addHisto("multi_bjet_30_a4jet", cutflowType+"/nvtx_30", 100, 0., 20.);
-  //after btag
-  addHisto("pt_bjet_30_a4jet", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("eta_bjet_30_a4jet", cutflowType+"/nvtx_30", 50, -5.0, 5.0);
-  addHisto("pt_met_30_a4jet_btag", cutflowType+"/nvtx_30", 50, 0., 500.);
-  addHisto("bdiscr_30_a4jet_btag", cutflowType+"/nvtx_30", 50, 0, 2.0);
-  
-  //NVTX FROM 30 To 40
-  InitHist("nvtx_40", cutflowType, outFile_, true); 
-  //befor 1 mu cut
-  addHisto("multi_mu_40_b1mu", cutflowType+"/nvtx_40", 100, 0., 20.);
-  addHisto("pt_mu_40_b1mu", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("pt_met_40_b1mu", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("eta_mu_40_b1mu", cutflowType+"/nvtx_40", 50, -5.0, 5.0);
-  //after 1 mu cut
-  addHisto("pt_mu_40_a1mu", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("pt_met_40_a1mu", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("eta_mu_40_a1mu", cutflowType+"/nvtx_40", 50, -5.0, 5.0);
-  //before 4 jet cut
-  addHisto("multi_jet_40_b4jet", cutflowType+"/nvtx_40", 100, 0., 20.);
-  addHisto("pt_jet_40_b4jet", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("pt_met_40_b4jet", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("eta_jet_40_b4jet", cutflowType+"/nvtx_40", 50, -5.0, 5.0);
-  addHisto("bdiscr_40_b4jet", cutflowType+"/nvtx_40", 50, 0, 2.0);
-  //after 4 jet cut
-  addHisto("multi_jet_40_a4jet", cutflowType+"/nvtx_40", 100, 0., 20.);
-  addHisto("pt_jet_40_a4jet", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("eta_jet_40_a4jet", cutflowType+"/nvtx_40", 50, -5.0, 5.0);
-  addHisto("pt_met_40_a4jet", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("bdiscr_40_a4jet", cutflowType+"/nvtx_40", 50, 0, 2.0);
-  addHisto("multi_bjet_40_a4jet", cutflowType+"/nvtx_40", 100, 0., 20.);
-  //after btag
-  addHisto("pt_bjet_40_a4jet", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("eta_bjet_40_a4jet", cutflowType+"/nvtx_40", 50, -5.0, 5.0);
-  addHisto("pt_met_40_a4jet_btag", cutflowType+"/nvtx_40", 50, 0., 500.);
-  addHisto("bdiscr_40_a4jet_btag", cutflowType+"/nvtx_40", 50, 0, 2.0);
-  
-  //NVTX FROM 40 To 50
-  InitHist("nvtx_50", cutflowType, outFile_, true); 
-  //befor 1 mu cut
-  addHisto("multi_mu_50_b1mu", cutflowType+"/nvtx_50", 100, 0., 20.);
-  addHisto("pt_mu_50_b1mu", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("pt_met_50_b1mu", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("eta_mu_50_b1mu", cutflowType+"/nvtx_50", 50, -5.0, 5.0);
-  //after 1 mu cut
-  addHisto("pt_mu_50_a1mu", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("pt_met_50_a1mu", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("eta_mu_50_a1mu", cutflowType+"/nvtx_50", 50, -5.0, 5.0);
-  //before 4 jet cut
-  addHisto("multi_jet_50_b4jet", cutflowType+"/nvtx_50", 100, 0., 20.);
-  addHisto("pt_jet_50_b4jet", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("pt_met_50_b4jet", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("eta_jet_50_b4jet", cutflowType+"/nvtx_50", 50, -5.0, 5.0);
-  addHisto("bdiscr_50_b4jet", cutflowType+"/nvtx_50", 50, 0, 2.0);
-  //after 4 jet cut
-  addHisto("multi_jet_50_a4jet", cutflowType+"/nvtx_50", 100, 0., 20.);
-  addHisto("pt_jet_50_a4jet", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("pt_met_50_a4jet", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("eta_jet_50_a4jet", cutflowType+"/nvtx_50", 50, -5.0, 5.0);
-  addHisto("bdiscr_50_a4jet", cutflowType+"/nvtx_50", 50, 0, 2.0);
-  addHisto("multi_bjet_50_a4jet", cutflowType+"/nvtx_50", 100, 0., 20.);
-  //after btag
-  addHisto("pt_bjet_50_a4jet", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("eta_bjet_50_a4jet", cutflowType+"/nvtx_50", 50, -5.0, 5.0);
-  addHisto("pt_met_50_a4jet_btag", cutflowType+"/nvtx_50", 50, 0., 500.);
-  addHisto("bdiscr_50_a4jet_btag", cutflowType+"/nvtx_50", 50, 0, 2.0);
 /*  
   addHisto("mjj_kfit", cutflowType, 40, 0.,200.);
   addHisto("mjj_kfit_deltaR", cutflowType, 40, 0.,200.);
@@ -301,20 +153,21 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("AvTopPtWeight",cutflowType, 2, 0., 2.); //Average weight to be divided for each histogram
   addHisto("SVEffUncert", cutflowType, 3, 0., 3.); //To store SV Eff uncert.
  */
-  InitHist("BTag", cutflowType, outFile_, false); 
-  addHisto("Pre_RelIso",cutflowType+"/BTag", 40,0,0.5);
-  addHisto("Final_RelIso",cutflowType+"/BTag", 40,0,0.5);
-  addHisto("Muon_mult_final",cutflowType+"/BTag", 10,0,10);
+  InitHist("BTag", cutflowType, outFile_); 
+  addHisto("pre_RelIso_mu",cutflowType+"/BTag", 40,0,0.5);
+  addHisto("final_RelIso_mu",cutflowType+"/BTag", 40,0,0.5);
+  addHisto("final_multi_mu",cutflowType+"/BTag", 10,0,10);
   addHisto("final_multi_jet", cutflowType+"/BTag", 100,0,10);
   addHisto("CSVL_count", cutflowType+"/BTag", 10,0,10);
   addHisto("CSVM_count", cutflowType+"/BTag", 10,0,10);
   addHisto("wmt", cutflowType+"/BTag", 50, 0., 200.);
-  addHisto("nvtx", cutflowType+"/BTag", 50, 0., 50.);
+  addHisto("rho", cutflowType+"/BTag", 100, 0., 1.);
+  addHisto("nvtx", cutflowType+"/BTag", 60, 0., 60.);
 /*
   InitHist("KinFit", cutflowType, outFile_);
-  addHisto("Pre_RelIso",cutflowType+"/KinFit", 40,0,0.5);
-  addHisto("Final_RelIso",cutflowType+"/KinFit", 40,0,0.5);
-  addHisto("Muon_mult_final",cutflowType+"/KinFit", 10,0,10);
+  addHisto("pre_RelIso_mu",cutflowType+"/KinFit", 40,0,0.5);
+  addHisto("final_RelIso_mu",cutflowType+"/KinFit", 40,0,0.5);
+  addHisto("final_multi_mu",cutflowType+"/KinFit", 10,0,10);
   addHisto("final_multi_jet", cutflowType+"/KinFit", 10,0,10);
   addHisto("CSVL_count", cutflowType+"/KinFit", 10,0,10);
   addHisto("CSVM_count", cutflowType+"/KinFit", 10,0,10);
@@ -339,7 +192,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
 
 }
   //void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file)
-  void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file, bool isNvtx=false)
+  void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file)
 {
   std::string name(dirname);
   std::string fullname;
@@ -351,7 +204,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   else{file->mkdir(name.c_str()); fullname = name;}
   TDirectory *d = file->GetDirectory(fullname.c_str());
   file->cd(fullname.c_str());
-  if(!isNvtx){
   addHisto("pt_jet", fullname, 50, 0., 500.);
   TH1 *h1 = getHisto("pt_jet", fullname);
   h1->SetDirectory(d);
@@ -369,11 +221,8 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("multi_jet", fullname, 100, 0., 20.);
   h1 = getHisto("multi_jet", fullname);
   h1->SetDirectory(d);
-  addHisto("btag_jet", fullname, 200, -5., 5.);
-  h1 = getHisto("btag_jet", fullname);
-  h1->SetDirectory(d);
-  addHisto("btagmulti_jet", fullname, 100, 0., 10.);
-  h1 = getHisto("btagmulti_jet", fullname);
+  addHisto("bDiscr_Loose", fullname, 200, -5., 5.);
+  h1 = getHisto("bDiscr_Loose", fullname);
   h1->SetDirectory(d);
 
   addHisto("pt_ele", fullname, 50, 0., 500.);
@@ -399,7 +248,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("pt_met", fullname, 50, 0., 500.);
   h1 = getHisto("pt_met", fullname);
   h1->SetDirectory(d);
-  
   addHisto("final_pt_met", fullname, 50, 0., 500.);
   h1 = getHisto("final_pt_met", fullname);
   h1->SetDirectory(d);
@@ -407,7 +255,9 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("phi_met", fullname, 63, -M_PI, M_PI);
   h1 = getHisto("phi_met", fullname);
   h1->SetDirectory(d);
-  }
+  addHisto("final_phi_met", fullname, 63, -M_PI, M_PI);
+  h1 = getHisto("final_phi_met", fullname);
+  h1->SetDirectory(d);
 }  
 
 void HistogramPlotter::addHisto(TString name, TString dirname, int range, double min, double max)
