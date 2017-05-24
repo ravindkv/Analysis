@@ -26,6 +26,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("wmt", cutflowType, 50, 0., 200.);
   addHisto("nvtx", cutflowType, 60, 0., 60.);
   addHisto("rho", cutflowType, 100, 0., 1.);
+  addHisto("rho_0", cutflowType, 100, 0., 1.);
   addHisto("mjj", cutflowType, 50, 20., 250.);
   
 /*  
@@ -162,6 +163,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("CSVM_count", cutflowType+"/BTag", 10,0,10);
   addHisto("wmt", cutflowType+"/BTag", 50, 0., 200.);
   addHisto("rho", cutflowType+"/BTag", 100, 0., 1.);
+  addHisto("rho_0", cutflowType+"/BTag", 100, 0., 1.);
   addHisto("nvtx", cutflowType+"/BTag", 60, 0., 60.);
 /*
   InitHist("KinFit", cutflowType, outFile_);

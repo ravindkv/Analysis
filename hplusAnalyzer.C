@@ -363,24 +363,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("final_RelIso_mu",cutflowType, mRelIso, evtWeight);
     fillHisto("final_multi_mu",cutflowType, count_muon, evtWeight);
 
-    //Apply Top re-weighting weights here (after lepton selection, such that we can use coefficients of l+jets events).
-    ///double topPtWeights_offline = 1.0;
-    if(!isData){
-      //get sample information
-      string sampleName = ev->sampleInfo.sampleName;
-      if(sampleName.find("TTJets") != string::npos || sampleName.find("WH") != string::npos || sampleName.find("HplusM120") != string::npos){
-	topPtWeights_offline = sqrt(exp(0.159 - 0.00141*mcTop.pt())*exp(0.159 - 0.00141*mcAntiTop.pt()));
-	if(cutflowType.Contains("TopPtPlus"))
-	  topPtWeights_offline = topPtWeights_offline*topPtWeights_offline;
-	else if(cutflowType.Contains("TopPtMinus"))
-	  topPtWeights_offline = 1.0;
-      }
-    }
-    //cout << "topPtWeights_offline" << topPtWeights_offline << endl;
-    TotalTopPtWeights += topPtWeights_offline; 
-    TotalLplusJEvents++;
-    evtWeight *= topPtWeights_offline; //Multiply to the total weights
-
     // Fill histogram after trigger and one offline isolated muon and applied 2nd lepton veto
     int nJet = j_final.size();
     fillHisto("eta_mu", cutflowType, pfMuons[m_i].p4.eta(), evtWeight);
@@ -388,6 +370,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     // vertex just after one lepton selection
     //double pri_vtxs = Vertices.size();
     fillHisto("nvtx", cutflowType, pri_vtxs, evtWeight);
+    fillHisto("rho_0", cutflowType, Vertices[0].rho, evtWeight);
     for( std::size_t n=0; n<Vertices.size(); n++){
       rho_vtxs = Vertices[n].rho;
       fillHisto("rho", cutflowType, rho_vtxs, evtWeight);
@@ -504,6 +487,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("final_multi_jet", cutflowType+"/BTag", nJet, evtWeight);
     fillHisto("final_pt_met", cutflowType+"/BTag", metPt, evtWeight);
     fillHisto("nvtx", cutflowType+"/BTag", pri_vtxs, evtWeight);
+    fillHisto("rho_0", cutflowType+"/BTag", Vertices[0].rho, evtWeight);
     for(std::size_t n=0; n<Vertices.size(); n++){
       rho_vtxs = Vertices[n].rho;
       fillHisto("rho", cutflowType+"/BTag", rho_vtxs, evtWeight);
@@ -514,7 +498,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(input_count%10==0)
     cout << "input count: "<< input_count << endl;
     //if(input_count > 100000) break;
-    //if(i > 50000) break;
+    //if(i > 5000) break;
     }//event loop
       
   outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
@@ -543,9 +527,9 @@ void hplusAnalyzer::processEvents(){
   
   //condor submission
   //for Data 
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
   //for MC
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
