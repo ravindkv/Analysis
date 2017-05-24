@@ -14,14 +14,11 @@
 #create a directory where all the outputs will be
 #stored, for different merged ntuple input files
 #------------------------------------------------
-#outcond="outcond_MuRunBv3"
-#outcond="outcond_MuRunCv1"
-#outcond="outcond_MuRunDv1"
-#outcond="outcond_MuRunEv1"
-#outcond="outcond_MuRunFv1"
-outcond="outcond_MuRunGv1"
-#outcond="outcond_MuRunHv2"
-#outcond="outcond_MuRunHv3"
+
+outcond="log_MuMC_20170429_1_pileup"
+#outcond="log_MuMC_20170429_2_pileup"
+#outcond="log_MuData_20170502_1_pileup"
+#outcond="log_MuData_20170502_2_pileup"
 
 mkdir $outcond
 cp hplusCond.sub $outcond
@@ -36,7 +33,7 @@ cd $outcond
 echo "make sure that you have coppied voms \n"
 echo "certificate e.g. x509up_u93032 from /tmp\n"
 echo "to /afs/cern.ch/user/r/rverma/ \n "
-
+count=0
 cat mergedNtupleT2.txt | while read ntupleT2Path
 do
   #----------------------------------------------
@@ -45,14 +42,14 @@ do
   #get the  second last entry of the array
   #remove .root, from the input ntuple
   #----------------------------------------------
-  echo " "
-  echo -e "\033[01;32m input ntuple: \033[00m" $ntupleT2Path
+  ((count++))
+  echo -e "\033[01;32m input ntuple=\033[00m" $count": " $ntupleT2Path
   IFS='/ ' read -r -a array <<< "$ntupleT2Path"
   len=${#array[@]}
   sec_last=`expr $len - 1`
   #sec_last=`expr $len`
   ntuple=${array[$sec_last]}
-  echo $ntuple
+  #echo $ntuple
   iFile=${ntuple/.root/""}
  
   #----------------------------------------------

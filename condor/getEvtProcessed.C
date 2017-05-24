@@ -19,7 +19,7 @@
 
 void getEvtProcessed(){
 
-    TString allFile[37] = {
+    TString allFile[40] = {
     " DY1JetsToLL_Merged.root ", 
     " DY2JetsToLL_Merged.root ", 
     " DY3JetsToLL_Merged.root ",
@@ -41,12 +41,15 @@ void getEvtProcessed(){
     " MuRunGv1_Merged.root    ", 
     " MuRunH2v1_Merged.root   ", 
     " MuRunH3v1_Merged.root   ", 
-    " QCD_Pt-120to_Merged.root", 
-    " QCD_Pt-15to2_Merged.root", 
-    " QCD_Pt-170to_Merged.root", 
-    " QCD_Pt-20to3_Merged.root", 
-    " ST_s_Merged.root       " ,
-    " ST_t__Merged.root       ", 
+    " QCD_Pt-15to20_Mu_Merged.root   ", 
+    " QCD_Pt-20to30_Mu_Merged.root   ",
+    " QCD_Pt-30to50_Mu_Merged.root   ",
+    " QCD_Pt-50to80_Mu_Merged.root   ",
+    " QCD_Pt-80to120_Mu_Merged.root  ",    
+    " QCD_Pt-120to170_Mu_Merged.root ", 
+    " QCD_Pt-170to300_Mu_Merged.root ", 
+    " ST_s_Merged.root       ",
+    " ST_t__Merged.root      ", 
     " ST_tW_Merged.root      ", 
     " TTJets_Merged.root     ", 
     " W1JetsToLNu_Merged.root", 
@@ -59,7 +62,7 @@ void getEvtProcessed(){
     " ZZ_Merged.root " 
     }
 
-    for(int i= 0; i<37; i++){
+    for(int i= 0; i<40; i++){
       TString inFile(allFile[i]);
       TFile* ttbar= new TFile(inFile);
       TString path= "base/totalEvents";
