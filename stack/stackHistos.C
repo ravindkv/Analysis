@@ -87,19 +87,16 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   hSig->SetFillColor(0);
   
   //stack all the MC samples
-  /*
-  stackHisto(inFile, "QCD_Pt-80to120_Mu_Merged.root", "QCD_Pt-80to120", histname, kBlue, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "DYJetsToLL_Merged.root", "DYJets", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "ST_t__Merged.root", "ST_t", histname, kGreen , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "WJetsToLNu_Merged.root", "WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "TTJets_Merged.root","ttbar", histname, kCyan, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  */
   stackHisto(inFile, "all_QCD.root", "all_QCD", histname, kBlue, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "all_DY.root", "all_DY", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_DY.root", "all_DY", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "DYJetsToLL_Merged.root", "all_DY", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
   stackHisto(inFile, "all_ST.root", "all_ST", histname, kGreen , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "all_WJets.root", "all_WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_WJets.root", "all_WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "WJetsToLNu_Merged.root", "all_WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
   stackHisto(inFile, "all_TTJets.root","ttbar", histname, kCyan, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
   //stackHisto(inFile, "all_H120.root","Hplus", histname,  6, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig, leg);
+  
+  
   ////////////////////////////////////////////////////////////
   //
   // Plot DATA points on the stacked MC histos
@@ -200,10 +197,33 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     gPad->SetPad(xpad[0],ypad[0],xpad[1],ypad[2]);
     //gPad->SetPad(xpad[0],0.05,xpad[1],ypad[2]);
     TH1F *hRatio = (TH1F*)data->Clone("hRatio");
-    hRatio->Reset();
-    hRatio->Add(data);
-    hRatio->Add(hMC, -1);
-    hRatio->Divide(hMC);
+    //hRatio->Reset();
+    //hRatio->Add(data);
+    //hRatio->Add(hMC, -1);
+    //hRatio->Divide(hMC);
+    int nbin= data->GetSize();
+    cout<<"bin = "<<nbin<<endl;
+    double div=0.0; 
+    double sigma=0.0;
+    double a1 =0.0;
+    double binC_data= 0.0;
+    double binC_mc = 0.0;
+
+    for(int i=1; i<nbin; i++){
+      binC_data = data->GetBinContent(i);
+      binC_mc = hMC->GetBinContent(i);
+      cout<<i<<endl;
+      cout<<binC_mc<<endl;
+      cout<<binC_data<<endl;
+      cout<<endl;
+      if(binC_mc !=0&& binC_data!=0){
+        div = binC_data/binC_mc;
+        a1 = sqrt(1.0/binC_data + 1.0/binC_mc);
+        sigma = div*a1;
+        hRatio->SetBinContent(i, div);
+        hRatio->SetBinError(i, sigma);
+      }
+    }
     hRatio->SetMarkerStyle(20);
     hRatio->SetMarkerSize(1.0);
     hRatio->SetMarkerColor(kBlack);
@@ -212,15 +232,15 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     //hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
     hRatio->GetXaxis()->SetTitle(xaxis_title);
     hRatio->GetYaxis()->SetTitleOffset(0.5);
-    hRatio->GetYaxis()->SetTitle("#frac{Data-Bkg}{Bkg}");
+    hRatio->GetYaxis()->SetTitle("#frac{Data}{MC}");
     hRatio->GetYaxis()->CenterTitle();
     hRatio->GetYaxis()->SetTitleSize(0.1);
     hRatio->GetXaxis()->SetTitleSize(0.1);
     hRatio->GetXaxis()->SetLabelSize(0.17); // 0.1
     hRatio->GetXaxis()->LabelsOption("u"); // extra
     hRatio->GetYaxis()->SetLabelSize(0.06);
-    //hRatio->Draw("E"); // use "P" or "AP"
-    hRatio->Draw("E same");
+    hRatio->Draw("e1"); // use "P" or "AP"
+    //hRatio->Draw("E same");
     c1->Update();
   }
 
@@ -274,13 +294,19 @@ void example_stack_all(){
   
 }
 void example_stack_kfit(TString dir="BTag"){
-  example_stack(dir+"/pt_jet","jet P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
-  example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,false,false,-3.0,3.0);
-  example_stack(dir+"/pt_mu","#mu P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
-  example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,false,false,-3.0,3.0);
-  example_stack(dir+"/bDiscr_Loose","bDiscr", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack(dir+"/final_pt_mu","#pt_mu", 1, true,true,true,false, false,20.0,100.0);
-  //example_stack(dir+"/final_RelIso_mu", "final_RelIso", 1, true, true, true, false, false, 0, 5, false);
+  //example_stack(dir+"/pt_jet","jet P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+  //example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,false,false,-3.0,3.0);
+  //example_stack(dir+"/pt_mu","#mu P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+  //example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,false,false,-3.0,3.0);
+  ////example_stack(dir+"/bDiscr_Loose","bDiscr", 1, true,true,true,false,false,0.0,1.0);
+  //example_stack("pfCISV","pfCombinedInclusiveSecondaryVertexV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
+  //example_stack("pfCMVA","pfCombinedMVAV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
+  //example_stack("pfCCvsL","pfCombinedCvsLJetTags", 1, true,true,true,false,false,0.0,1.0);
+  //example_stack("pfCCvs","pfCombinedCvsBJetTags", 1, true,true,true,false,false,0.0,1.0);
+  //example_stack("mjj","m_{jj}",1,true,true,true);
+  //////example_stack(dir+"/final_pt_mu","#pt_mu", 1, true,true,true,false, false,20.0,100.0);
+  //example_stack(dir+"/final_pt_met","#pt_met", 1, true,true,true,false, false,20.0,100.0);
+ // example_stack(dir+"/final_RelIso_mu", "final_RelIso", 1, true, true, true, false, false, 0, 5);
 
   if(dir == "KinFit"){
     example_stack(dir+"/kfJet1_pt","P_{T}[GeV]",1,true,true,true,true, true,20.0,200.0);
@@ -289,11 +315,13 @@ void example_stack_kfit(TString dir="BTag"){
     example_stack(dir+"/kfJet2_eta","#eta^{jets}",1,true,true,true,true,true,-3.0,3.0);
   }
 
-  example_stack(dir+"/final_multi_jet","N_{jets}",1,true,true,true,false,true,3,11);
-  ///example_stack(dir+"/final_pt_met","E_{T}^{miss}[GeV]",10,true,true,true,false,true,15.0,100.0);
-  ///example_stack(dir+"/wmt","m_{T}[GeV]",2,true,true,true,false,false,0,175);
-  ///example_stack(dir+"/CSVM_count","btagged jet multiplicity",1,true,true, true,false,true,1,8);
+  example_stack(dir+"/final_multi_jet","N_{jets}",1,true,true,true,false,true,3,15);
+  //example_stack(dir+"/wmt","m_{T}[GeV]",2,true,true,true,false,false,0,175);
+  /////example_stack(dir+"/CSVM_count","btagged jet multiplicity",1,true,true, true,false,true,1,8);
   example_stack(dir+"/nvtx","N_{vertex}",1,true,true,true);
-  example_stack(dir+"/rho","rho",1,true,true,true);
-}
-
+  //example_stack(dir+"/rho","rho",1,true,true,true);
+  //example_stack(dir+"/rho_0","rho_0",1,true,true,true);
+  example_stack(dir+"/chi2","chi2",1,true,true,true);
+  example_stack(dir+"/ndof","ndof",1,true,true,true);
+} 
+  

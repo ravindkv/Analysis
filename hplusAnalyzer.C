@@ -1,132 +1,10 @@
-#include <iomanip>
-#include <iostream>
-#include <fstream>
 
-#include "TRandom2.h"
-#include "TMatrixD.h"
-#include "TF1.h"
-#include "TProfile.h"
-#include "TObjArray.h"
-#include "TMatrixD.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TTimeStamp.h"
-#include "Math/VectorUtil.h"
-
-#include "interface/Reader.h"
-#include "interface/ObjectSelector.hh"
-#include "interface/MomentumVec.h"
-#include "interface/LumiReweighting.h"
-#include "interface/UncertaintyComputer.hh"
-#include "interface/HistogramPlotter.hh"
+#include "hplusAnalyzer.h"
 
 using namespace std;
-
-class hplusAnalyzer : public ObjectSelector, HistogramPlotter
-{
-public :
-  hplusAnalyzer() : ObjectSelector(), HistogramPlotter()
-  {
-    DRMIN_JET = 0.5;
-    DRMIN_ELE = 0.5;
-    METCUT_   = 30.0;
-    /////////////// Pileup reweigting //////////////////
-    //Pileup informations for Data: 
-    //
-    LumiWeights_ = reweight::LumiReWeighting("trueInTimePU_mcDY.root","trueMinBiasPU_dataMu.root", "pileup", "pileup");
-    PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
-    PShiftUp_ = reweight::PoissonMeanShifter(0.5);
-    
-    /////////////// MC cross sections at 13 TeV: /////// 
-    //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV.py
-    //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
-    //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
-    //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
-    xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
-    xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
-    xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  6025.2;        evtDBS["DYJetsToLL"]        =  49144274;
-    xss["HplusM100"]         =  1;             evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  1;             evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  1;             evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  1;             evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  1;             evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  1;             evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  1;             evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  1;             evtDBS["HplusM90"]          =  988480;
-    xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
-    xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
-    xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
-    xss["QCD_Pt-50to80_Mu"]  =  437504;        evtDBS["QCD_Pt-50to80_Mu"]  =  19806915;
-    xss["QCD_Pt-80to120_Mu"] =  106033;        evtDBS["QCD_Pt-80to120_Mu"] =  13786971;
-    xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
-    xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
-    xss["ST_s"]              =  7.3;           evtDBS["ST_s"]              =  2989199;
-    xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
-    xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
-    xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  10139950;   
-    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
-    xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
-    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
-    xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  61526.7;       evtDBS["WJetsToLNu"]        =  29705748;
-    xss["WW"]                =  63.21;         evtDBS["WW"]                =  994012;
-    xss["WZ"]                =  22.82;         evtDBS["WZ"]                =  1000000;
-    xss["ZZ"]                =  10.32;         evtDBS["ZZ"]                =  990064; 
-    
-    //Lumis(inverse pb) of single muon DATA at 13TeV
-    //https://docs.google.com/spreadsheets/d/1lQyfcY0gnG_IgFrtnbBES_HV1M7ARQM9qCw01vsnxSk/edit?usp=sharing
-    double lumiB = 5403; 
-    double lumiC = 2395;
-    double lumiD = 4255; 
-    double lumiE = 4053;
-    double lumiF = 3105;
-    double lumiG = 7544;
-    double lumiH = 8529+216;
-    double lumiTotal = lumiB+ lumiC+ lumiD+ lumiE+ lumiF+ lumiG+ lumiH;
-    
-    //muon Trigger/ID/ISo SFs, in bins of eta (from muon POG)
-    //SFs for different lumi period are weighted by lumi fraction.
-    //Trigger SF for HLT_IsoMu24_eta2p1
-    double sfEta1 = (lumiE*0.956+lumiB*0.9798+lumiC*0.9841+lumiD*0.98151)/lumiTotal; // 0<|eta|<0.9 
-    double sfEta2 = (lumiE*0.9528+lumiB*0.9618+lumiC*0.9688+lumiD*0.96156)/lumiTotal; // 0.9<|eta|<1.2
-    double sfEta3 = (lumiE*0.9809+lumiB*0.9814+lumiC*1.0021+lumiD*0.99721)/lumiTotal; // 1.2<|eta|<2.1
-    //multiply mu ID/Iso SFs
-    sfEta1 = sfEta1*0.9939*1.0004;
-    sfEta2 = sfEta2*0.9902*1.0031;
-    sfEta3 = sfEta3*0.9970*1.0050;
-    muSF["sfEta1"] = 1; //sfEta1;
-    muSF["sfEta2"] = 1; //sfEta2;
-    muSF["sfEta3"] = 1; //sfEta3;
-  };
-  ~hplusAnalyzer() {
-    delete evR;
-  };
-  
-  void CutFlowAnalysis(TString url,  string myKey="PFlow", bool isData = true, string evtType="data");
-  void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", bool isData = true, TFile *outFile_=0);
-  //void CreateAnalHistos(TString flowType, TFile* outFile_);
-  void processEvents();
-  float reweightHEPNUPWJets(int hepNUP);
-  float reweightHEPNUPDYJets(int hepNUP);
-
-private :
-  double DRMIN_JET, DRMIN_ELE, METCUT_;
-  Reader *evR;
-  
-  reweight::LumiReWeighting LumiWeights_;
-  reweight::PoissonMeanShifter PShiftUp_;   //pileup syst up
-  reweight::PoissonMeanShifter PShiftDown_; //pileup syst down 
-  std::map<string, double> xss;
-  std::map<string, double> evtDBS;
-  std::map<string, double> muSF;
-  ofstream outfile_;
-};
-void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, string evtType){
+void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   
   TString outFile("13TeV/outputDir/");
-  //TString outFile("");
   TString Filename_ = outFile+evtType+"_Anal.root";
   TFile *outFile_ = TFile::Open( Filename_, "RECREATE" );
   outFile_->SetCompressionLevel( 9 );
@@ -135,33 +13,30 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, bool isData, stri
   string debug_file(debug_Filename_);
   outfile_.open(debug_file.c_str());
 
-  CutFlowProcessor(url, myKey, "base", isData, outFile_);
+  CutFlowProcessor(url, myKey, "base", outFile_);
   outfile_.close();
   outFile_->Write(); 
   outFile_->Close(); 
 }
-  
-void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType, bool isData, TFile *outFile_){
-    int input_count = 0;
-  
-  outfile_<<"///// Begin processing "<<cutflowType<<"  selection ///////"<<endl;
-  cout <<"///// Begin processing "<<cutflowType<<"  selection ///////"<<endl;
-  
-  bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
 
+//---------------------------------------------------//
+//Process the cuts, event by event
+//---------------------------------------------------//  
+void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType, TFile *outFile_){
+  
+  int input_count = 0;
+  bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
   string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("METs");
-  //  if(myKey.find("PFlow") != string::npos)jAlgo = "PFlow";
-  //  else if(myKey.find("HPS") != string::npos)jAlgo = "JetsAK5PF";
   
   //Uncertainty variations, JES, JER, MET unclustered, bTag
   ///int jes = 0, jer = 0, metuc = 0, bscale = 0;
-  int jes = 1, jer = 1, metuc = 1; 
+  int jes = 1, jer = 1; 
   if(cutflowType.Contains("JESPlus"))jes = 1;
   else if (cutflowType.Contains("JESMinus"))jes = -1;
   else if (cutflowType.Contains("JERPlus"))jer = 1;
   else if (cutflowType.Contains("JERMinus"))jer = -1;
-  else if (cutflowType.Contains("METUCPlus"))metuc = 1;
-  else if (cutflowType.Contains("METUCMinus"))metuc = -1;
+  //else if (cutflowType.Contains("METUCPlus"))metuc = 1;
+  //else if (cutflowType.Contains("METUCMinus"))metuc = -1;
   //else if (cutflowType.Contains("bTagPlus"))bscale = 1;
   //else if (cutflowType.Contains("bTagMinus"))bscale = -1; 
 
@@ -191,7 +66,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   double matchedJet_q = 0.0, matchedJet_b = 0.0, matched_quark_eta_pt = 0.0, not_matchedJet_q = 0.0;
   double TotalTopPtWeights = 0, TotalLplusJEvents = 0; 
   double TotalSVEff = 0, TotalEvtsWithSV = 0.;
-  double sampleWeight(1.0);
   
   //---------------------------------------------------//
   //loop over each event, of the ntuple
@@ -207,31 +81,39 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //apply lumi, k factor and pileup weight
     //---------------------------------------------------//
     double evtWeight = 1.0;
-    if(!isData){
-      //lumi weight
+
+    if(!ev->isData){
       string sampleName = ev->sampleInfo.sampleName;
+      //k-factor weight (along with lumi weight) 
+      if(sampleName.find("WJetsToLNu") != string::npos || sampleName.find("W1JetsToLNu") != string::npos || sampleName.find("W2JetsToLNu") != string::npos || sampleName.find("W3JetsToLNu") != string::npos || sampleName.find("W4JetsToLNu") != string::npos){
+	    int hepNUP = ev->sampleInfo.hepNUP;
+        double weightK = reweightHEPNUPWJets(hepNUP) * (lumiTotal/1000.0);
+        evtWeight *= weightK;  
+        fillHisto("hepNUP", cutflowType, hepNUP, evtWeight);
+      }
+      else if(sampleName.find("DYJetsToLL") != string::npos || sampleName.find("DY1JetsToLL") != string::npos || sampleName.find("DY2JetsToLL") != string::npos || sampleName.find("DY3JetsToLL") != string::npos || sampleName.find("DY4JetsToLL") != string::npos){
+        int hepNUP = ev->sampleInfo.hepNUP;
+        double weightK = reweightHEPNUPDYJets(hepNUP) * (lumiTotal/1000.0);
+        evtWeight *= weightK;  
+        fillHisto("hepNUP", cutflowType, hepNUP, evtWeight);
+      }
+      
+      //lumi weight
+      else {
+      double sampleWeight(1.0);
       sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
+      evtWeight *= sampleWeight; 
       if(i < 1){
         outfile_<<"Sample weight for "<<sampleName<<" is= "<< sampleWeight<<endl;
+        }
       }
-      evtWeight *= sampleWeight; 
-      //k factor weights for WJets samples (we have to update it ==========)
-      /*
-      if(sampleName.find("WJETS") != string::npos || sampleName.find("W1JETS") != string::npos || sampleName.find("W2JETS") != string::npos || sampleName.find("W3JETS") != string::npos || sampleName.find("W4JETS") != string::npos){
-	int hepNUP = ev->sampleInfo.hepNUP;
-        sampleWeight = reweightHEPNUPWJets(hepNUP) * (Lumi/1000.0);
-      }
-      else if(sampleName.find("ZJETS") != string::npos || sampleName.find("Z1JETS") != string::npos || sampleName.find("Z2JETS") != string::npos || sampleName.find("Z3JETS") != string::npos || sampleName.find("Z4JETS") != string::npos){
-        int hepNUP = ev->sampleInfo.hepNUP;
-        sampleWeight = reweightHEPNUPDYJets(hepNUP) * (Lumi/1000.0);
-      }
-      */
+      
       //pileup weight 
       vector<double>pu = ev->sampleInfo.truepileup;
       if(pu.size() > 0) {
 	  float npu = pu[0];
-	  double weight = LumiWeights_.weight(npu);
-      evtWeight *= weight;  
+	  double weightPU = LumiWeights_.weight(npu);
+      evtWeight *= weightPU;  
       }
     } 
 
@@ -239,7 +121,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     // apply top re-weighting weight
     //---------------------------------------------------//
     double topPtWeights_offline = 1.0;
-    if(!isData){
+    if(!ev->isData){
       string sampleName = ev->sampleInfo.sampleName;
       //(we have to update it ==========)
       if(sampleName.find("TTJets") != string::npos || sampleName.find("WH") != string::npos || sampleName.find("HplusM120") != string::npos){
@@ -253,6 +135,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
       }
     }
+    cout <<"topWt = "<<topPtWeights_offline<<endl;
     TotalTopPtWeights += topPtWeights_offline;
     //cout<<"topPtWeights_offline = "<<topPtWeights_offline<<endl;
     TotalLplusJEvents++;
@@ -313,7 +196,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<MyLorentzVector> lquarks; lquarks.clear();
     MyLorentzVector mcTop, mcAntiTop;
     mcTop.SetPxPyPzE(0., 0., 0., 0.); mcAntiTop.SetPxPyPzE(0., 0., 0., 0.);
-    if(!isData){
+    if(!ev->isData){
       vector<MyMCParticle>allMCParticles = ev->mcParticles;
       for(size_t imc=0; imc < allMCParticles.size(); ++imc){
 	if(abs(allMCParticles[imc].pid) == 5 && allMCParticles[imc].mother.size() > 0 && (abs(allMCParticles[imc].mother[0])==6) )
@@ -336,7 +219,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto("pre_RelIso_mu",cutflowType, mRelIso_no_iso, evtWeight);
     }
     double pri_vtxs = Vertices.size();
-    double rho_vtxs = 0.0;
     int nLepton = m_init.size();  // this condition proof that only muon + jet events
     if(nLepton != 1)continue;
     if( looseMuonVeto( m_init[0],pfMuons, isPFlow) ) continue;
@@ -370,10 +252,11 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     // vertex just after one lepton selection
     //double pri_vtxs = Vertices.size();
     fillHisto("nvtx", cutflowType, pri_vtxs, evtWeight);
-    fillHisto("rho_0", cutflowType, Vertices[0].rho, evtWeight);
+    fillHisto("rhoAll_0", cutflowType, Vertices[0].rhoAll_, evtWeight);
     for( std::size_t n=0; n<Vertices.size(); n++){
-      rho_vtxs = Vertices[n].rho;
-      fillHisto("rho", cutflowType, rho_vtxs, evtWeight);
+      fillHisto("rhoAll_", cutflowType, Vertices[n].rhoAll_, evtWeight);
+      fillHisto("chi2", cutflowType, Vertices[n].chi2, evtWeight);
+      fillHisto("ndof", cutflowType, Vertices[n].ndof, evtWeight);
       }
     //---------------------------------------------------//
     // Apply Jet Selection
@@ -425,18 +308,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<int> j_final_nob; j_final_nob.clear();
     double pfCISV = 0.0; //pfCombinedInclusiveSecondaryVertexV2BJetTags
     double pfCMVA = 0.0; //pfCombinedMVAV2BJetTags
-    double pfCCvsL = 0.0; //pfCombinedCvsLJetTags
-    double pfCCvs = 0.0; //pfCombinedCvsBJetTags
+    double pfCCvsL = 0.0;//pfCombinedCvsLJetTags
+    double pfCCvsB = 0.0; //pfCombinedCvsBJetTags
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       pfCISV = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
       pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
       pfCCvsL= pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
-      pfCCvs = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
+      pfCCvsB = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
       fillHisto("pfCISV", cutflowType, pfCISV , evtWeight); 
       fillHisto("pfCMVA", cutflowType, pfCMVA , evtWeight); 
       fillHisto("pfCCvsL", cutflowType, pfCCvsL, evtWeight); 
-      fillHisto("pfCCvs", cutflowType, pfCCvs , evtWeight); 
+      fillHisto("pfCCvsB", cutflowType, pfCCvsB , evtWeight); 
       if(pfCISV > 0.5426){
         count_CSVL++;
         fillHisto("bDiscr_Loose", cutflowType+"/BTag", pfCISV, evtWeight); 
@@ -445,11 +328,22 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     }
     fillHisto("CSVL_count", cutflowType, count_CSVL, evtWeight);
     
+    double pfCCvsL_0 = 0.0;
+    double pfCCvsL_1 = 0.0;
+    double pfCCvsB_0 = 0.0;
+    double pfCCvsB_1 = 0.0;
     //Get the invariant mass of csbar pair
     if(j_final_nob.size() >= 2){
       int first_index = j_final_nob[0];
       int sec_index = j_final_nob[1];
-      fillHisto("pt_sjet", cutflowType, pfJets[sec_index].p4.pt(), evtWeight);
+      pfCCvsL_0 = pfJets[first_index].bDiscriminator["pfCombinedCvsLJetTags"];
+      pfCCvsL_1 = pfJets[sec_index].bDiscriminator["pfCombinedCvsLJetTags"];
+      pfCCvsB_0 = pfJets[first_index].bDiscriminator["pfCombinedCvsBJetTags"];
+      pfCCvsB_1 = pfJets[sec_index].bDiscriminator["pfCombinedCvsBJetTags"];
+      fillHisto("pfCCvsL_0", cutflowType, pfCCvsL_0, evtWeight); 
+      fillHisto("pfCCvsL_1", cutflowType, pfCCvsL_1, evtWeight); 
+      fillHisto("pfCCvsB_0", cutflowType, pfCCvsB_0 , evtWeight); 
+      fillHisto("pfCCvsB_1", cutflowType, pfCCvsB_1 , evtWeight); 
       MyLorentzVector diJet = pfJets[first_index].p4 + pfJets[sec_index].p4;
       fillHisto("mjj", cutflowType, diJet.M(), evtWeight);
     }
@@ -487,18 +381,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("final_multi_jet", cutflowType+"/BTag", nJet, evtWeight);
     fillHisto("final_pt_met", cutflowType+"/BTag", metPt, evtWeight);
     fillHisto("nvtx", cutflowType+"/BTag", pri_vtxs, evtWeight);
-    fillHisto("rho_0", cutflowType+"/BTag", Vertices[0].rho, evtWeight);
+    fillHisto("rhoAll_0", cutflowType+"/BTag", Vertices[0].rhoAll_, evtWeight);
     for(std::size_t n=0; n<Vertices.size(); n++){
-      rho_vtxs = Vertices[n].rho;
-      fillHisto("rho", cutflowType+"/BTag", rho_vtxs, evtWeight);
+      fillHisto("rhoAll_", cutflowType+"/BTag", Vertices[n].rhoAll_, evtWeight);
+      fillHisto("chi2", cutflowType+"/BTag", Vertices[n].chi2, evtWeight);
+      fillHisto("ndof", cutflowType+"/BTag", Vertices[n].ndof, evtWeight);
       }
     fillHisto("wmt", cutflowType+"/BTag", mt, evtWeight);
 
     input_count++;
     if(input_count%10==0)
     cout << "input count: "<< input_count << endl;
-    //if(input_count > 100000) break;
-    //if(i > 5000) break;
+    if(i > 5000) break;
     }//event loop
       
   outfile_ << "Number of times HadP and HadQ matches with jets" << matchjetcount << endl;
@@ -521,36 +415,33 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 void hplusAnalyzer::processEvents(){ 
   
   //Data, MC sample from lxplus and T2
-  //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", true, "TTJets_MuMC_check"); 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_02May17/MuData_20170502/MuRunCv1_MuData_20170502/SingleMuon/MuRunCv1_MuData_20170502/170502_125714/0000/MuRunCv1_MuData_20170502_Ntuple_2.root", "PF", true, "MuRunCv1_tot");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/multicrab_29April17/MuMC_20170429/TTJets_MuMC_20170429/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170429/170429_110042/0000/TTJets_MuMC_20170429_Ntuple_3.root", "PF", false, "TTJets_MuMC");
+  //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", "TTJets_MuMC_check"); 
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_nokfit_20170528/MuMC_20170528/WJetsToLNu_MuMC_20170528/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_MuMC_20170528/170528_115040/0000/WJetsToLNu_MuMC_20170528_Ntuple_1.root", "PF", "WJets_MC");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_nokfit_20170528/MuMC_20170528/TTJets_MuMC_20170528/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170528/170528_114711/0000/TTJets_MuMC_20170528_Ntuple_10.root", "PF", "TT_MuMC");
   
   //condor submission
-  //for Data 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", true, "outputFile");
-  //for MC
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", false, "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
 
   int nJets = hepNUP-5;
-  if(nJets==0)      return 0.515637279;
-  else if(nJets==1) return 0.185061618;
-  else if(nJets==2) return 0.062474528;
-  else if(nJets==3) return 0.038296287;
-  else if(nJets>=4) return 0.019044067;
+  if(nJets==0)      return 2.07;
+  else if(nJets==1) return 0.226;
+  else if(nJets==2) return 0.119;
+  else if(nJets==3) return 0.0562;
+  else if(nJets>=4) return 0.0671;
   else return 1 ;
 }
 
 float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
 
   int nJets = hepNUP-5;
-  if(nJets==0)      return 0.117971671;
-  else if(nJets==1) return 0.022925801;
-  else if(nJets==2) return 0.009107319;
-  else if(nJets==3) return 0.005462804;
-  else if(nJets>=4) return 0.004252079;
+  if(nJets==0)      return 0.117;
+  else if(nJets==1) return 0.0164;
+  else if(nJets==2) return 0.0167;
+  else if(nJets==3) return 0.0167;
+  else if(nJets>=4) return 0.0128;
   else return 1 ;
 }
 

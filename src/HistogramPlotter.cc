@@ -19,15 +19,23 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("pfCISV", cutflowType, 200, -5., 5.);
   addHisto("pfCMVA", cutflowType, 200, -5., 5.);
   addHisto("pfCCvsL",cutflowType, 200, -5., 5.);
-  addHisto("pfCCvs", cutflowType, 200, -5., 5.);
+  addHisto("pfCCvsB", cutflowType, 200, -5., 5.);
+  
+  addHisto("pfCCvsL_0",cutflowType, 200, -5., 5.);
+  addHisto("pfCCvsL_1",cutflowType, 200, -5., 5.);
+  addHisto("pfCCvsB_0", cutflowType, 200, -5., 5.);
+  addHisto("pfCCvsB_1", cutflowType, 200, -5., 5.);
 
   addHisto("CSVL_count", cutflowType, 50,0,10);
   addHisto("CSVM_count", cutflowType, 50,0,10);
   addHisto("wmt", cutflowType, 50, 0., 200.);
   addHisto("nvtx", cutflowType, 60, 0., 60.);
-  addHisto("rho", cutflowType, 100, 0., 1.);
-  addHisto("rho_0", cutflowType, 100, 0., 1.);
+  addHisto("rhoAll_", cutflowType, 100, 0., 100.);
+  addHisto("rhoAll_0", cutflowType, 100, 0., 100.);
+  addHisto("chi2", cutflowType, 100, 0., 500.);
+  addHisto("ndof", cutflowType, 100, 0., 500.);
   addHisto("mjj", cutflowType, 50, 20., 250.);
+  addHisto("hepNUP", cutflowType, 100, 1., 20.);
   
 /*  
   addHisto("mjj_kfit", cutflowType, 40, 0.,200.);
@@ -162,9 +170,12 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("CSVL_count", cutflowType+"/BTag", 10,0,10);
   addHisto("CSVM_count", cutflowType+"/BTag", 10,0,10);
   addHisto("wmt", cutflowType+"/BTag", 50, 0., 200.);
-  addHisto("rho", cutflowType+"/BTag", 100, 0., 1.);
-  addHisto("rho_0", cutflowType+"/BTag", 100, 0., 1.);
+  addHisto("rhoAll_", cutflowType+"/BTag", 100, 0., 100.);
+  addHisto("rhoAll_0", cutflowType+"/BTag", 100, 0., 100.);
+  addHisto("chi2", cutflowType+"/BTag", 100, 0., 500.);
+  addHisto("ndof", cutflowType+"/BTag", 100, 0., 500.);
   addHisto("nvtx", cutflowType+"/BTag", 60, 0., 60.);
+  addHisto("hepNUP", cutflowType+"/BTag", 100, 1., 20.);
 /*
   InitHist("KinFit", cutflowType, outFile_);
   addHisto("pre_RelIso_mu",cutflowType+"/KinFit", 40,0,0.5);

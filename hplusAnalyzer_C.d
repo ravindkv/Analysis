@@ -1,6 +1,7 @@
 
 # DO NOT DELETE
 
+./hplusAnalyzer_C.so: hplusAnalyzer.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TRandom2.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TRandom.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc481/lcg/root/5.34.18-cms12/include/TNamed.h

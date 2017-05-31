@@ -15,7 +15,7 @@
 #stored, for different merged ntuple input files
 #------------------------------------------------
 
-outcond="log_MuMC_20170429_1_pileup"
+outcond="log_MuMC_MuData_20170528_kfact"
 #outcond="log_MuMC_20170429_2_pileup"
 #outcond="log_MuData_20170502_1_pileup"
 #outcond="log_MuData_20170502_2_pileup"

@@ -13,7 +13,7 @@ import sys
 import datetime
 
 #USERS INPUTS
-isData = False
+isData = True
 isMC = True
 
 mc = [
