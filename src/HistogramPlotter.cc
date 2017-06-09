@@ -29,9 +29,16 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("CSVL_count", cutflowType, 50,0,10);
   addHisto("CSVM_count", cutflowType, 50,0,10);
   addHisto("wmt", cutflowType, 50, 0., 200.);
-  addHisto("nvtx", cutflowType, 60, 0., 60.);
-  addHisto("rhoAll_", cutflowType, 100, 0., 100.);
-  addHisto("rhoAll_0", cutflowType, 100, 0., 100.);
+  addHisto("nvtx", cutflowType, 100, 0., 100.);
+  addHisto("nvtx_6Kbins", cutflowType, 6000, 0., 1000.);
+  addHisto("intimepu", cutflowType, 6000, 0., 1000.);
+  addHisto("outoftimepu", cutflowType, 6000, 0., 1000.);
+  addHisto("totalpu", cutflowType, 6000, 0., 1000.);
+  addHisto("trueintimepu", cutflowType, 6000, 0., 1000.);
+  addHisto("trueoutoftimepu", cutflowType, 6000, 0., 1000.);
+  addHisto("truetotalpu", cutflowType, 6000, 0., 1000.);
+  addHisto("rhoAll", cutflowType, 100, 0., 100.);
+  addHisto("rhoAll0", cutflowType, 100, 0., 100.);
   addHisto("chi2", cutflowType, 100, 0., 500.);
   addHisto("ndof", cutflowType, 100, 0., 500.);
   addHisto("mjj", cutflowType, 50, 20., 250.);
@@ -170,11 +177,12 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("CSVL_count", cutflowType+"/BTag", 10,0,10);
   addHisto("CSVM_count", cutflowType+"/BTag", 10,0,10);
   addHisto("wmt", cutflowType+"/BTag", 50, 0., 200.);
-  addHisto("rhoAll_", cutflowType+"/BTag", 100, 0., 100.);
-  addHisto("rhoAll_0", cutflowType+"/BTag", 100, 0., 100.);
+  addHisto("rhoAll", cutflowType+"/BTag", 100, 0., 100.);
+  addHisto("rhoAll0", cutflowType+"/BTag", 100, 0., 100.);
   addHisto("chi2", cutflowType+"/BTag", 100, 0., 500.);
   addHisto("ndof", cutflowType+"/BTag", 100, 0., 500.);
-  addHisto("nvtx", cutflowType+"/BTag", 60, 0., 60.);
+  addHisto("nvtx", cutflowType+"/BTag", 100, 0., 100.);
+  addHisto("nvtx_6Kbins", cutflowType+"/BTag", 6000, 0., 1000.);
   addHisto("hepNUP", cutflowType+"/BTag", 100, 1., 20.);
 /*
   InitHist("KinFit", cutflowType, outFile_);
@@ -291,6 +299,11 @@ void HistogramPlotter::add2DHisto(TString name, TString dirname, int range1, dou
   //histos2_[fullname]->Sumw2();
 }
 
+void HistogramPlotter::fillHistoPU(TString name, TString dirname, int bin, double binCont)
+{
+  TH1* h = getHisto(name, dirname);
+  if(h != 0) h->SetBinContent(bin, binCont);
+}
 
 void HistogramPlotter::fillHisto(TString name, TString dirname, double value, double weight)
 {

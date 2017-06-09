@@ -35,7 +35,7 @@ public :
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData
     //PU info for MC:
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Pileup_MC_Information
-    LumiWeights_ = reweight::LumiReWeighting("trueInTimePU_mcDY.root","trueMinBiasPU_dataMu.root", "pileup", "pileup");
+    LumiWeights_ = reweight::LumiReWeighting("stack/trueInTimePU_mcDY.root","stack/trueMinBiasPU_dataMu.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
     

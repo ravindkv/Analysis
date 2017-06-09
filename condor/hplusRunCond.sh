@@ -15,11 +15,8 @@
 #stored, for different merged ntuple input files
 #------------------------------------------------
 
-outcond="log_MuMC_MuData_20170528_kfact"
-#outcond="log_MuMC_20170429_2_pileup"
-#outcond="log_MuData_20170502_1_pileup"
-#outcond="log_MuData_20170502_2_pileup"
-
+#outcond="log_MuMC_MuData_20170603"
+outcond="log_check"
 mkdir $outcond
 cp hplusCond.sub $outcond
 cp hplusAnalyzer.sh $outcond
@@ -34,7 +31,7 @@ echo "make sure that you have coppied voms \n"
 echo "certificate e.g. x509up_u93032 from /tmp\n"
 echo "to /afs/cern.ch/user/r/rverma/ \n "
 count=0
-cat mergedNtupleT2.txt | while read ntupleT2Path
+cat ntupleT2Paths.txt | while read ntupleT2Path
 do
   #----------------------------------------------
   #print T2Paths of ntuple, on terminal

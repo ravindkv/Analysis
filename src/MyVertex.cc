@@ -6,6 +6,7 @@ MyVertex::MyVertex():
   ndof(0),
   normalizedChi2(-999),
   rho(-999)
+  rhoAll(-999);
 {
 }
 
@@ -21,6 +22,6 @@ void MyVertex::Reset()
   ndof = 0;
   normalizedChi2 = -999.;
   rho = -999;
-  rhoAll_ = -999;
+  rhoAll = -999;
   XYZ.SetCoordinates(0.0,0.0,0.0);
 }

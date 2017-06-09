@@ -22,7 +22,7 @@ class MyVertex
   double ndof;
   double normalizedChi2;
   double rho;  // for maxd0 selection (<2)
-  double rhoAll_;
+  double rhoAll;
   Point3D        XYZ;      //  position
   
  private :
