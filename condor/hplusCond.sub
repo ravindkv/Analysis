@@ -4,18 +4,18 @@
 
 #---------------------------------------------
 # voms-proxy-init --voms cms, to use T2 files
-# hplusAnalyzer.sh is run by condor_submit
-# Arguments are passed to hplusAnalyzer.sh
+# hplusAnalyzer_TIFR.sh is run by condor_submit
+# Arguments are passed to hplusAnalyzer_TIFR.sh
 #---------------------------------------------
 
 Universe              = vanilla
-x509userproxy         = /afs/cern.ch/user/r/rverma/x509up_u93032
+x509userproxy         = /home/rverma/x509up_u56537
 #use_x509userproxy    = true
-Executable            = hplusAnalyzer.sh
+Executable            = hplusAnalyzer_TIFR.sh
 Arguments             = FNAME OUTPUTFILE OUTPUTDIR $(Process) $(Cluster)
 
 #---------------------------------------------
-# hplusAnalyzer.C output are stored in .stdout
+# hplusAnalyzer_TIFR.sh output are stored in .stdout
 # all kind of errors are stores in .stderr
 # CPU usage, RAM etc are stored in .log
 #---------------------------------------------

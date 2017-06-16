@@ -19,6 +19,7 @@ class MyVertex
   double chi2;
   Point3D        ErrXYZ;   //  error position
   int isValid;
+  int totVtx;
   double ndof;
   double normalizedChi2;
   double rho;  // for maxd0 selection (<2)
