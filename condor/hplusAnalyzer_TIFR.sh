@@ -21,13 +21,13 @@ date
 #//////////// T3 /////////////////////////////////
 echo "CONDOR DIR: $_CONDOR_SCRATCH_DIR"
 cd ${_CONDOR_SCRATCH_DIR}
-cp -r /home/rverma/t3store2/CMSSW_7_2_1/ .
+cp -r /home/rverma/t3store2/CMSSW_8_0_25/ .
 
 #------------------------------------------------
 #copy the lxplus package to the remote machine
 #and run the codes at remote machine
 #------------------------------------------------
-cd CMSSW_7_2_1/src/Analysis/
+cd CMSSW_8_0_25/src/Analysis/
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
 ./runMe.sh $inNtupleFile $outAnalFile $outAnalDir
@@ -38,17 +38,17 @@ eval `scram runtime -sh`
 #Remove the package, after copying the output
 #------------------------------------------------
 echo "OUTPUT: "
-ls ${_CONDOR_SCRATCH_DIR}/CMSSW_7_2_1/src/Analysis/13TeV/$outAnalDir
+ls ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir
 
-cp -rf ${_CONDOR_SCRATCH_DIR}/CMSSW_7_2_1/src/Analysis/13TeV/$outAnalDir/* /home/rverma/condor_out/histo_MuMC_MuData_20170608_TIFR
+cp -rf ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir/* /home/rverma/condor_out/histo_MuMC_MuData_20170608_TIFR
 
-#xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/CMSSW_7_2_1/src/Analysis/13TeV/$outAnalDir root://se01.indiacms.res.in:1094//cms/store/user/rverma/histo_MuMC_MuData_20170608_TIFR/
+xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$outAnalDir root://se01.indiacms.res.in:1094//cms/store/user/rverma/histo_MuMC_MuData_20170608_TIFR/
 cd ${_CONDOR_SCRATCH_DIR}
-rm -rf CMSSW_7_2_1
+rm -rf CMSSW_8_0_25
 
 #/////////// LXPLUS ///////////////////////
 #cd /afs/cern.ch/work/r/rverma/private/analysis/CMSSW_7_2_3/src
-#cd /home/rverma/t3store2/CMSSW_7_2_1/src/
+#cd /home/rverma/t3store2/CMSSW_8_0_25/src/
 #source /cvmfs/cms.cern.ch/cmsset_default.sh
 #eval `scram runtime -sh`
 #echo "CONDOR DIR: $_CONDOR_SCRATCH_DIR"
@@ -56,7 +56,7 @@ rm -rf CMSSW_7_2_1
 #
 #
 ##cp -r /afs/cern.ch/work/r/rverma/private/analysis/CMSSW_7_2_3/src/Analysis .
-#cp -r /home/rverma/t3store2/CMSSW_7_2_1/src/Analysis .
+#cp -r /home/rverma/t3store2/CMSSW_8_0_25/src/Analysis .
 #cd Analysis
 #./runMe.sh $inNtupleFile $outAnalFile $outAnalDir
 #echo "OUTPUT: "

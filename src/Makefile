@@ -8,9 +8,10 @@ OBJS = $(addsuffix .o,$(basename $(files)))
 
 OPT = -O -Wall -fPIC -D_REENTRANT
 INC = -I${ROOTSYS}/include -I..
+EXT = -std=c++11
 
 .cc.o:
-	$(CXX) $(OPT) $(INC) -c $*.cc
+	$(CXX) $(OPT) $(INC) $(EXT) -c $*.cc
 
 all:
 	@$(MAKE) eventdict.cc; $(MAKE) libMyEvent.so

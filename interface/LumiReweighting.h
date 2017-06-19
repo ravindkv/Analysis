@@ -256,7 +256,7 @@ namespace reweight {
 
 	  weights_->Divide( den );  // so now the average weight should be 1.0
 	  std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
-      weights_->Draw();
+      //weights_->Draw();
 ///*
    //int NBins = weights_->GetNbinsX();
    //for(int ibin = 1; ibin<NBins+1; ++ibin){
