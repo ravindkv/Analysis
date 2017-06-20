@@ -244,7 +244,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         double statusOfKinFit=-99;
         double probOfKinFit=-99;
         vector<MyKineFitParticle> allKineFitParticles = ev->KineFitParticles;
-        cout<<endl;	
 	for(size_t imk=0; imk < allKineFitParticles.size(); imk++){
           string labelName = "";
 	  if(cutflowType.Contains("JESPlus"))labelName="JESUp";
@@ -487,7 +486,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           input_count++;
           if(input_count%10==0)
           cout << "input count iso: "<< input_count << endl;
-          if(i > 10000) break;
+          //if(i > 10000) break;
           
           //---------------------------------------------------//
           // add set of plots after KinFit:
@@ -534,7 +533,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             //---------------------------------------------------//
             if(kfLightJets.size() >= 2){
               MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
-              fillHisto("mjj_kfit", cutflowType+"/Iso", diJet.mass(), evtWeight);
+              fillHisto("mjj_kfit", cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
               bool match_j1 = false, match_j2 = false;
               for(size_t ij = 0; ij < j_final.size(); ij++){
                 int ind_ij = j_final[ij];
@@ -578,9 +577,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
                     fillHisto("kfJet1_phi",cutflowType+"/Iso/KinFit", kfLightJets[0].phi(), evtWeight);
                     fillHisto("kfJet2_phi",cutflowType+"/Iso/KinFit", kfLightJets[1].phi(), evtWeight);
                   }
-                fillHisto("mjj_kfit_Id",cutflowType+"/Iso", diJet.mass(), evtWeight);
-                if(probOfKinFit > 0.1) fillHisto("mjj_kfit_Id_probfit1",cutflowType+"/Iso", diJet.mass(), evtWeight);
-                if(probOfKinFit > 0.2) fillHisto("mjj_kfit_Id_probfit2",cutflowType+"/Iso", diJet.mass(), evtWeight);
+                fillHisto("mjj_kfit_Id",cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
+                if(probOfKinFit > 0.1) fillHisto("mjj_kfit_Id_probfit1",cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
+                if(probOfKinFit > 0.2) fillHisto("mjj_kfit_Id_probfit2",cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
                 } //end-of  if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 )
               } // end-of if(match1 & match2) 
             } // end-of if(kfLightJets.size() >= 2)

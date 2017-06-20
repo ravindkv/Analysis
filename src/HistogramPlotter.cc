@@ -77,10 +77,10 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("kfJet2_eta", cutflowType+"/Iso/KinFit", 60, -3.0, 3.0);
   addHisto("kfJet1_phi", cutflowType+"/Iso/KinFit", 63, -M_PI, M_PI);
   addHisto("kfJet2_phi", cutflowType+"/Iso/KinFit", 63, -M_PI, M_PI);
-  addHisto("mjj_kfit",cutflowType+"/Iso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id",cutflowType+"/Iso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id_probfit1",cutflowType+"/Iso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id_probfit2",cutflowType+"/Iso/KinFit", 5000, 0, 500);
+  addHisto("mjj_kfit",cutflowType+"/Iso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id",cutflowType+"/Iso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id_probfit1",cutflowType+"/Iso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id_probfit2",cutflowType+"/Iso/KinFit", 500, 0, 500);
   
   ////////////////// NonIsolation ///////////////// 
   //base/NonIso histo
@@ -136,10 +136,10 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("kfJet2_eta", cutflowType+"/NonIso/KinFit", 60, -3.0, 3.0);
   addHisto("kfJet1_phi", cutflowType+"/NonIso/KinFit", 63, -M_PI, M_PI);
   addHisto("kfJet2_phi", cutflowType+"/NonIso/KinFit", 63, -M_PI, M_PI);
-  addHisto("mjj_kfit",cutflowType+"/NonIso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id",cutflowType+"/NonIso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id_probfit1",cutflowType+"/NonIso/KinFit", 5000, 0, 500);
-  addHisto("mjj_kfit_Id_probfit2",cutflowType+"/NonIso/KinFit", 5000, 0, 500);
+  addHisto("mjj_kfit",cutflowType+"/NonIso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id",cutflowType+"/NonIso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id_probfit1",cutflowType+"/NonIso/KinFit", 500, 0, 500);
+  addHisto("mjj_kfit_Id_probfit2",cutflowType+"/NonIso/KinFit", 500, 0, 500);
 
 }
 
