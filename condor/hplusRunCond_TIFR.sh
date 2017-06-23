@@ -21,7 +21,7 @@ eval `scram runtime -sh`
 voms-proxy-init --voms cms
 cp /tmp/x509up_u56537 ~/
 
-log="log_20170608_"
+log="log_20170620_"
 logDir=$log${ntupleT2Paths/.txt/""}
 baseDir="/home/rverma/condor_log/"
 mkdir -p $baseDir$logDir

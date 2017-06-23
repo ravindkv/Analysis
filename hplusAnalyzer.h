@@ -46,12 +46,12 @@ public :
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62472600;
+    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
     //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48906200;
+    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
     //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["HplusM100"]         =  1;             evtDBS["HplusM100"]         =  996170; 
     xss["HplusM120"]         =  1;             evtDBS["HplusM120"]         =  994498; 
@@ -72,14 +72,13 @@ public :
     xss["ST_s"]              =  7.3;           evtDBS["ST_s"]              =  2989199;
     xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
-    xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  9676510;   
-    //xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  10139950;   
-    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45230942;
+    xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  10139950;   
+    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44715700;
     //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29531700;
+    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
     //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
     xss["WW"]                =  63.21;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  22.82;         evtDBS["WZ"]                =  1000000;
