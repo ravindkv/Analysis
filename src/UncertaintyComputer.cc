@@ -171,13 +171,13 @@ bool UncertaintyComputer::getBtagWithSF(MyJet jet, bool isData, int scale, bool 
   bool isBtagged = false;
 
   if(scale == 0){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["combinedSecondaryVertexBJetTags"], jet.partonFlavour, isData ,kNo, kNo, is2012);
+    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo, kNo, is2012);
   }
   else if(scale == 1){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["combinedSecondaryVertexBJetTags"], jet.partonFlavour, isData ,kUp, kUp, is2012);
+    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp, kUp, is2012);
   }
   else if(scale == -1){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["combinedSecondaryVertexBJetTags"], jet.partonFlavour, isData ,kDown, kDown, is2012);
+    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown, kDown, is2012);
   }
   
   return isBtagged;

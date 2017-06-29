@@ -8,5 +8,5 @@ No of correct jet pair assign to W:   0
 No of not correct jet pair assign to W:   0
 No of correct jet pair not assign to W but |eta| < 2.5 and pt > 25:   0
 No of correct jet matched to b (from top) :   0
-Average weights for top-reweighting : 32941.2/32947 = 0.999825
+Average weights for top-reweighting : 0/0 = -nan
 Efficiency Uncertainty on the SV finding : 0/0 = -nan
