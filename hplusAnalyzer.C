@@ -626,7 +626,7 @@ void hplusAnalyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", "TTJets_MuMC_check"); 
   
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170620/MuMC_20170620/TTJets_MuMC_20170620/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170620/170620_175939/0000/TTJets_MuMC_20170620_Ntuple_31.root", "PF", "ntupleToHistos");
+ // CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170620/MuMC_20170620/TTJets_MuMC_20170620/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170620/170620_175939/0000/TTJets_MuMC_20170620_Ntuple_31.root", "PF", "ntupleToHistos");
   
 		  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20170610/MuMC_20170608/TTJets_MuMC_20170608/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170608/170608_190531/0000/TTJets_MuMC_20170608_Ntuple_1.root", "PF", "TT");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20170610/MuMC_20170608/WZ_MuMC_20170608/WZ_TuneCUETP8M1_13TeV-pythia8/WZ_MuMC_20170608/170608_190850/0000/WZ_MuMC_20170608_Ntuple_3.root", "PF","DY1");

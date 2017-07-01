@@ -34,7 +34,7 @@ double UncertaintyComputer::getJERSF(double eta, int jer)
 {
 
   double SF = 1.0;
-  for(size_t i = 0; i < 7; i++){
+  for(size_t i = 0; i < 13; i++){
     if(TMath::Abs(eta) >= JEREtaMap[i] && TMath::Abs(eta) < JEREtaMap[i+1]){
       if(jer == 0)SF = JERSF[i];
       else if (jer == 1){
@@ -80,6 +80,7 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
     metY += rawJet.py(); 
     double jet_pt = vJ[j_ind].p4.pt(); 
     double SF = getJERSF(vJ[j_ind].p4.eta(), jer); 
+    //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
     double ptscale = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt); 
     rawJet *= ptscale; 
     metX -= rawJet.px(); 
@@ -158,6 +159,10 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
   jet_pt *= (1+(jet.JECUncertainty*double(jes)));
 
   //apply JER uncert, scaling
+  double dR = 0;
+  double rCone = 0;
+  double sigmaJER = 
+  ///if(gen_pt> 0 && dR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
   if(gen_pt > 0){
     double SF = getJERSF(jet.p4.eta(), jer); 
     double ptscale = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt);

@@ -2,7 +2,7 @@ input file: root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_
 totalEvents: 32947
 Sample weight for TTJets is= 2.81455
 Number of times HadP and HadQ matches with jets0
-total number of selected events 997
+total number of selected events 934
 No of times three pair jet matched:    0
 No of correct jet pair assign to W:   0
 No of not correct jet pair assign to W:   0
