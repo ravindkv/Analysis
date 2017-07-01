@@ -126,6 +126,8 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("kfJet1_phi", cutflowType+"/Iso/KinFit", 63, -M_PI, M_PI);
   addHisto("kfJet2_phi", cutflowType+"/Iso/KinFit", 63, -M_PI, M_PI);
   addHisto("mjj_kfit",cutflowType+"/Iso/KinFit", 100, 0, 500);
+  addHisto("mjj_kfit_CTag",cutflowType+"/Iso/KinFit", 5000, 0, 500);
+  addHisto("mjj_kfit_noCTag",cutflowType+"/Iso/KinFit", 5000, 0, 500);
   addHisto("mjj_kfit_Id",cutflowType+"/Iso/KinFit", 100, 0, 500);
   addHisto("mjj_kfit_Id_probfit1",cutflowType+"/Iso/KinFit", 100, 0, 500);
   addHisto("mjj_kfit_Id_probfit2",cutflowType+"/Iso/KinFit", 100, 0, 500);
