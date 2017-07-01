@@ -547,17 +547,59 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             if(kfLightJets.size() >= 2){
               kfCount++;
 	      MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
+	      
+	      // category depending on C-tagging
+	      //pfCCvsL= pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
+	      //pfCCvsB = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
+
               fillHisto("mjj_kfit", cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
               bool match_j1 = false, match_j2 = false;
+	      int indexForCTag0 = 0, indexForCTag1 = 0;
+	      
               for(size_t ij = 0; ij < j_final.size(); ij++){
                 int ind_ij = j_final[ij];
                 if(DeltaR(kfLightJets[0], pfJets[ind_ij].p4) < 0.2){
                   match_j1=true;
+		  indexForCTag0 = ind_ij;
+		  //cout << "ind_ij for 0th Jet: " << ind_ij << endl;
                 }
                 if(DeltaR(kfLightJets[1], pfJets[ind_ij].p4) < 0.2){
                   match_j2=true;
+		  indexForCTag1 = ind_ij;
+		  //cout << "ind_ij for 1st Jet: " << ind_ij << endl;
                 }
               }
+	      
+	      // category depending on C-tagging
+              double pfCCvsL_ForCTag0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsLJetTags"];
+	      double pfCCvsL_ForCTag1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsLJetTags"];
+
+              double pfCCvsB_ForCTag0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsBJetTags"]; 
+	      double pfCCvsB_ForCTag1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsBJetTags"];
+	      
+	      cout << "=========================" << endl;
+	      cout << "pfCCvsL_ForCTag0: " << pfCCvsL_ForCTag0 << endl;
+	      cout << "pfCCvsL_ForCTag1: " << pfCCvsL_ForCTag1 << endl;
+	      
+	      cout << "pfCCvsB_ForCTag0: " << pfCCvsB_ForCTag0 << endl;
+	      cout << "pfCCvsB_ForCTag1: " << pfCCvsB_ForCTag1 << endl;
+	      cout << "=========================" << endl;
+
+	      //MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
+	      //CharmL-> (CvsL: -0.48 and CvsB: -0.17)
+	      if(match_j1 && match_j2){
+		MyLorentzVector diJet_tag = kfLightJets[0]+kfLightJets[1];
+		if((pfCCvsL_ForCTag0 > -0.48 || pfCCvsL_ForCTag1 > -0.48) && (pfCCvsB_ForCTag0 > -0.17 || pfCCvsB_ForCTag1 > -0.17)){
+		  fillHisto("mjj_kfit_CTag", cutflowType+"/Iso/KinFit", diJet_tag.mass(), evtWeight);
+		}else {
+		  fillHisto("mjj_kfit_noCTag", cutflowType+"/Iso/KinFit", diJet_tag.mass(), evtWeight);
+		}
+		
+	      }
+
+
+
+
               if(match_j1 && match_j2){
                 if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 ){
                   if(probOfKinFit > 0.1){
@@ -632,7 +674,8 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20170610/MuMC_20170608/WZ_MuMC_20170608/WZ_TuneCUETP8M1_13TeV-pythia8/WZ_MuMC_20170608/170608_190850/0000/WZ_MuMC_20170608_Ntuple_3.root", "PF","DY1");
   
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  CutFlowAnalysis("/hadoop/cms/store/user/gkole/chargedHiggs/13TeV/Ntuple/June2017/TTJets_MuMC_20170620_Ntuple_1.root", "PF", "outputFile");
 } 
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
