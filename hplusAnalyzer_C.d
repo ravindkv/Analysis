@@ -301,6 +301,8 @@
 ./hplusAnalyzer_C.so: interface/ObjectSelector.hh
 ./hplusAnalyzer_C.so: interface/UncertaintyComputer.hh interface/BtagSF.hh
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TRandom3.h
+./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH2D.h
+./hplusAnalyzer_C.so: interface/BTagCalibrationStandalone.h
 ./hplusAnalyzer_C.so: interface/SVEffUnc.hh interface/MomentumVec.h
 ./hplusAnalyzer_C.so: interface/LumiReweighting.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TH1F.h
@@ -309,5 +311,6 @@
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TRandom1.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TStopwatch.h
 ./hplusAnalyzer_C.so: interface/HistogramPlotter.hh
+./hplusAnalyzer_C.so: interface/BTagCalibrationStandalone.h
 ./hplusAnalyzer_C.so: /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RVersion.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RConfig.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TClass.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TDictAttributeMap.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TInterpreter.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TROOT.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TBuffer.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TMemberInspector.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TError.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/RtypesImp.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TIsAProxy.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TFileMergeInfo.h /cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed6/include/TCollectionProxyInfo.h
 hplusAnalyzer_C__ROOTBUILDVERSION= 6.06/01

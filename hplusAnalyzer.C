@@ -23,7 +23,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
 //Process the cuts, event by event
 //---------------------------------------------------//  
 void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType, TFile *outFile_){
-  
   int input_count = 0;
   bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
   string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("METs");
@@ -51,14 +50,15 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //---------------------------------------------------//
       double lumiTotal = 34312;
       int nEntries = evR->AssignEventTreeFrom(f);
-      if( nEntries == 0) {return; }
-      TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"))->Clone("inputcf");
-      TH1F* intimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/intimepu"))->Clone("intimepu");
-      TH1F* outoftimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/outoftimepu"))->Clone("outoftimepu");
-      TH1F* totalpu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/totalpu"))->Clone("totalpu");
-      TH1F* trueintimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/trueintimepu"))->Clone("trueintimepu");
-      TH1F* trueoutoftimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/trueoutoftimepu"))->Clone("trueoutoftimepu");
-      TH1F* truetotalpu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/truetotalpu"))->Clone("truetotalpu");
+      if(nEntries == 0) {return; }
+      
+      TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"));
+      TH1F* intimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/intimepu"));
+      TH1F* outoftimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/outoftimepu"));
+      TH1F* totalpu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/totalpu"));
+      TH1F* trueintimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/trueintimepu"));
+      TH1F* trueoutoftimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/trueoutoftimepu"));
+      TH1F* truetotalpu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/truetotalpu"));
       double initialEvents = inputcf->GetBinContent(1);
       cout<<"input file: "<<url<<endl;
       outfile_<<"input file: "<<url<<endl;
@@ -81,6 +81,45 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       double TotalTopPtWeights = 0, TotalLplusJEvents = 0; 
       double TotalSVEff = 0, TotalEvtsWithSV = 0.;
       
+      //---------------------------------------------------//
+      //BTag SF: read CSV file for SF, 2D histos for eff 
+      //---------------------------------------------------//      
+      //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco#Data_MC_Scale_Factors_period_dep
+      const std::string & filename = "stack/CSVv2_Moriond17_B_H.csv";
+      const std::string & tagger = "CSVv2";
+      const std::string & measurementType = "comb";
+      const std::string & sysType = "central"; 
+      const std::vector<std::string> & otherSysTypes = {"up", "down"};
+      //b-quark
+      BTagCalibrationReader readCSVbL= readCSVfile(filename, tagger, BTagEntry::OP_LOOSE,
+ 		      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_B);
+      //c-quark
+      BTagCalibrationReader readCSVcL= readCSVfile(filename, tagger, BTagEntry::OP_LOOSE,
+		      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_C);
+      //other(light) quarks and gluon
+      BTagCalibrationReader readCSVlL= readCSVfile(filename, tagger, BTagEntry::OP_LOOSE,
+		      "incl", sysType, otherSysTypes, BTagEntry::FLAV_UDSG);
+      
+      //getBTagEffHistos(f);
+      TString histPath("myMiniTreeProducer/Jets/");
+      TH2D* h2_BTaggingEff_Denom_b = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_b"));
+      TH2D* h2_BTaggingEff_Denom_c = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_c"));
+      TH2D* h2_BTaggingEff_Denom_udsg = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_udsg")); 
+      TH2D* h2_BTaggingEff_Num_bL = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_bL"));
+      TH2D* h2_BTaggingEff_Num_cL = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_cL"));
+      TH2D* h2_BTaggingEff_Num_udsgL = (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_udsgL")); 
+      
+      //---------------------------------------------------//
+      //muon scale factors from 2D histograms 
+      //---------------------------------------------------//      
+      //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults 
+      //Run BCDEF
+      TFile *f_BtoF = new TFile("stack/EfficienciesAndSF_RunBtoF.root");
+      TH2D *h2_BtoF = (TH2D*)f_BtoF->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+      //Run GH
+      TFile *f_GH = new TFile("stack/EfficienciesAndSF_Period4.root");
+      TH2D *h2_GH = (TH2D*)f_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+
       //---------------------------------------------------//
       //loop over each event, of the ntuple
       //---------------------------------------------------//
@@ -136,8 +175,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           evtWeight *= weightPU;  
           }
         } 
-/*
-        //---------------------------------------------------//
+        
+	//---------------------------------------------------//
         // apply top re-weighting weight
         //---------------------------------------------------//
         double topPtWeights_offline = 1.0;
@@ -159,8 +198,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         //cout<<"topPtWeights_offline = "<<topPtWeights_offline<<endl;
         TotalLplusJEvents++;
         evtWeight *= topPtWeights_offline; //Multiply to the total weights
-  */      
-        //---------------------------------------------------//
+        
+	//---------------------------------------------------//
         //apply muon triggers
         //---------------------------------------------------//
         double nCutPass = 0.0;
@@ -337,14 +376,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         ////////////////////////////////////////////////////////////////  
         if(isofound){
           //apply muon SF to eventWeights 
-           
-          //double musfWeight = 1.0;
-          //if(fabs(pfMuons[m_i].p4.eta()) < 0.9)musfWeight = muSF["sfEta1"];
-          //else if(fabs(pfMuons[m_i].p4.eta()) > 0.9 && fabs(pfMuons[m_i].p4.eta()) < 1.2)musfWeight = muSF["sfEta2"];
-          //else musfWeight = muSF["sfEta3"];
-          //evtWeight *= musfWeight;
-          //cout<<"evtWeight musf = "<<evtWeight<<endl;
-             
+          double musfWeight = 1.0;
+	  string file_path(url);
+	  //muSF for Run BCDEF
+	  if(file_path.find("RunB") != string::npos||
+			  file_path.find("RunC") != string::npos||
+			  file_path.find("RunD") != string::npos||
+			  file_path.find("RunE") != string::npos||
+			  file_path.find("RunF") != string::npos)
+	  {
+            musfWeight = getMuonSF(h2_BtoF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+	  }
+	  //muSF for Run GH
+	  else musfWeight = getMuonSF(h2_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+          evtWeight *= musfWeight;
           nCutPass++; 
           fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one electron
           int count_muon = m_init_noiso.size();
@@ -407,7 +452,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           //nCutPass++;
           //fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
           
-          
           //---------------------------------------------------//
           //apply B-tagging, C-tagging
           //---------------------------------------------------//
@@ -424,7 +468,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 
 	  //LOOSE BTAG
 	  int count_CSVL = 0; int count_CSVL_SF = 0; 
-          for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+          ///bool isBtagL = true; bool isBtagM = true; isBtagT = true; 
+	  bool isBtag = false;
+	  for(size_t ijet = 0; ijet < j_final.size(); ijet++){
             int ind_jet = j_final[ijet];
             pfCISV = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
             pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
@@ -434,13 +480,19 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             fillHisto("pfCMVA", cutflowType+"/Iso/BTag", pfCMVA , evtWeight); 
             fillHisto("pfCCvsL", cutflowType+"/Iso/BTag", pfCCvsL, evtWeight); 
             fillHisto("pfCCvsB", cutflowType+"/Iso/BTag", pfCCvsB , evtWeight); 
-            
-	    bool isBtag = getBtagWithSF(pfJets[ind_jet], ev->isData, bscale, true); 
-	    if(isBtag)count_CSVL_SF++; 
+	   
+	    //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
+	    //b-quark
+	    if(abs(pfJets[ind_jet].partonFlavour) ==5)
+              isBtag = getBtagWithSF(readCSVbL, h2_BTaggingEff_Num_bL, h2_BTaggingEff_Denom_b, pfJets[ind_jet], ev->isData, bscale); 
+	    //c-quark
+	    else if(abs(pfJets[ind_jet].partonFlavour) ==4) 
+	      isBtag = getBtagWithSF(readCSVcL, h2_BTaggingEff_Num_cL, h2_BTaggingEff_Denom_c, pfJets[ind_jet], ev->isData, bscale); 
+	    //other quarks and gluon
+	    else isBtag = getBtagWithSF(readCSVlL, h2_BTaggingEff_Num_udsgL, h2_BTaggingEff_Denom_udsg, pfJets[ind_jet], ev->isData, bscale); 
 	    
-	    if(pfCISV > 0.5426){
-              count_CSVL++;
-            }
+	    if(isBtag)count_CSVL_SF++; 
+	    if(pfCISV > 0.5426) count_CSVL++;
             else j_final_nob.push_back(ind_jet);  
           }
 	  ///cout<<"count_CSVL = "<<count_CSVL<<endl;
@@ -500,7 +552,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           input_count++;
           if(input_count%10==0)
           cout << "input count iso: "<< input_count << endl;
-          //if(i > 10000) break;
+         // if(i > 1000) break;
           //---------------------------------------------------//
           // add set of plots after KinFit:
           //---------------------------------------------------//
@@ -514,9 +566,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             //---------------------------------------------------//
             //select maximum b-tag discriminator jet in KF
             //---------------------------------------------------//
-            int maxBtagJet = -1;
+            Int_t maxBtagJet = -1;
             double maxBDiscr = -999.;
-            for(size_t ik = 0; ik < kfJets.size(); ik++){
+            for(Int_t ik = 0; ik < kfJets.size(); ik++){
               for(size_t ij = 0; ij < j_final.size(); ij++){
                 int ind_ij = j_final[ij];
                 if(DeltaR(kfJets[ik], pfJets[ind_ij].p4) < 0.2){
@@ -536,7 +588,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             }
             vector<MyLorentzVector> kfLightJets; kfLightJets.clear();
             if(kfJets.size() >=3 && maxBtagJet >= 0){
-              for(unsigned ik = 0; ik < kfJets.size(); ik++){
+              for(Int_t ik = 0; ik < kfJets.size(); ik++){
                 if(ik != maxBtagJet)kfLightJets.push_back(kfJets[ik]);
               }
             }
@@ -547,17 +599,59 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             if(kfLightJets.size() >= 2){
               kfCount++;
 	      MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
+	      
+	      // category depending on C-tagging
+	      //pfCCvsL= pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
+	      //pfCCvsB = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
+
               fillHisto("mjj_kfit", cutflowType+"/Iso/KinFit", diJet.mass(), evtWeight);
               bool match_j1 = false, match_j2 = false;
+	      int indexForCTag0 = 0, indexForCTag1 = 0;
+	      
               for(size_t ij = 0; ij < j_final.size(); ij++){
                 int ind_ij = j_final[ij];
                 if(DeltaR(kfLightJets[0], pfJets[ind_ij].p4) < 0.2){
                   match_j1=true;
+		  indexForCTag0 = ind_ij;
+		  //cout << "ind_ij for 0th Jet: " << ind_ij << endl;
                 }
                 if(DeltaR(kfLightJets[1], pfJets[ind_ij].p4) < 0.2){
                   match_j2=true;
+		  indexForCTag1 = ind_ij;
+		  //cout << "ind_ij for 1st Jet: " << ind_ij << endl;
                 }
               }
+	      
+	      // category depending on C-tagging
+              double pfCCvsL_ForCTag0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsLJetTags"];
+	      double pfCCvsL_ForCTag1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsLJetTags"];
+
+              double pfCCvsB_ForCTag0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsBJetTags"]; 
+	      double pfCCvsB_ForCTag1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsBJetTags"];
+	     /* 
+	      cout << "=========================" << endl;
+	      cout << "pfCCvsL_ForCTag0: " << pfCCvsL_ForCTag0 << endl;
+	      cout << "pfCCvsL_ForCTag1: " << pfCCvsL_ForCTag1 << endl;
+	      
+	      cout << "pfCCvsB_ForCTag0: " << pfCCvsB_ForCTag0 << endl;
+	      cout << "pfCCvsB_ForCTag1: " << pfCCvsB_ForCTag1 << endl;
+	      cout << "=========================" << endl;
+	     */	
+	      //MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
+	      //CharmL-> (CvsL: -0.48 and CvsB: -0.17)
+	      if(match_j1 && match_j2){
+		MyLorentzVector diJet_tag = kfLightJets[0]+kfLightJets[1];
+		if((pfCCvsL_ForCTag0 > -0.48 || pfCCvsL_ForCTag1 > -0.48) && (pfCCvsB_ForCTag0 > -0.17 || pfCCvsB_ForCTag1 > -0.17)){
+		  fillHisto("mjj_kfit_CTag", cutflowType+"/Iso/KinFit", diJet_tag.mass(), evtWeight);
+		}else {
+		  fillHisto("mjj_kfit_noCTag", cutflowType+"/Iso/KinFit", diJet_tag.mass(), evtWeight);
+		}
+		
+	      }
+
+
+
+
               if(match_j1 && match_j2){
                 if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 ){
                   if(probOfKinFit > 0.1){
@@ -624,36 +718,12 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 void hplusAnalyzer::processEvents(){ 
   
   //Data, MC sample from lxplus and T2
-  //CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", "TTJets_MuMC_check"); 
+  CutFlowAnalysis("TTJets_ntuple_MuChannel.root", "PF", "TTJets_MuMC_check"); 
   
- // CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170620/MuMC_20170620/TTJets_MuMC_20170620/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170620/170620_175939/0000/TTJets_MuMC_20170620_Ntuple_31.root", "PF", "ntupleToHistos");
-  
-		  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20170610/MuMC_20170608/TTJets_MuMC_20170608/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170608/170608_190531/0000/TTJets_MuMC_20170608_Ntuple_1.root", "PF", "TT");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20170610/MuMC_20170608/WZ_MuMC_20170608/WZ_TuneCUETP8M1_13TeV-pythia8/WZ_MuMC_20170608/170608_190850/0000/WZ_MuMC_20170608_Ntuple_3.root", "PF","DY1");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170620/MuMC_20170620/TTJets_MuMC_20170620/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170620/170620_175939/0000/TTJets_MuMC_20170620_Ntuple_31.root", "PF", "ntupleToHistos");
   
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("/hadoop/cms/store/user/gkole/chargedHiggs/13TeV/Ntuple/June2017/TTJets_MuMC_20170620_Ntuple_1.root", "PF", "outputFile");
 } 
-
-float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
-
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 2.11;
-  else if(nJets==1) return 0.23;
-  else if(nJets==2) return 0.119;
-  else if(nJets==3) return 0.0562;
-  else if(nJets>=4) return 0.0671;
-  else return 1 ;
-}
-
-float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
-
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 0.120;
-  else if(nJets==1) return 0.0164;
-  else if(nJets==2) return 0.0167;
-  else if(nJets==3) return 0.0167;
-  else if(nJets>=4) return 0.0128;
-  else return 1 ;
-}
 

@@ -20,6 +20,8 @@
 #include "interface/LumiReweighting.h"
 #include "interface/UncertaintyComputer.hh"
 #include "interface/HistogramPlotter.hh"
+#include "interface/BTagCalibrationStandalone.h"
+
 class hplusAnalyzer : public ObjectSelector, HistogramPlotter
 {
 public :
@@ -28,6 +30,9 @@ public :
     DRMIN_JET = 0.5;
     DRMIN_ELE = 0.5;
     METCUT_   = 30.0;
+   
+
+
     //---------------------------------------------------//
     //Pileup reweigting 
     //---------------------------------------------------//
@@ -85,29 +90,6 @@ public :
     xss["ZZ"]                =  10.32;         evtDBS["ZZ"]                =  990064; 
     
     //Lumis(inverse pb) of single muon DATA at 13TeV
-    //https://docs.google.com/spreadsheets/d/1lQyfcY0gnG_IgFrtnbBES_HV1M7ARQM9qCw01vsnxSk/edit?usp=sharing
-    double lumiB = 5403; 
-    double lumiC = 2395;
-    double lumiD = 4255; 
-    double lumiE = 4053;
-    double lumiF = 3105;
-    double lumiG = 7544;
-    double lumiH = 8529+216;
-    double lumiTotal = lumiB+ lumiC+ lumiD+ lumiE+ lumiF+ lumiG+ lumiH;
-    
-    //muon Trigger/ID/ISo SFs, in bins of eta (from muon POG)
-    //SFs for different lumi period are weighted by lumi fraction.
-    //Trigger SF for HLT_IsoMu24_eta2p1
-    double sfEta1 = (lumiE*0.956+lumiB*0.9798+lumiC*0.9841+lumiD*0.98151)/lumiTotal; // 0<|eta|<0.9 
-    double sfEta2 = (lumiE*0.9528+lumiB*0.9618+lumiC*0.9688+lumiD*0.96156)/lumiTotal; // 0.9<|eta|<1.2
-    double sfEta3 = (lumiE*0.9809+lumiB*0.9814+lumiC*1.0021+lumiD*0.99721)/lumiTotal; // 1.2<|eta|<2.1
-    //multiply mu ID/Iso SFs
-    sfEta1 = sfEta1*0.9939*1.0004;
-    sfEta2 = sfEta2*0.9902*1.0031;
-    sfEta3 = sfEta3*0.9970*1.0050;
-    muSF["sfEta1"] = 1; //sfEta1;
-    muSF["sfEta2"] = 1; //sfEta2;
-    muSF["sfEta3"] = 1; //sfEta3;
   };
   ~hplusAnalyzer() {
     delete evR;
@@ -119,7 +101,6 @@ public :
   void processEvents();
   float reweightHEPNUPWJets(int hepNUP);
   float reweightHEPNUPDYJets(int hepNUP);
-
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
@@ -130,5 +111,65 @@ private :
   std::map<string, double> xss;
   std::map<string, double> evtDBS;
   std::map<string, double> muSF;
+  /*
+  BTagCalibrationReader readCSVfile(const std::string &tagger, const std::string &filename);
+  */
   ofstream outfile_;
+  BTagCalibrationReader readCSVfile(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
+  Double_t getMuonSF(TH2D *h2, double eta, double pt);
+
 };
+
+float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
+
+  int nJets = hepNUP-5;
+  if(nJets==0)      return 2.11;
+  else if(nJets==1) return 0.23;
+  else if(nJets==2) return 0.119;
+  else if(nJets==3) return 0.0562;
+  else if(nJets>=4) return 0.0671;
+  else return 1 ;
+}
+
+float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
+
+  int nJets = hepNUP-5;
+  if(nJets==0)      return 0.120;
+  else if(nJets==1) return 0.0164;
+  else if(nJets==2) return 0.0167;
+  else if(nJets==3) return 0.0167;
+  else if(nJets>=4) return 0.0128;
+  else return 1 ;
+}
+
+BTagCalibrationReader hplusAnalyzer::readCSVfile(const std::string &filename, const std::string &tagger,  
+		BTagEntry::OperatingPoint op, 
+		const std::string & measurementType,
+		const std::string & sysType, 
+		const std::vector<std::string> & otherSysTypes, 
+		BTagEntry::JetFlavor jf
+		)
+{ 
+  BTagCalibration calib(tagger, filename);
+  BTagCalibrationReader reader(op, sysType, otherSysTypes);      
+  reader.load(calib, jf, measurementType); 
+  return reader;
+}
+//https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
+Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
+  TAxis *xaxis = h2->GetXaxis();
+  TAxis *yaxis = h2->GetYaxis();
+  Int_t binX = xaxis->FindBin(abs(eta));
+  Int_t binY = yaxis->FindBin(pt);
+  cout<<endl;
+  cout<<"pt = "<<pt<<endl;
+  cout<<"eta = "<<eta<<endl;
+  cout<<"binX = "<<binX<<endl;
+  cout<<"binY = "<<binY<<endl;
+  double sf = 0.0;
+  double err = 0.0;
+  sf = h2->GetBinContent(binX, binY);
+  err = h2->GetBinError(binX, binY);
+  cout<<"musf = "<<sf<<endl;
+  return sf;
+}

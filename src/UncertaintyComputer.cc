@@ -159,9 +159,9 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
   jet_pt *= (1+(jet.JECUncertainty*double(jes)));
 
   //apply JER uncert, scaling
-  double dR = 0;
-  double rCone = 0;
-  double sigmaJER = 
+  //double dR = 0;
+  //double rCone = 0;
+  //double sigmaJER = 0; 
   ///if(gen_pt> 0 && dR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
   if(gen_pt > 0){
     double SF = getJERSF(jet.p4.eta(), jer); 
@@ -172,19 +172,18 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
   return jet_pt;
 }
 
-bool UncertaintyComputer::getBtagWithSF(MyJet jet, bool isData, int scale, bool is2012){
+bool UncertaintyComputer::getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, MyJet jet, bool isData, int scale){
   bool isBtagged = false;
-
+  
   if(scale == 0){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo, kNo, is2012);
+  isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo);
   }
   else if(scale == 1){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp, kUp, is2012);
+    isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp);
   }
   else if(scale == -1){
-    isBtagged = btsf->isbtagged(jet.p4.pt(), jet.p4.eta(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown, kDown, is2012);
+    isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown);
   }
-  
   return isBtagged;
 }
 
