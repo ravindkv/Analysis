@@ -64,12 +64,13 @@ public :
 
 
     // muon //////////////////////////////////////////
-    M_RELISO_MAX_  = 0.12; //sync with muon POG  
+    M_RELISO_MAX_  = 0.15; //sync with muon POG
+    //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2  
     M_PT_MIN_      = 25;  // CMS 30 and ATLAS 20  , we took 25 as trigger is IsoMu24
     M_ETA_MAX_     = 2.1; // CMS 2.1 and ATLAS 2.5, we took 2.1 as maximum eta
     M_D0_MAX_      = 0.2; // was using 0.045
     
-    LOOSE_M_RELISO_MAX_ = 0.3;
+    LOOSE_M_RELISO_MAX_ = 0.25;
     LOOSE_M_ETA_MAX_    = 2.5;
     LOOSE_M_PT_MIN_     = 10;
     RHO_AEFF_M_         = 0.112;
@@ -85,8 +86,10 @@ public :
   //Loose Lepton veto
   bool looseElectronVeto(int selectedElectron, const vector<MyElectron> & vE, bool isPFlow=false);
   bool looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow=false);
-
-
+  
+  //Medium muon ID
+  bool isMediumMuon(const MyMuon * m, bool isPFlow);
+  
   // object cleaning
   void ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR );
 

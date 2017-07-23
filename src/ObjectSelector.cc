@@ -109,11 +109,29 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     ///double pujetid    = int(jet->puIDMVALoose);
 
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_)
-      //    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ )
-      { j_i->push_back(i);}
+    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_){
+      //    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ ){ 
+      j_i->push_back(i);
+    }
   }
 }
+
+//https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+bool ObjectSelector::isMediumMuon(const MyMuon * m, bool isPFlow){
+  
+  bool isMedium(false);
+  bool goodGlob = m->isGlobalMuon && 
+	  m->normChi2 && 
+	  m->chi2LocalPosition < 12 && 
+	  m->trkKink < 20; 
+  bool isLooseMuon = m->isPFMuon && 
+          (m->isGlobalMuon || m->isTrackerMuon);
+  isMedium =  isLooseMuon &&  
+	    m->validFraction > 0.8 && 
+	    m->segmentCompatibility >(goodGlob ? 0.303 : 0.451); 
+  return isMedium; 
+}
+
 
 bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
 
@@ -129,13 +147,11 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
     double mPt      = TMath::Abs(m->p4.pt());
     //double mRelIso  = (isPFlow) ? m->RelIso : m->UserPFRelIso;
     double mRelIso  = m->pfRelIso;
-    
     //see if this muon is glogal
     static const unsigned int GlobalMuon     =  1<<1;
     bool isGlobal = (m->type & GlobalMuon);
     
     if(! isGlobal ) continue;
-    
     if( mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
     
   }

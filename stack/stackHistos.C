@@ -63,7 +63,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   TH1F* h1_base = (f1->Get("base/"+histname))->Clone("h1_base");
   double scale_factor = 1.0;
   h1_base->Scale(scale_factor);  
-  h1_base->SetFillColor(kYellow);
+  h1_base->SetFillColor(13);
   if(axisrange){
     h1_base->GetXaxis()->SetRangeUser(xmin,xmax);
   }
@@ -86,16 +86,23 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   hSig->SetLineWidth(3);
   hSig->SetFillColor(0);
   
+  //COLOR SCHEME: VIBGYOR : V=kViolet, I=kIndigo, B=kBlue, G=kGreen, Y=kYellow, O=kOrange, Red= kRed    
   //stack all the MC samples
-  stackHisto(inFile, "all_QCD.root", "all_QCD", histname, kBlue, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  //stackHisto(inFile, "all_DY.root", "all_DY", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "DYJetsToLL_Merged.root", "all_DY", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "all_ST.root", "all_ST", histname, kGreen , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  //stackHisto(inFile, "all_WJets.root", "all_WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "WJetsToLNu_Merged.root", "all_WJets", histname, kMagenta+3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  stackHisto(inFile, "all_TTJets.root","ttbar", histname, kCyan, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
-  //stackHisto(inFile, "all_H120.root","Hplus", histname,  6, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig, leg);
+ //pelo
+  //stackHisto(inFile, "all_Hplus.root", "Hplus", histname, kBlue, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_QCD.root", "QCD", histname, kBlue, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_DY.root", "DY", histname, kGreen, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_ST.root", "ST", histname, kYellow , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_WJets.root", "WJets", histname, kPink , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_TTJets.root","ttbar", histname, kRed, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
   
+  //stackHisto(inFile, "all_Hplus.root", "Hplus", histname, 2, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "all_QCD.root", "QCD", histname, 3, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "all_DY.root", "DY", histname, 4, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "all_ST.root", "ST", histname, 5 , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "all_WJets.root", "WJets", histname, 6 , 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  stackHisto(inFile, "all_TTJets.root","ttbar", histname, 7, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
+  //stackHisto(inFile, "all_TT_v2.root","ttbar", histname, 7, 1, axisrange, xmin, xmax, MuptStack, hMC, hSig,leg);
   
   ////////////////////////////////////////////////////////////
   //
@@ -103,7 +110,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   //
   ////////////////////////////////////////////////////////////
 
-  TFile* data_ = TFile::Open(inFile+"all_MuData.root");
+  TFile* data_ = TFile::Open(inFile+"all_muData.root");
   if(data_ == 0) return;
   if(data_->IsZombie()){data_->Close(); return;}
   //TH1F* data = (data_->Get("base/BTag/"+histname))->Clone("data");
@@ -119,7 +126,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   
   //lable x-axis, for cutflow
   if(label){
-    TString steps[15] = {"","= 1 muon","#geq 4 jets","#slash{E}_{T} #geq 0GeV", "#geq 2 b-tagged jets","After KinFit","","","","","","","","",""};
+    TString steps[15] = {"","muon trig","= 1 muon","#geq 4 jets","#slash{E}_{T} #geq 20GeV", "#geq 2 b-tagged jets","After KinFit","","","","","","","",""};
     const size_t nsteps = sizeof(steps)/sizeof(TString);
     for(int istep=0; istep<nsteps; istep++ ){
       data->GetXaxis()->SetBinLabel(istep+1, steps[istep]);
@@ -145,7 +152,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   ch->SetBorderSize(1);
   ch->AddText("#mu + jets");
   pt->SetTextSize(0.059);
-  TText *text = pt->AddText("CMS Preliminary,    #sqrt{s} = 13 TeV,    35.5 fb^{-1}");
+  TText *text = pt->AddText("CMS Preliminary,    #sqrt{s} = 13 TeV,    34.31 fb^{-1}");
   //TText *text = pt->AddText("#sqrt{s} = 13 TeV");
   text->SetTextAlign(11);
   if(histname.Contains("Pre_RelIso") || histname.Contains("cutflow")) {
@@ -171,7 +178,6 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     MuptStack->GetYaxis()->SetTitleOffset(1.45);
     MuptStack->Draw("HISTSAME");
   }
-
   if(drawsignal)hSig->Draw("HISTSAME"); // only for hSig histogram 
   //  if(drawsignal)h7_base->Draw("HISTSAME"); // for sv_mass plot only
   if(drawdata)data->Draw("ESAME"); // not for dijet mass 
@@ -202,7 +208,6 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     //hRatio->Add(hMC, -1);
     //hRatio->Divide(hMC);
     int nbin= data->GetSize();
-    cout<<"bin = "<<nbin<<endl;
     double div=0.0; 
     double sigma=0.0;
     double a1 =0.0;
@@ -212,10 +217,6 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     for(int i=1; i<nbin; i++){
       binC_data = data->GetBinContent(i);
       binC_mc = hMC->GetBinContent(i);
-      cout<<i<<endl;
-      cout<<binC_mc<<endl;
-      cout<<binC_data<<endl;
-      cout<<endl;
       if(binC_mc !=0&& binC_data!=0){
         div = binC_data/binC_mc;
         a1 = sqrt(1.0/binC_data + 1.0/binC_mc);
@@ -228,7 +229,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     hRatio->SetMarkerSize(1.0);
     hRatio->SetMarkerColor(kBlack);
     hRatio->SetLineColor(kBlack);
-    hRatio->GetYaxis()->SetRangeUser(-2.5, 2.5);
+    hRatio->GetYaxis()->SetRangeUser(0, 2);
     //hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
     hRatio->GetXaxis()->SetTitle(xaxis_title);
     hRatio->GetYaxis()->SetTitleOffset(0.5);
@@ -236,7 +237,7 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     hRatio->GetYaxis()->CenterTitle();
     hRatio->GetYaxis()->SetTitleSize(0.1);
     hRatio->GetXaxis()->SetTitleSize(0.1);
-    hRatio->GetXaxis()->SetLabelSize(0.17); // 0.1
+    hRatio->GetXaxis()->SetLabelSize(0.12); // 0.1
     hRatio->GetXaxis()->LabelsOption("u"); // extra
     hRatio->GetYaxis()->SetLabelSize(0.06);
     hRatio->Draw("e1"); // use "P" or "AP"
@@ -271,57 +272,56 @@ void stackHisto(TString path, TString filename, TString lable, TString histname,
 void example_stack_all(){
 
    // final required plots:
+  TString dir = "Iso/";
+ //example_stack(dir+"pt_mu", "pt_mu", 1, true, true, true, false, false, 0, 5, false);
+ //example_stack(dir+"eta_mu", "eta_mu", 1, true, true, true, false, false, 0, 5, false);
+ //example_stack(dir+"pt_jet", "pt_jet", 1, true, true, true, false, false, 0, 5, false);
+ //example_stack(dir+"eta_jet", "pt_jet", 1, true, true, true, false, false, 0, 5, false);
+  example_stack(dir+"multi_jet", "multi_jet", 1, true, true, true, false, false, 0, 5, false);
+  example_stack(dir+"cutflow", "cutflow", 1, true, true, true, false, false, 0, 5, true);
+ example_stack(dir+"nvtx", "nvtx", 1, true, true, true, false, false, 0, 5, false);
+ example_stack(dir+"rhoAll", "rhoAll", 1, true, true, true, false, false, 0, 5, false);
+ example_stack(dir+"wmt_1mu_4jet","m_{T}[GeV]", 2, true, true, true, false, false,0,175);
+  example_stack("RelIso_mu", "RelIso of muons", 1, true, true, true, false, false, 0, 1, false);
   //example_stack("pt_mu","",1,true,true,true,true,true,1,5, true); // log, drawdata, ratio, drawsignal, axisrange, xmin, xmax, label // good_v1
-  //example_stack("pt_mu","", 1,true,true, true,false,true,0, 5, true);
-  // example_stack("pt_mu","", 1,true,true, true,false,true,0, 5, false);
-  //example_stack("pt_mu", "pt_mu", 1, true, true, true, true, false, 0, 5, false);
-  //example_stack("pt_mu", "pt_mu", 1, true, true, true, false, false, 0, 5, false);
-  //example_stack("eta_mu", "eta_mu", 1, true, true, true, false, false, 0, 5, false);
-  example_stack("pt_jet", "pt_jet", 1, true, true, true, false, false, 0, 5, false);
-  example_stack("eta_jet", "pt_jet", 1, true, true, true, false, false, 0, 5, false);
-  example_stack("mjj", "mjj", 1, true, false, false, false, false, 0, 5, false);
-  //example_stack("multi_jet", "multi_jet", 1, true, true, true, false, false, 0, 5, false);
-  example_stack("nvtx", "nvtx", 1, true, true, true, false, false, 0, 5, false);
-  //example_stack("nvtx_nocut", "nvtx_nocut", 1, true, true, true, false, false, 0, 5, false);
-  //example_stack("nvtx_1mu", "nvtx_1mu", 1, true, true, true, false, false, 0, 5, false);
- // example_stack("/wmt","m_{T}[GeV]", 2, true, true, true, false, false,0,175);
-  //example_stack("cutflow", "cutflow", 1, true, true, true, false, false, 0, 5, true);
-  //example_stack("Pre_RelIso", "Pre_RelIso", 1, true, true, true, false, false, 0, 5, false);
-
-  //example_stack("pt_mu","", 1,true,true, false,false,false,0, 5, false);
-  //example_stack("pt_mu","", 1,true,false, false,false,false,0, 5, false);
-  //example_stack("pt_mu","", 1,false,true, true,false,true,0, 5, true);
   
 }
-void example_stack_kfit(TString dir="BTag"){
-  //example_stack(dir+"/pt_jet","jet P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
-  //example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,false,false,-3.0,3.0);
-  //example_stack(dir+"/pt_mu","#mu P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
-  //example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,false,false,-3.0,3.0);
-  ////example_stack(dir+"/bDiscr_Loose","bDiscr", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack("pfCISV","pfCombinedInclusiveSecondaryVertexV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack("pfCMVA","pfCombinedMVAV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack("pfCCvsL","pfCombinedCvsLJetTags", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack("pfCCvs","pfCombinedCvsBJetTags", 1, true,true,true,false,false,0.0,1.0);
-  //example_stack("mjj","m_{jj}",1,true,true,true);
-  //////example_stack(dir+"/final_pt_mu","#pt_mu", 1, true,true,true,false, false,20.0,100.0);
-  //example_stack(dir+"/final_pt_met","#pt_met", 1, true,true,true,false, false,20.0,100.0);
- // example_stack(dir+"/final_RelIso_mu", "final_RelIso", 1, true, true, true, false, false, 0, 5);
-
-  if(dir == "KinFit"){
-    example_stack(dir+"/kfJet1_pt","P_{T}[GeV]",1,true,true,true,true, true,20.0,200.0);
-    example_stack(dir+"/kfJet2_pt","P_{T}[GeV]",1,true,true,true,true, true,20.0,200.0);
-    example_stack(dir+"/kfJet1_eta","#eta^{jets}",1,true,true,true,true,true,-3.0,3.0);
-    example_stack(dir+"/kfJet2_eta","#eta^{jets}",1,true,true,true,true,true,-3.0,3.0);
-  }
-
-  example_stack(dir+"/final_multi_jet","N_{jets}",1,true,true,true,false,true,3,15);
-  //example_stack(dir+"/wmt","m_{T}[GeV]",2,true,true,true,false,false,0,175);
-  /////example_stack(dir+"/CSVM_count","btagged jet multiplicity",1,true,true, true,false,true,1,8);
+void example_stack_btag(TString dir="Iso/BTag"){
+ //example_stack(dir+"/pt_mu","#mu P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+ //example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,false,false,-3.0,3.0);
+ //example_stack(dir+"/pt_jet","jet P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+ //example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,false,false,-3.0,3.0);
+ //example_stack(dir+"/final_multi_jet","N_{jets}",1,true,true,true,false,true,3,15);
+ //example_stack(dir+"/final_pt_met","pt_met", 1, true,true,true,false, false,20.0,100.0);
+ //example_stack(dir+"/pfCISV","pfCombinedInclusiveSecondaryVertexV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
+ //example_stack(dir+"/pfCMVA","pfCombinedMVAV2BJetTags", 1, true,true,true,false,false,0.0,1.0);
+ //example_stack(dir+"/pfCCvsL","pfCombinedCvsLJetTags", 1, true,true,true,false,false,0.0,1.0);
+ //example_stack(dir+"/pfCCvsB","pfCombinedCvsBJetTags", 1, true,true,true,false,false,0.0,1.0);
+  example_stack(dir+"/mjj","m_{jj}",1,true,true,true);
   example_stack(dir+"/nvtx","N_{vertex}",1,true,true,true);
-  //example_stack(dir+"/rho","rho",1,true,true,true);
-  //example_stack(dir+"/rho_0","rho_0",1,true,true,true);
-  example_stack(dir+"/chi2","chi2",1,true,true,true);
-  example_stack(dir+"/ndof","ndof",1,true,true,true);
+  example_stack(dir+"/rhoAll","rhoAll",1,true,true,true);
+  //example_stack(dir+"/chi2","chi2",1,true,true,true);
+  //example_stack(dir+"/ndof","ndof",1,true,true,true);
+  //example_stack(dir+"/wmt","m_{T}[GeV]",2,true,true,true,false,false,0,175);
+  example_stack(dir+"/CSVL_count","btagged jet multiplicity",1,true,true, true,false,true,1,8);
+
 } 
   
+void example_stack_kinfit(TString dir="Iso/KinFit"){
+ example_stack(dir+"/pt_mu","#mu P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+ example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,false,false,-3.0,3.0);
+ example_stack(dir+"/pt_jet","jet P_{T}[GeV]", 1, true,true,true,false, false,20.0,100.0);
+ example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,false,false,-3.0,3.0);
+ example_stack(dir+"/final_multi_jet","N_{jets}",1,true,true,true,false,true,3,15);
+ example_stack(dir+"/final_pt_met","pt_met", 1, true,true,true,false, false,20.0,100.0);
+ example_stack(dir+"/nvtx","N_{vertex}",1,true,true,true);
+ example_stack(dir+"/rhoAll","rhoAll",1,true,true,true);
+ example_stack(dir+"/chi2","chi2",1,true,true,true);
+ example_stack(dir+"/ndof","ndof",1,true,true,true);
+  //example_stack(dir+"/wmt","m_{T}[GeV]",2,true,true,true,false,false,0,175);
+  example_stack(dir+"/mjj_kfit","m_{jj}",1,true,true,true);
+ //example_stack(dir+"/kfJet1_pt","P_{T}[GeV]",1,true,true,true,false, false, 20.0,200.0);
+ //example_stack(dir+"/kfJet2_pt","P_{T}[GeV]",1,true,true,true,false, false, 20.0,200.0);
+ //example_stack(dir+"/kfJet1_eta","#eta^{jets}",1,true,true,true,false, false,-3.0,3.0);
+ //example_stack(dir+"/kfJet2_eta","#eta^{jets}",1,true,true,true,false, false,-3.0,3.0);
+} 

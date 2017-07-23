@@ -20,6 +20,13 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("trueoutoftimepu", cutflowType, 6000, 0., 1000.);
   addHisto("truetotalpu", cutflowType, 6000, 0., 1000.);
   addHisto("RelIso_mu",cutflowType, 40, 0, 1.0);
+  //Scale factors
+  addHisto("SF_hepNUP_WJets",cutflowType, 1000, 0, 1000);
+  addHisto("SF_hepNUP_DYJets",cutflowType, 1000, 0, 1000);
+  addHisto("SF_sampleWeight",cutflowType, 1000, 0, 1000);
+  addHisto("SF_weightPU",cutflowType, 1000, 0, 1000);
+  addHisto("SF_topPtWeights",cutflowType, 1000, 0, 10);
+  addHisto("SF_muonSF",cutflowType, 1000, 0, 10);
  
   ////////////////// Isolation ///////////////// 
   //base/Iso histo
@@ -35,54 +42,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("wmt_1mu", cutflowType+"/Iso", 500, 0., 500.);
   addHisto("wmt_1mu_4jet", cutflowType+"/Iso", 500, 0., 500.);
   addHisto("wmt_1mu_4jet_btag", cutflowType+"/Iso", 500, 0., 500.);
-  
-  //TIGHT: base/Iso/Btag histo
-  InitHist("Iso/BTagT", cutflowType, outFile_);
-  addHisto("pfCISV", cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCMVA", cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCCvsL",cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCCvsB", cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("CSVL_count", cutflowType+"/Iso/BTagT", 50,0,10);
-  addHisto("pfCCvsL_0",cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCCvsL_1",cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCCvsB_0", cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("pfCCvsB_1", cutflowType+"/Iso/BTagT", 50, -2., 2.);
-  addHisto("mjj",cutflowType+"/Iso/BTagT", 100, 0, 500);
-  addHisto("cutflow", cutflowType+"/Iso/BTagT", 10 , 0., 10.); 
-  addHisto("final_RelIso_mu",cutflowType+"/Iso/BTagT", 40,0,0.5);
-  addHisto("final_multi_jet", cutflowType+"/Iso/BTagT", 10,0,10);
-  addHisto("nvtx", cutflowType+"/Iso/BTagT", 100, 0., 100.);
-  addHisto("nvtx_6Kbins", cutflowType+"/Iso/BTagT", 6000, 0., 1000.);
-  addHisto("rhoAll", cutflowType+"/Iso/BTagT", 100, 0., 100.);
-  addHisto("chi2", cutflowType+"/Iso/BTagT", 100, 0., 500.);
-  addHisto("ndof", cutflowType+"/Iso/BTagT", 100, 0., 500.);
-  addHisto("wmt", cutflowType+"/Iso/BTagT", 500, 0., 500.);
-  addHisto("CSVT_count", cutflowType+"/Iso/BTagT", 50,0,10);
-  addHisto("pt_jetJESJER", cutflowType+"/Iso/BTagT", 50, 0., 500.);
-  
-  //MEDIUM: base/Iso/Btag histo
-  InitHist("Iso/BTagM", cutflowType, outFile_);
-  addHisto("pfCISV", cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCMVA", cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCCvsL",cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCCvsB", cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("CSVL_count", cutflowType+"/Iso/BTagM", 50,0,10);
-  addHisto("pfCCvsL_0",cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCCvsL_1",cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCCvsB_0", cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("pfCCvsB_1", cutflowType+"/Iso/BTagM", 50, -2., 2.);
-  addHisto("mjj",cutflowType+"/Iso/BTagM", 100, 0, 500);
-  addHisto("cutflow", cutflowType+"/Iso/BTagM", 10 , 0., 10.); 
-  addHisto("final_RelIso_mu",cutflowType+"/Iso/BTagM", 40,0,0.5);
-  addHisto("final_multi_jet", cutflowType+"/Iso/BTagM", 10,0,10);
-  addHisto("nvtx", cutflowType+"/Iso/BTagM", 100, 0., 100.);
-  addHisto("nvtx_6Kbins", cutflowType+"/Iso/BTagM", 6000, 0., 1000.);
-  addHisto("rhoAll", cutflowType+"/Iso/BTagM", 100, 0., 100.);
-  addHisto("chi2", cutflowType+"/Iso/BTagM", 100, 0., 500.);
-  addHisto("ndof", cutflowType+"/Iso/BTagM", 100, 0., 500.);
-  addHisto("wmt", cutflowType+"/Iso/BTagM", 500, 0., 500.);
-  addHisto("CSVM_count", cutflowType+"/Iso/BTagM", 50,0,10);
-  addHisto("pt_jetJESJER", cutflowType+"/Iso/BTagM", 50, 0., 500.);
   
   //LOOSE: base/Iso/Btag histo
   InitHist("Iso/BTag", cutflowType, outFile_);

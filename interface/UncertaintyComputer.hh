@@ -50,15 +50,16 @@ public :
      delete sveffunc;
   }
   
-  double metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0);
-  double metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer=0);
-  double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0);
+  double metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, double sigmaJER =0.08);
+  double metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer=0, double sigmaJER =0.08);
+  double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0, double sigmaJER = 0.08);
   double metWithUncl(const vector<MyJet> & vJ, vector<int> *j, const vector<MyMuon> &vMu, vector<int> *m, const vector<MyElectron> &vEle, vector<int> *el, MyMET MET, int unc=0);
   double getJERSF(double eta, int jer=0);
-  double jetPtWithJESJER(MyJet jet, int jes=0, int jer=0); 
+  double jetPtWithJESJER(MyJet jet, int jes=0, int jer=0, double sigmaJER=0.08); 
   bool getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, MyJet jet, bool isData, int scale);
   void  openCSVfile(const std::string &filename); 
   double EffUncOnSV(MyJet jet);
+  double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
   
 private :
   BtagSF* btsf;

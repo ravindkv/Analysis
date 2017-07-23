@@ -30,9 +30,6 @@ public :
     DRMIN_JET = 0.5;
     DRMIN_ELE = 0.5;
     METCUT_   = 30.0;
-   
-
-
     //---------------------------------------------------//
     //Pileup reweigting 
     //---------------------------------------------------//
@@ -40,7 +37,7 @@ public :
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData
     //PU info for MC:
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Pileup_MC_Information
-    LumiWeights_ = reweight::LumiReWeighting("stack/trueInTimePU_mcDY.root","stack/trueMinBiasPU_dataMu.root", "pileup", "pileup");
+    LumiWeights_ = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY.root","stack/lumiRewgt/trueMinBiasPU_dataMu.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
     
@@ -51,13 +48,13 @@ public :
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62285500;
+  //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
-    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48518500;
+  //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["HplusM100"]         =  1;             evtDBS["HplusM100"]         =  996170; 
     xss["HplusM120"]         =  1;             evtDBS["HplusM120"]         =  994498; 
     xss["HplusM140"]         =  1;             evtDBS["HplusM140"]         =  987730; 
@@ -78,13 +75,13 @@ public :
     xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
     xss["TTJets"]            =  831.76;        evtDBS["TTJets"]            =  10139950;   
-    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44715700;
-    //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
+    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44981200;
+  //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
-    //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+  //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
     xss["WW"]                =  63.21;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  22.82;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  10.32;         evtDBS["ZZ"]                =  990064; 
@@ -136,7 +133,7 @@ float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
   int nJets = hepNUP-5;
   if(nJets==0)      return 0.120;
   else if(nJets==1) return 0.0164;
-  else if(nJets==2) return 0.0167;
+  else if(nJets==2) return 0.0168;
   else if(nJets==3) return 0.0167;
   else if(nJets>=4) return 0.0128;
   else return 1 ;
@@ -157,19 +154,18 @@ BTagCalibrationReader hplusAnalyzer::readCSVfile(const std::string &filename, co
 }
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
 Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
+  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   Int_t binX = xaxis->FindBin(abs(eta));
   Int_t binY = yaxis->FindBin(pt);
-  cout<<endl;
-  cout<<"pt = "<<pt<<endl;
-  cout<<"eta = "<<eta<<endl;
-  cout<<"binX = "<<binX<<endl;
-  cout<<"binY = "<<binY<<endl;
-  double sf = 0.0;
-  double err = 0.0;
-  sf = h2->GetBinContent(binX, binY);
-  err = h2->GetBinError(binX, binY);
-  cout<<"musf = "<<sf<<endl;
-  return sf;
+  
+  double sf = h2->GetBinContent(binX, binY);
+  double err = h2->GetBinError(binX, binY);
+  if(sf!=0) return sf;
+  else return 1.0; 
 }
+
+
+
+
