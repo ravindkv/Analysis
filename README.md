@@ -1,8 +1,9 @@
 # Analysis
    
 ### Download and compile the package  ###  
-* cmsrel CMSSW_7_2_3
-* cd CMSSW_7_2_3/src
+* source /cvmfs/cms.cern.ch/cmsset_default.sh
+* cmsrel CMSSW_8_0_28
+* cd CMSSW_8_0_28/src
 * cmsenv
 * git clone https://github.com/ravindkv/Analysis.git 
 * cd Analysis/src
@@ -15,6 +16,5 @@
 
 ### Submit condor batch jobs  ###
 
-* voms-proxy-init -voms cms
 * cd condor
-* ./hplusRunCond.sh
+* ./hplusRunCond_TIFR.sh ntupleT2Paths.txt
