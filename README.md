@@ -12,7 +12,7 @@
 * cd .. 
 
 ### Compile and run, in one go ### 
-* root -l 'runme.C("hplusAnalyzer")'
+* root -l 'runMe.C("hplusAnalyzer")'
 
 ### Submit condor batch jobs  ###
 
