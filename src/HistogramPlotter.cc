@@ -20,6 +20,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("trueoutoftimepu", cutflowType, 6000, 0., 1000.);
   addHisto("truetotalpu", cutflowType, 6000, 0., 1000.);
   addHisto("RelIso_mu",cutflowType, 40, 0, 1.0);
+  addHisto("hepNUP", cutflowType, 100, 1., 20.);
   //Scale factors
   addHisto("SF_hepNUP_WJets",cutflowType, 1000, 0, 1000);
   addHisto("SF_hepNUP_DYJets",cutflowType, 1000, 0, 1000);
@@ -63,7 +64,8 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("chi2", cutflowType+"/Iso/BTag", 100, 0., 500.);
   addHisto("ndof", cutflowType+"/Iso/BTag", 100, 0., 500.);
   addHisto("wmt", cutflowType+"/Iso/BTag", 500, 0., 500.);
-  addHisto("pt_jetJESJER", cutflowType+"/Iso/BTag", 50, 0., 500.);
+  addHisto("pt_bjet", cutflowType+"/Iso/BTag", 50, 0., 500.);
+  addHisto("eta_bjet", cutflowType+"/Iso/BTag", 50, -5.0, 5.0);
   
   //base/Iso/KinFit histo
   InitHist("Iso/KinFit", cutflowType, outFile_);
@@ -77,7 +79,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("ndof", cutflowType+"/Iso/KinFit", 100, 0., 500.);
   addHisto("nvtx", cutflowType+"/Iso/KinFit", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/Iso/KinFit", 6000, 0., 1000.);
-  addHisto("hepNUP", cutflowType+"/Iso/KinFit", 100, 1., 20.);
   addHisto("kfJet1_pt", cutflowType+"/Iso/KinFit", 40, 0, 200);
   addHisto("kfJet2_pt", cutflowType+"/Iso/KinFit", 40, 0, 200);
   addHisto("kfJet1_eta", cutflowType+"/Iso/KinFit", 60, -3.0, 3.0);
@@ -136,7 +137,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("ndof", cutflowType+"/NonIso/KinFit", 100, 0., 500.);
   addHisto("nvtx", cutflowType+"/NonIso/KinFit", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/NonIso/KinFit", 6000, 0., 1000.);
-  addHisto("hepNUP", cutflowType+"/NonIso/KinFit", 100, 1., 20.);
   addHisto("kfJet1_pt", cutflowType+"/NonIso/KinFit", 40, 0, 200);
   addHisto("kfJet2_pt", cutflowType+"/NonIso/KinFit", 40, 0, 200);
   addHisto("kfJet1_eta", cutflowType+"/NonIso/KinFit", 60, -3.0, 3.0);

@@ -8,7 +8,6 @@ using namespace std;
 void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, bool isPFlow){
   
   for(unsigned int i=0;i<vE.size();i++){
-
     const MyElectron * e = &vE[i];
     ///double scEta    = e->electronSCEta;
     double eEta     = TMath::Abs(e->p4.eta());
@@ -16,8 +15,43 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     double ePt      = TMath::Abs(e->p4.pt());
     ///double eRelIso  = e->RelIso;
     double d0       = fabs(e->D0);
+
     std::map<std::string, float>idWPs = e->eidWPs;
-    float eid = (isPFlow) ? idWPs["eidTightMC"] : idWPs["simpleEleId70cIso"];
+    
+    /*To print all eidWPs
+    map <std::string, float> :: iterator itr;
+    for(itr = idWPs.begin(); itr != idWPs.end(); ++itr){
+      cout  <<  '\t' << itr->first <<  '\t' << itr->second<<'\n';
+    }
+    //All possible names: 	
+        cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose	0
+	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium	0
+	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight	0
+	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto	0
+	cutBasedElectronID-Spring15-25ns-V1-standalone-loose	0
+	cutBasedElectronID-Spring15-25ns-V1-standalone-medium	0
+	cutBasedElectronID-Spring15-25ns-V1-standalone-tight	0
+	cutBasedElectronID-Spring15-25ns-V1-standalone-veto	0
+	cutBasedElectronID-Spring15-50ns-V2-standalone-loose	0
+	cutBasedElectronID-Spring15-50ns-V2-standalone-medium	0
+	cutBasedElectronID-Spring15-50ns-V2-standalone-tight	0
+	cutBasedElectronID-Spring15-50ns-V2-standalone-veto	0
+	eidLoose	4
+	eidRobustHighEnergy	4
+	eidRobustLoose	4
+	eidRobustTight	4
+	eidTight	4
+	heepElectronID-HEEPV60	0
+	mvaEleID-Spring15-25ns-Trig-V1-wp80	0
+	mvaEleID-Spring15-25ns-Trig-V1-wp90	0
+	mvaEleID-Spring15-25ns-nonTrig-V1-wp80	0
+	mvaEleID-Spring15-25ns-nonTrig-V1-wp90	0
+	mvaEleID-Spring15-25ns-nonTrig-V1-wpLoose	0
+	mvaEleID-Spring15-50ns-Trig-V1-wp80	0
+	mvaEleID-Spring15-50ns-Trig-V1-wp90	0
+     */
+    //float eid = (isPFlow) ? idWPs["eidLooseMC"] : idWPs["simpleEleId90cIso"];
+    float eid = (isPFlow) ? idWPs["eidTight"] : idWPs["cutBasedElectronID-Spring15-25ns-V1-standalone-veto"];
     bool passId = (int(eid) & 0x1);
     bool isNotFromConversion = ((int(eid) >> 2) & 0x1);
     ///bool isEcalDriven = (e->isEcalDriven > 0 || e->isPFlow > 0);
@@ -25,14 +59,11 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     double zvertex   = vertex.XYZ.z();
     double zelectron = e->vertex.z();
     double dz = fabs(zvertex - zelectron);
-    
     ///if( defaultSelection_  && ( fabs(scEta)> 1.4442 && fabs(scEta)<1.5660)  ){ continue; }
     if( defaultSelection_ ){ continue; }
     if( defaultSelection_  && eEt < E_ET_MIN_ ){ continue; }
     if( !defaultSelection_ && ePt < E_PT_MIN_ ){ continue; }
-
     if(dz > ZMAX_)continue;
-
     ///if(passId && isNotFromConversion && isEcalDriven  && d0 < E_D0_MAX_ && eEta < E_ETA_MAX_ && eRelIso < E_RELISO_MAX_){ e_i->push_back(i);}
     if(passId && isNotFromConversion && d0 < E_D0_MAX_ && eEta < E_ETA_MAX_){ e_i->push_back(i);}
 
@@ -155,7 +186,6 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
     if( mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
     
   }
-  
   return looseVeto;
     
 }
@@ -164,21 +194,20 @@ bool ObjectSelector::looseElectronVeto(int selectedElectron, const vector<MyElec
   bool looseVeto(false);
   for( int i=0;i< (int) vE.size();i++ ){
     if(i==selectedElectron){ continue; }
-    
     const MyElectron * e = &vE[i];
-    
     double eEta      = TMath::Abs(e->p4.eta());
     double eEt       = TMath::Abs(e->p4.Et());
     ///double eRelIso   = e->RelIso;
     std::map<std::string, float>idWPs = e->eidWPs;
-    float eid = (isPFlow) ? idWPs["eidLooseMC"] : idWPs["simpleEleId90cIso"];
+    //float eid = (isPFlow) ? idWPs["eidLooseMC"] : idWPs["simpleEleId90cIso"];
+    float eid = (isPFlow) ? idWPs["eidTight"] : idWPs["cutBasedElectronID-Spring15-25ns-V1-standalone-veto"];
     bool id = (int(eid) & 0x1);
     double minDR2mu  = 0.4;
-        
     ///if(id && eEt > LOOSE_E_ET_MIN_ && eEta < LOOSE_E_ETA_MAX_ && eRelIso < LOOSE_E_RELISO_MAX_ && minDR2mu >0.1){ looseVeto = true;}
-    if(id && eEt > LOOSE_E_ET_MIN_ && eEta < LOOSE_E_ETA_MAX_ && minDR2mu >0.1){ looseVeto = true;}
+    if(id && eEt > LOOSE_E_ET_MIN_ && eEta < LOOSE_E_ETA_MAX_ && minDR2mu >0.1){ 
+      looseVeto = true;
+    }
   }
-  
   return looseVeto;
   
 }

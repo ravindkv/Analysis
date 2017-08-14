@@ -106,7 +106,6 @@ vector<MyElectron> Reader::getElectrons(MyEvent* ev, string algo)
 
   vector<MyElectron> selElectrons;
   selElectrons.clear();
- 
   vector<MyElectron> allElectrons = ev->Electrons;
   for(size_t iele=0; iele < allElectrons.size(); ++iele){
     if(algo.find("PFlow") != std::string::npos){
