@@ -141,6 +141,7 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer, double 
 
   double gen_pt = jet.Genp4.pt();  
   double jet_pt = jet.p4.pt();
+ 
   //apply JES uncert scaling 
   jet_pt *= (1+(jet.JECUncertainty*double(jes)));
   //apply JER uncert, scaling
@@ -148,7 +149,7 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer, double 
   double rCone = 0.4;
   if(gen_pt> 0 && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
   //if(gen_pt > 0){
-    double SF = getJERSF(jet.p4.eta(), jer); 
+    double SF = getJERSF(jet.p4.eta(), jer);
     double ptscale = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt);
     jet_pt *= ptscale;
   }

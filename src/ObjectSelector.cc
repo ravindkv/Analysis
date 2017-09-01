@@ -129,19 +129,16 @@ void ObjectSelector::preSelectMuonsNoIso(vector<int> * m_i, const vector<MyMuon>
   
 }
 
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer){
-  
+void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer, double sigmaJER){
+ 
   for(unsigned int i=0;i<vJ.size();i++){
-    
     const MyJet *jet = &vJ[i];
     double jetEta     = TMath::Abs(jet->p4.eta());
     //double jetPt      = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer); 
+    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer, sigmaJER); 
     ///double pujetid    = int(jet->puIDMVALoose);
-
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
     if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_){
-      //    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ ){ 
       j_i->push_back(i);
     }
   }
