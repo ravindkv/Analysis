@@ -255,15 +255,15 @@ namespace reweight {
 	  TH1F* den = new TH1F(*(MC_distr_));
 
 	  weights_->Divide( den );  // so now the average weight should be 1.0
-	  std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
+	 // std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
       //weights_->Draw();
-///*
    //int NBins = weights_->GetNbinsX();
    //for(int ibin = 1; ibin<NBins+1; ++ibin){
+  /*
    for(int ibin = 1; ibin<60; ++ibin){
      std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
    }
-//*/
+   */
       weightOOT_init();
 
 	  FirstWarning_ = true;

@@ -13,7 +13,9 @@ unsigned int Reader::AssignEventTreeFrom(TFile *f, TString path)
   TTree *t = myTree;
   unsigned int nEntries = t->GetEntriesFast();
   if(nEntries==0) return 0;
-  cout<<" nEntries "<<nEntries<<endl;
+  cout<<"============================"<<endl;
+  cout<<" Total events = "<<nEntries<<endl;
+  cout<<"============================"<<endl;
   myEvent = new MyEvent;
   
   myEvent = 0; t->GetBranch("MyEvent")->SetAddress(&myEvent);

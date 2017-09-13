@@ -27,8 +27,8 @@ class hplusAnalyzer : public ObjectSelector, HistogramPlotter
 public :
   hplusAnalyzer() : ObjectSelector(), HistogramPlotter()
   {
-    DRMIN_JET = 0.5;
-    DRMIN_ELE = 0.5;
+    DRMIN_JET = 0.4;
+    DRMIN_ELE = 0.4;
     METCUT_   = 30.0;
     //---------------------------------------------------//
     //Pileup reweigting 

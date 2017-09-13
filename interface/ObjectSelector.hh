@@ -44,17 +44,17 @@ public :
     ///////////////
 
     // Jets ///////////////////////////////////////////
-    JET_PT_MIN_        = 30;  // CMS 20 and ATLAS 25
-    JET_ETA_MAX_       = 2.5; // CMS 2.5 and ATLAS 2.5 new proposed  value 4.7
+    JET_PT_MIN_        = 30;  
+    JET_ETA_MAX_       = 2.4; 
     JET_EMF_MIN_       = 0.01;
     JET_LEPTON_DRMIN_  = 0.5;
     //////////////////////////////////////////////////
 
     // electron //////////////////////////////////////
-    E_RELISO_MAX_       = 0.1;
+    E_RELISO_MAX_       = 0.0994;// https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
     E_ETA_MAX_          = 2.5;
     E_ET_MIN_           = 20;
-    E_D0_MAX_           = 0.04;
+    E_D0_MAX_           = 0.05;
 
     LOOSE_E_RELISO_MAX_ = 0.2;
     LOOSE_E_ETA_MAX_    = 2.5;
@@ -66,14 +66,13 @@ public :
     // muon //////////////////////////////////////////
     M_RELISO_MAX_  = 0.15; //sync with muon POG
     //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2  
-    M_PT_MIN_      = 25;  // CMS 30 and ATLAS 20  , we took 25 as trigger is IsoMu24
-    M_ETA_MAX_     = 2.1; // CMS 2.1 and ATLAS 2.5, we took 2.1 as maximum eta
-    M_D0_MAX_      = 0.2; // was using 0.045
+    M_PT_MIN_      = 30;  
+    M_ETA_MAX_     = 2.4; 
+    M_D0_MAX_      = 0.2; 
     
     LOOSE_M_RELISO_MAX_ = 0.25;
-    LOOSE_M_ETA_MAX_    = 2.5;
-    LOOSE_M_PT_MIN_     = 10;
-    RHO_AEFF_M_         = 0.112;
+    LOOSE_M_ETA_MAX_    = 2.4;
+    LOOSE_M_PT_MIN_     = 15;
     ///////////////////////////////////////////////////
   }
 
@@ -84,8 +83,9 @@ public :
   void preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes=0, int jer=0, double sigmaJER =0);
 
   //Loose Lepton veto
-  bool looseElectronVeto(int selectedElectron, const vector<MyElectron> & vE, bool isPFlow=false);
+  bool looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow=false);
   bool looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow=false);
+  bool loose2ndMuonVeto( int firstMuon, int secondMuon, const vector<MyMuon> & vM, bool isPFlow=false);
   
   //Medium muon ID
   bool isMediumMuon(const MyMuon * m, bool isPFlow);
