@@ -214,7 +214,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     double nCutPass_NonIso = 0.0;
     fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
-    
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
@@ -354,19 +353,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     }
     int nMuon = m_init_noiso.size();
     double pri_vtxs = Vertices[0].totVtx;
-    //if(nMuon != 2)continue;
     if(nMuon != 1)continue;
     //veto 0th muon, if other muons are stroger than the 0th.
     //we veto 0th if it is a fake muon
     //check if 0th muon has mediumMuon ID
     int m_i = m_init_noiso[0];
-    if( !isMediumMuon(&pfMuons_noiso[m_i], isPFlow)) continue;
-    if(looseMuonVeto( m_init_noiso[0],pfMuons_noiso, isPFlow) ) continue;
+    if(!isMediumMuon(&pfMuons_noiso[m_i], isPFlow)) continue;
+    if(looseMuonVeto( m_i, pfMuons_noiso, isPFlow) ) continue;
     nCutPass++; 
     fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
     nCutPass_NonIso++;
     fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
-    if(looseElectronVeto(-1, pfElectrons, isPFlow)) continue;
+    if(looseElectronVeto(-1, pfElectrons, Vertices[0], isPFlow)) continue;
     nCutPass++; 
     fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
     nCutPass_NonIso++;
@@ -389,8 +387,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     double lumi_BCDEF = 19.04; double lumi_GH = 16.09 ;	
     double lumi = lumi_BCDEF + lumi_GH;
     //trigger 	
-    double muSFtrig_BCDEF 	= getMuonSF(h2_trigSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
-    double muSFtrig_GH 	= getMuonSF(h2_trigSF_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+    double muSFtrig_BCDEF 	= getMuonTrigSF(h2_trigSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+    double muSFtrig_GH 	= getMuonTrigSF(h2_trigSF_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
     double muSFtrig 	= (muSFtrig_BCDEF*lumi_BCDEF + muSFtrig_GH*lumi_GH)/lumi; 
     //identification: Please note, the 2D histo has Pt<120. So for Pt>120, we have taken muSFid = 1.0;
     double muSFid_BCDEF 	= getMuonSF(h2_idSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
@@ -418,10 +416,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     bool noisofound = false;
     bool isofound = false;
     double tmp_iso = pfMuons_noiso[m_i].pfRelIso;
+    fillHisto("RelIso_mu",cutflowType, tmp_iso, evtWeight);
     if(tmp_iso > 0.15 && tmp_iso < 0.4){
       noisofound = true;
     }
-    fillHisto("RelIso_mu",cutflowType, tmp_iso, evtWeight);
     if(tmp_iso < 0.15) isofound = true;
     
     ////////////////////////////////////////////////////////////////  
@@ -473,7 +471,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, sigma_jetPtreso);
       fillHisto("pt_met", cutflowType+"/Iso", metPt, evtWeight);
       fillHisto("phi_met", cutflowType+"/Iso", met.p4.phi(), evtWeight);
-      if(metPt < 30) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+      if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
       nCutPass++;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
       fillHisto("final_pt_met", cutflowType+"/Iso", metPt, evtWeight);
@@ -530,6 +528,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
         else j_final_nob.push_back(ind_jet); 
         if(pfCISV >0.5426) count_CSVL ++;
+        //if(pfCISV >0.8484) count_CSVL ++;
+        //if(pfCISV >0.9535) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass = 8;
@@ -540,7 +540,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       nCutPass = 9;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); 
       
-      if(mt < 30) continue; // mt cuts
+      //if(mt < 30) continue; // mt cuts
       nCutPass = 10;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); 
       //---------------------------------------------------//
@@ -845,7 +845,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       ///else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
       fillHisto("pt_met", cutflowType+"/NonIso", metPt, evtWeight);
       fillHisto("phi_met", cutflowType+"/NonIso", met.p4.phi(), evtWeight);
-      if(metPt < 30) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+      if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
       nCutPass_NonIso++;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
       fillHisto("final_pt_met", cutflowType+"/NonIso", metPt, evtWeight);
@@ -901,7 +901,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           bdiscr.push_back(pfCISV);
         }
         else j_final_nob.push_back(ind_jet); 
-        if(pfCISV >0.5426) count_CSVL ++;
+        if(pfCISV >0.8484) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass_NonIso = 8;
@@ -912,7 +912,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       nCutPass_NonIso = 9;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight); 
       
-      if(mt < 30) continue; // mt cuts
+      //if(mt < 30) continue; // mt cuts
       nCutPass_NonIso = 10;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight); 
       //---------------------------------------------------//
@@ -1154,12 +1154,12 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("outFile_.root", "PF", "TTJets_MuMC_check"); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   
- //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170902/MuMC_20170902/TTJets_MuMC_20170902/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170902/170902_142038/0000/TTJets_MuMC_20170902_Ntuple_85.root", "PF", "new_ttbar");
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170717/MuMC_20170717/TTJets_MuMC_20170717/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170717/170717_153626/0000/TTJets_MuMC_20170717_Ntuple_85.root","PF", "histo_TTbar");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitL_20170717/MuData_20170717/MuRunB2v2_MuData_20170717/SingleMuon/MuRunB2v2_MuData_20170717/170717_154231/0000/MuRunB2v2_MuData_20170717_Ntuple_1.root", "PF","histo_data");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170915/MuMC_20170915/TTJets_MuMC_20170915/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_MuMC_20170915/170914_234059/0000/TTJets_MuMC_20170915_Ntuple_1.root", "PF", "");
+  
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitL_20170915/MuData_20170915/MuRunB2v2_MuData_20170915/SingleMuon/MuRunB2v2_MuData_20170915/170914_234448/0000/MuRunB2v2_MuData_20170915_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

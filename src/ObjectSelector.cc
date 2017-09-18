@@ -5,115 +5,157 @@
 ClassImp(ObjectSelector)
 
 using namespace std;
+
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
+//Electron ID: veto
+bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e)
+{
+  bool passID = false;
+  //barrel
+  if(abs(e->eleSCEta) <= 1.479 
+     && e->sigmaIetaIeta 	< 0.0115	 
+     && abs(e->dEtaInSeed) 	< 0.00749	
+     && abs(e->dPhiIn) 		< 0.228	
+     && e->hadOverEm 		< 0.356	
+     && e->relCombPFIsoEA 	< 0.175	
+     && abs(e->iEminusiP) 	< 0.299	
+     && e->nInnerHits       	<= 2
+     && e->passConversionVeto  
+    )passID = true;
+
+  //endcap 
+  if(abs(e->eleSCEta) > 1.479 
+     && e->sigmaIetaIeta 	< 0.037	
+     && abs(e->dEtaInSeed) 	< 0.00895	 
+     && abs(e->dPhiIn) 		< 0.213	
+     && e->hadOverEm 		< 0.211	
+     && e->relCombPFIsoEA 	< 0.159	
+     && abs(e->iEminusiP) 	< 0.15	
+     && e->nInnerHits       	<= 3
+     && e->passConversionVeto  
+     )passID = true;
+  return passID;
+}
+
+//Electron ID: loose
+bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_loose(const MyElectron *e)
+{
+  bool passID = false;
+  //barrel
+  if(abs(e->eleSCEta) <= 1.479 
+     && e->sigmaIetaIeta 	< 0.011	 
+     && abs(e->dEtaInSeed) 	< 0.00477	
+     && abs(e->dPhiIn) 		< 0.222	
+     && e->hadOverEm 		< 0.298	
+     && e->relCombPFIsoEA 	< 0.0994	
+     && abs(e->iEminusiP) 	< 0.241	
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+    )passID = true;
+
+  //endcap 
+  if(abs(e->eleSCEta) > 1.479 
+     && e->sigmaIetaIeta 	< 0.0314	
+     && abs(e->dEtaInSeed) 	< 0.00868	 
+     && abs(e->dPhiIn) 		< 0.213	
+     && e->hadOverEm 		< 0.101	
+     && e->relCombPFIsoEA 	< 0.107	
+     && abs(e->iEminusiP) 	< 0.14	
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+     )passID = true;
+  return passID;
+}
+
+//Electron ID: medium
+bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron *e)
+{
+  bool passID = false;
+  //barrel
+  if(abs(e->eleSCEta) <= 1.479 
+     && e->sigmaIetaIeta 	< 0.00998	 
+     && abs(e->dEtaInSeed) 	< 0.00311	
+     && abs(e->dPhiIn) 		< 0.103	
+     && e->hadOverEm 		< 0.253	
+     && e->relCombPFIsoEA 	< 0.0695	
+     && abs(e->iEminusiP) 	< 0.134	
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+    )passID = true;
+
+  //endcap
+  if(abs(e->eleSCEta) > 1.479 
+     && e->sigmaIetaIeta 	< 0.0298	
+     && abs(e->dEtaInSeed) 	< 0.00609	 
+     && abs(e->dPhiIn) 		< 0.045	
+     && e->hadOverEm 		< 0.0878	
+     && e->relCombPFIsoEA 	< 0.0821	
+     && abs(e->iEminusiP) 	< 0.13	
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+     )passID = true;
+  return passID;
+}
+
+//Electron ID: tight
+bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *e)
+{
+  bool passID = false;
+  //barrel
+  if(abs(e->eleSCEta) <= 1.479 
+     && e->sigmaIetaIeta 	< 0.00998 
+     && abs(e->dEtaInSeed) 	< 0.00308
+     && abs(e->dPhiIn) 		< 0.0816 
+     && e->hadOverEm 		< 0.0414 
+     && e->relCombPFIsoEA 	< 0.0588
+     && abs(e->iEminusiP) 	< 0.0129 
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+    )passID = true;
+
+  //endcap
+  if(abs(e->eleSCEta) > 1.479 
+     && e->sigmaIetaIeta 	< 0.0292 
+     && abs(e->dEtaInSeed) 	< 0.00605 
+     && abs(e->dPhiIn) 		< 0.0394
+     && e->hadOverEm 		< 0.0641
+     && e->relCombPFIsoEA 	< 0.0571
+     && abs(e->iEminusiP) 	< 0.0129
+     && e->nInnerHits       	<= 1
+     && e->passConversionVeto  
+     )passID = true;
+  return passID;
+}
+
 void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, bool isPFlow){
- 
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
   for(unsigned int i=0;i<vE.size();i++){
     const MyElectron * e   = &vE[i];
-    double sigmaIetaIeta   = e->sigmaIetaIeta;
-    double dEtaInSeed      = e->dEtaInSeed; 
-    double dPhiIn          = e->dPhiIn;     
-    double hadOverEm       = e->hadOverEm;  
-    double iEminusiP       = abs(e->iEminusiP);  
-    double nInnerHits      = e->nInnerHits; 
-    double eRelIso  	   = e->relCombPFIsoEA; 
 
-    double eEta     	   = TMath::Abs(e->p4.eta());
     double ePt     	   = TMath::Abs(e->p4.pt());
     double d0      	   = fabs(e->D0);
     double zvertex   	   = vertex.XYZ.z();
     double zelectron 	   = e->vertex.z();
     double dz 		   = fabs(zvertex - zelectron);
-
-    std::map<std::string, float>idWPs = e->eidWPs;
-    float eid = (isPFlow) ? idWPs["eidLoose"] : idWPs["cutBasedElectronID-Spring15-25ns-V1-standalone-veto"];
-    //float eid = idWPs["eidLoose"];
-    bool passId = (int(eid) & 0x1);
-
-    bool isPassConVeto = e->isPassConVeto;
-    //barrel cuts ( |eta supercluster| <= 1.479) 
-    if(abs(eEta) <= 1.479 
-       && ePt  			>30 
-       && sigmaIetaIeta 	< 0.00998 
-       && abs(dEtaInSeed) 	< 0.00308
-       && abs(dPhiIn) 		< 0.0816 
-       && hadOverEm 		< 0.0414 
-       && abs(iEminusiP) 	< 0.0129 
-       && eRelIso 		< 0.0588
-       && nInnerHits       	<= 1
-       && isPassConVeto    
-       && d0  			< 0.05 
-       && dz 			< 0.1 
-       && passId    
-      )e_i->push_back(i);
-
-    //endcap cuts ( |eta supercluster| > 1.479) |
-    if(abs(eEta) > 1.479 
-       && ePt  			>30 
-       && sigmaIetaIeta 	< 0.0292 
-       && abs(dEtaInSeed) 	< 0.00605 
-       && abs(dPhiIn) 		< 0.0394
-       && hadOverEm 		< 0.0641
-       && abs(iEminusiP) 	< 0.0129
-       && eRelIso 		< 0.0571
-       && nInnerHits       	<= 1
-       && isPassConVeto    
-       && d0  			< 0.1 
-       && dz 			< 0.3 
-       && passId    
-      )e_i->push_back(i);
-    //To print all eidWPs
-    /*
-    map <std::string, float> :: iterator itr;
-    for(itr = idWPs.begin(); itr != idWPs.end(); ++itr){
-      cout<<'\t'<< itr->first<<'\t'<<itr->second<<'\n';
-    }
-    //All possible names: 	
-        cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose	0
-	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium	0
-	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight	0
-	cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto	0
-	cutBasedElectronID-Spring15-25ns-V1-standalone-loose	0
-	cutBasedElectronID-Spring15-25ns-V1-standalone-medium	0
-	cutBasedElectronID-Spring15-25ns-V1-standalone-tight	0
-	cutBasedElectronID-Spring15-25ns-V1-standalone-veto	0
-	cutBasedElectronID-Spring15-50ns-V2-standalone-loose	0
-	cutBasedElectronID-Spring15-50ns-V2-standalone-medium	0
-	cutBasedElectronID-Spring15-50ns-V2-standalone-tight	0
-	cutBasedElectronID-Spring15-50ns-V2-standalone-veto	0
-	eidLoose	4
-	eidRobustHighEnergy	4
-	eidRobustLoose	4
-	eidRobustTight	4
-	eidTight	4
-	heepElectronID-HEEPV60	0
-	mvaEleID-Spring15-25ns-Trig-V1-wp80	0
-	mvaEleID-Spring15-25ns-Trig-V1-wp90	0
-	mvaEleID-Spring15-25ns-nonTrig-V1-wp80	0
-	mvaEleID-Spring15-25ns-nonTrig-V1-wp90	0
-	mvaEleID-Spring15-25ns-nonTrig-V1-wpLoose	0
-	mvaEleID-Spring15-50ns-Trig-V1-wp80	0
-	mvaEleID-Spring15-50ns-Trig-V1-wp90	0
-     */
+    //bool passID = cutBasedElectronID_Summer16_80X_V1_loose(e);
+    bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
+    //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
+    
+    if(passID && ePt >30 && d0 < 0.05 && dz < 0.1){e_i->push_back(i);}
   }
 }
 
 void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isPFlow){
   
   for( int i=0;i< (int) vM.size();i++){
-    
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt      = TMath::Abs(m->p4.pt());
     double mD0      = fabs(m->D0);
-    //double mRelIso  = (isPFlow) ? m->RelIso : m->UserPFRelIso;
     double mRelIso  = m->pfRelIso;
 
-    //bool isGlobalMuon = (m->type & (1<<1)); // 1 = 01, 1<<1 = 10 = 2
-    //bool isPFMuon = (m->type & (1<<5)); //1 = 000001, 1<<5 = 100000 = 32
     bool isGlobalMuon = m->isGlobalMuon; 
     bool isPFMuon = m->isPFMuon; 
-    //bool passId = (m->GlobalMuonPromptTight > 0);
     bool passId = (isGlobalMuon && isPFMuon && m->nMuonHits >=1 
 		   && m->nPixelHits >= 1 && m->nMatchedStations >=2 
 		   && m->nTrackerLayers >= 6 && m->normChi2 < 10); 
@@ -186,7 +228,7 @@ bool ObjectSelector::isMediumMuon(const MyMuon * m, bool isPFlow){
   
   bool isMedium(false);
   bool goodGlob = m->isGlobalMuon && 
-	  m->normChi2 && 
+	  m->normChi2 <3 && 
 	  m->chi2LocalPosition < 12 && 
 	  m->trkKink < 20; 
   bool isLooseMuon = m->isPFMuon && 
@@ -197,6 +239,20 @@ bool ObjectSelector::isMediumMuon(const MyMuon * m, bool isPFlow){
   return isMedium; 
 }
 
+bool ObjectSelector::isMediumMuonGH(const MyMuon * m, bool isPFlow){
+  
+  bool isMedium(false);
+  bool goodGlob = m->isGlobalMuon && 
+	  m->normChi2 <3 && 
+	  m->chi2LocalPosition < 12 && 
+	  m->trkKink < 20; 
+  bool isLooseMuon = m->isPFMuon && 
+          (m->isGlobalMuon || m->isTrackerMuon);
+  isMedium =  isLooseMuon &&  
+	    m->validFraction > 0.49 && 
+	    m->segmentCompatibility >(goodGlob ? 0.303 : 0.451); 
+  return isMedium; 
+}
 
 bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
 
@@ -205,38 +261,14 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
   for(int i=0;i< (int)vM.size();i++){
     
     if( i==selectedMuon ){continue;}
-    
     const MyMuon * m = &vM[i];
-    
     bool isGlobalMuon = m->isGlobalMuon; 
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt      = TMath::Abs(m->p4.pt());
     double mRelIso  = m->pfRelIso;
     
     if(! isGlobalMuon) continue;
-    if( mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
-  }
-  return looseVeto;
-    
-}
-
-bool ObjectSelector::loose2ndMuonVeto( int firstMuon, int secondMuon, const vector<MyMuon> & vM, bool isPFlow){
-
-  bool looseVeto(false);
-  
-  for(int i=0;i< (int)vM.size();i++){
-    
-    if( i==firstMuon ){continue;}
-    if( i==secondMuon   ){continue;}
-    
-    const MyMuon * m = &vM[i];
-    double mEta     = TMath::Abs(m->p4.eta());
-    double mPt      = TMath::Abs(m->p4.pt());
-    double mRelIso  = m->pfRelIso;
-    
-    bool isGlobalMuon = m->isGlobalMuon; 
-    if(! isGlobalMuon ) continue;
-    if( mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
+    if(isMediumMuon(m, isPFlow) && mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
   }
   return looseVeto;
     
@@ -248,13 +280,6 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
   bool looseVeto(false);
   for(unsigned long i=0;i<vE.size();i++){
     const MyElectron * e   = &vE[i];
-    double sigmaIetaIeta   = e->sigmaIetaIeta;
-    double dEtaInSeed      = e->dEtaInSeed; 
-    double dPhiIn          = e->dPhiIn;     
-    double hadOverEm       = e->hadOverEm;  
-    double iEminusiP       = abs(e->iEminusiP);  
-    double nInnerHits      = e->nInnerHits; 
-    double eRelIso  	   = e->relCombPFIsoEA; 
 
     double eEta     	   = TMath::Abs(e->p4.eta());
     double ePt     	   = TMath::Abs(e->p4.pt());
@@ -263,44 +288,31 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
     double zelectron 	   = e->vertex.z();
     double dz 		   = fabs(zvertex - zelectron);
 
-    std::map<std::string, float>idWPs = e->eidWPs;
-    //float eid = (isPFlow) ? idWPs["eidLoose"] : idWPs["cutBasedElectronID-Spring15-25ns-V1-standalone-veto"];
-    float eid = idWPs["eidLoose"];
-    bool passId = (int(eid) & 0x1);
-
-    bool isPassConVeto = e->isPassConVeto;
-    //barrel cuts ( |eta supercluster| <= 1.479) 
     if( i==selectedElectron) continue; 
-    if(abs(eEta) <= 1.479 
-       && ePt  			> 15 
-       && sigmaIetaIeta 	< 0.011 
-       && abs(dEtaInSeed) 	< 0.00477
-       && abs(dPhiIn) 		< 0.222
-       && hadOverEm 		< 0.298
-       && abs(iEminusiP) 	< 0.241 
-       && eRelIso 		< 0.0994
-       && nInnerHits       	<= 1
-       && isPassConVeto    
-       && d0  			< 0.05 
-       && dz 			< 0.1 
-       && passId    
-      )looseVeto = true;
+    bool passID = cutBasedElectronID_Summer16_80X_V1_veto(e);
+    if(passID && ePt >15 && d0 < 0.05 && dz < 0.1){looseVeto = true;}
+  }
+  return looseVeto;
+}
 
-    //endcap cuts ( |eta supercluster| > 1.479) |
-    if(abs(eEta) > 1.479 
-       && ePt  			> 15 
-       && sigmaIetaIeta 	< 0.0314 
-       && abs(dEtaInSeed) 	< 0.00868
-       && abs(dPhiIn) 		< 0.213
-       && hadOverEm 		< 0.101
-       && abs(iEminusiP) 	< 0.14
-       && eRelIso 		< 0.107
-       && nInnerHits       	<=1
-       && isPassConVeto    
-       && d0  			< 0.1 
-       && dz 			< 0.3 
-       && passId    
-      )looseVeto = true;
+bool ObjectSelector::looseElectronVetoTemp(unsigned long first_ele, unsigned long sec_ele, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow){
+
+  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
+  bool looseVeto(false);
+  for(unsigned long i=0;i<vE.size();i++){
+    const MyElectron * e   = &vE[i];
+
+    double eEta     	   = TMath::Abs(e->p4.eta());
+    double ePt     	   = TMath::Abs(e->p4.pt());
+    double d0      	   = fabs(e->D0);
+    double zvertex   	   = vertex.XYZ.z();
+    double zelectron 	   = e->vertex.z();
+    double dz 		   = fabs(zvertex - zelectron);
+
+    if( i==first_ele) continue; 
+    if( i==sec_ele) continue; 
+    bool passID = cutBasedElectronID_Summer16_80X_V1_veto(e);
+    if(passID && ePt >15 && d0 < 0.05 && dz < 0.1){looseVeto = true;}
   }
   return looseVeto;
 }

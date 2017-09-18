@@ -34,7 +34,9 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   InitHist("Iso", cutflowType, outFile_);
   addHisto("cutflow", cutflowType+"/Iso", 15 , 0., 15.); 
   addHisto("pre_RelIso_mu",cutflowType+"/Iso", 40,0,0.5);
+  addHisto("pre_RelIso_ele",cutflowType+"/Iso", 40,0,0.5);
   addHisto("final_RelIso_mu",cutflowType+"/Iso", 40,0,0.5);
+  addHisto("final_RelIso_ele",cutflowType+"/Iso", 40,0,0.5);
   addHisto("nvtx", cutflowType+"/Iso", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/Iso", 6000, 0., 1000.);
   addHisto("rhoAll", cutflowType+"/Iso", 100, 0., 100.);
@@ -93,7 +95,10 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   //base/NonIso histo
   InitHist("NonIso", cutflowType, outFile_);
   addHisto("cutflow", cutflowType+"/NonIso", 15 , 0., 15.); 
+  addHisto("pre_RelIso_mu",cutflowType+"/NonIso", 40,0,0.5);
+  addHisto("pre_RelIso_ele",cutflowType+"/NonIso", 40,0,0.5);
   addHisto("final_RelIso_mu",cutflowType+"/NonIso", 40,0,0.5);
+  addHisto("final_RelIso_ele",cutflowType+"/NonIso", 40,0,0.5);
   addHisto("nvtx", cutflowType+"/NonIso", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/NonIso", 6000, 0., 1000.);
   addHisto("rhoAll", cutflowType+"/NonIso", 100, 0., 100.);
@@ -179,7 +184,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("multi_jet", fullname, 100, 0., 20.);
   h1 = getHisto("multi_jet", fullname);
   h1->SetDirectory(d);
-/*
+  
   addHisto("pt_ele", fullname, 50, 0., 500.);
   h1 = getHisto("pt_ele", fullname);
   h1->SetDirectory(d);
@@ -189,7 +194,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("phi_ele", fullname, 63, -M_PI, M_PI);
   h1 = getHisto("phi_ele", fullname);
   h1->SetDirectory(d);
-*/
+  
   addHisto("pt_mu", fullname, 50, 0., 500.);
   h1 = getHisto("pt_mu", fullname);
   h1->SetDirectory(d);

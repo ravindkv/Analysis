@@ -114,6 +114,8 @@ private :
   ofstream outfile_;
   BTagCalibrationReader readCSVfile(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
   Double_t getMuonSF(TH2D *h2, double eta, double pt);
+  Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
+  Double_t getEleSF(TH2D *h2, double etaSC, double pt);
 
 };
 
@@ -157,15 +159,72 @@ Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
   
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
-  Int_t binX = xaxis->FindBin(abs(eta));
-  Int_t binY = yaxis->FindBin(pt);
+  //since the Pt range of 2D histo is <120
+  //for Pt >120, we use SF of Pt = 120
+  if(pt<=120){
+    Int_t binX = xaxis->FindBin(abs(eta));
+    Int_t binY = yaxis->FindBin(pt);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }
+  else{
+    Int_t binX = xaxis->FindBin(abs(eta));
+    Int_t binY = yaxis->FindBin(120);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }	  
+}
+Double_t hplusAnalyzer::getMuonTrigSF(TH2D *h2, double eta, double pt){
   
-  double sf = h2->GetBinContent(binX, binY);
-  double err = h2->GetBinError(binX, binY);
-  if(sf!=0) return sf;
-  else return 1.0; 
+  TAxis *xaxis = h2->GetXaxis();
+  TAxis *yaxis = h2->GetYaxis();
+  //since the Pt range of 2D histo is <120
+  //for Pt >120, we use SF of Pt = 120
+  if(pt<=500){
+    Int_t binX = xaxis->FindBin(abs(eta));
+    Int_t binY = yaxis->FindBin(pt);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }
+  else{
+    Int_t binX = xaxis->FindBin(abs(eta));
+    Int_t binY = yaxis->FindBin(500);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }	  
 }
 
+Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
+  
+  TAxis *xaxis = h2->GetXaxis();
+  TAxis *yaxis = h2->GetYaxis();
+  //since the Pt range of 2D histo is <500
+  //for Pt >500, we use SF of Pt = 500
+  if(pt<=500){
+    Int_t binX = xaxis->FindBin(abs(etaSC));
+    Int_t binY = yaxis->FindBin(pt);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }
+  else{
+    Int_t binX = xaxis->FindBin(abs(etaSC));
+    Int_t binY = yaxis->FindBin(500);
+    double sf = h2->GetBinContent(binX, binY);
+    double err = h2->GetBinError(binX, binY);
+    if(sf!=0) return sf;
+    else return 1.0;
+  }	  
+}
 
 
 

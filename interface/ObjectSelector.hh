@@ -51,15 +51,9 @@ public :
     //////////////////////////////////////////////////
 
     // electron //////////////////////////////////////
-    E_RELISO_MAX_       = 0.0994;// https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
     E_ETA_MAX_          = 2.5;
-    E_ET_MIN_           = 20;
+    E_PT_MIN_           = 30;
     E_D0_MAX_           = 0.05;
-
-    LOOSE_E_RELISO_MAX_ = 0.2;
-    LOOSE_E_ETA_MAX_    = 2.5;
-    LOOSE_E_ET_MIN_     = 10;
-    RHO_AEFF_E_         = 0.24;
     //////////////////////////////////////////////////
 
 
@@ -84,12 +78,19 @@ public :
 
   //Loose Lepton veto
   bool looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow=false);
+  bool looseElectronVetoTemp(unsigned long first_ele, unsigned long sec_ele, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow=false);
   bool looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow=false);
-  bool loose2ndMuonVeto( int firstMuon, int secondMuon, const vector<MyMuon> & vM, bool isPFlow=false);
   
   //Medium muon ID
   bool isMediumMuon(const MyMuon * m, bool isPFlow);
+  bool isMediumMuonGH(const MyMuon * m, bool isPFlow);
   
+  //egmGsfElectronIDs: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
+  bool cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e); 
+  bool cutBasedElectronID_Summer16_80X_V1_loose(const MyElectron *e); 
+  bool cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron *e); 
+  bool cutBasedElectronID_Summer16_80X_V1_tight(const MyElectron *e); 
+
   // object cleaning
   void ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR );
 

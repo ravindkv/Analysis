@@ -29,6 +29,7 @@ class MyElectron
   TString eleName; 
 
   MyLorentzVector p4;
+  double eleSCEta;
   Point3D       vertex;   
 
   ///sel
@@ -55,6 +56,7 @@ class MyElectron
   double Dz;
   double trigger_ele_pt;
   int quality;
+  bool passConversionVeto;
  private :
 };
 #endif

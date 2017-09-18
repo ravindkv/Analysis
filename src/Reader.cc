@@ -105,7 +105,7 @@ Long64_t Reader::LoadTree(Long64_t entry)
 
 vector<MyElectron> Reader::getElectrons(MyEvent* ev, string algo)
 {
-
+ 
   vector<MyElectron> selElectrons;
   selElectrons.clear();
   vector<MyElectron> allElectrons = ev->Electrons;
