@@ -77,7 +77,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron 
      && abs(e->dEtaInSeed) 	< 0.00311	
      && abs(e->dPhiIn) 		< 0.103	
      && e->hadOverEm 		< 0.253	
-     && e->relCombPFIsoEA 	< 0.0695	
+     ///&& e->relCombPFIsoEA 	< 0.0695	
      && abs(e->iEminusiP) 	< 0.134	
      && e->nInnerHits       	<= 1
      && e->passConversionVeto  
@@ -89,7 +89,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron 
      && abs(e->dEtaInSeed) 	< 0.00609	 
      && abs(e->dPhiIn) 		< 0.045	
      && e->hadOverEm 		< 0.0878	
-     && e->relCombPFIsoEA 	< 0.0821	
+     ///&& e->relCombPFIsoEA 	< 0.0821	
      && abs(e->iEminusiP) 	< 0.13	
      && e->nInnerHits       	<= 1
      && e->passConversionVeto  
@@ -152,34 +152,6 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt      = TMath::Abs(m->p4.pt());
     double mD0      = fabs(m->D0);
-    double mRelIso  = m->pfRelIso;
-
-    bool isGlobalMuon = m->isGlobalMuon; 
-    bool isPFMuon = m->isPFMuon; 
-    bool passId = (isGlobalMuon && isPFMuon && m->nMuonHits >=1 
-		   && m->nPixelHits >= 1 && m->nMatchedStations >=2 
-		   && m->nTrackerLayers >= 6 && m->normChi2 < 10); 
-
-    double zvertex   = vertex.XYZ.z();
-    double zmuon     = m->vertex.z();
-    double dz =  fabs(zvertex-zmuon);
-    
-    if(passId && mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && 
-		    mD0 < M_D0_MAX_&& dz < ZMAX_ && mRelIso < M_RELISO_MAX_ ){ 
-      m_i->push_back(i);
-    }
-  }
-  
-}
-
-void ObjectSelector::preSelectMuonsNoIso(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isPFlow){
-  
-  for( int i=0;i< (int) vM.size();i++){
-    
-    const MyMuon * m = &vM[i];
-    double mEta     = TMath::Abs(m->p4.eta());
-    double mPt      = TMath::Abs(m->p4.pt());
-    double mD0      = fabs(m->D0);
 
     bool isGlobalMuon = m->isGlobalMuon; 
     bool isPFMuon = m->isPFMuon; 
@@ -197,7 +169,6 @@ void ObjectSelector::preSelectMuonsNoIso(vector<int> * m_i, const vector<MyMuon>
   }
   
 }
-
 
 void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer, double sigmaJER){
  
@@ -281,7 +252,7 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
   for(unsigned long i=0;i<vE.size();i++){
     const MyElectron * e   = &vE[i];
 
-    double eEta     	   = TMath::Abs(e->p4.eta());
+    //double eEta     	   = TMath::Abs(e->p4.eta());
     double ePt     	   = TMath::Abs(e->p4.pt());
     double d0      	   = fabs(e->D0);
     double zvertex   	   = vertex.XYZ.z();
@@ -295,27 +266,6 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
   return looseVeto;
 }
 
-bool ObjectSelector::looseElectronVetoTemp(unsigned long first_ele, unsigned long sec_ele, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow){
-
-  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
-  bool looseVeto(false);
-  for(unsigned long i=0;i<vE.size();i++){
-    const MyElectron * e   = &vE[i];
-
-    double eEta     	   = TMath::Abs(e->p4.eta());
-    double ePt     	   = TMath::Abs(e->p4.pt());
-    double d0      	   = fabs(e->D0);
-    double zvertex   	   = vertex.XYZ.z();
-    double zelectron 	   = e->vertex.z();
-    double dz 		   = fabs(zvertex - zelectron);
-
-    if( i==first_ele) continue; 
-    if( i==sec_ele) continue; 
-    bool passID = cutBasedElectronID_Summer16_80X_V1_veto(e);
-    if(passID && ePt >15 && d0 < 0.05 && dz < 0.1){looseVeto = true;}
-  }
-  return looseVeto;
-}
 
 void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR ){
   

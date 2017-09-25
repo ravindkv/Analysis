@@ -1,8 +1,4 @@
 
-///////////////////////
-// Electron Channel
-///////////////////////
-
 #include "hplusAnalyzer.h"
 #include <map>
 
@@ -28,6 +24,12 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
 //Process the cuts, event by event
 //---------------------------------------------------//  
 void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflowType, TFile *outFile_){
+  
+  //----------------------------//
+  bool muChannel  = true;
+  bool eleChannel = false;
+  //----------------------------//
+  
   int input_count = 0;
   int input_count_NonIso = 0;
   bool isPFlow = (myKey.find("PFlow") != string::npos) ? true : false;
@@ -54,10 +56,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //get initial number of events, from ntuples
   //store initial informations, in a txt file
   //---------------------------------------------------//
-  double lumiTotal = 35324;
+  double lumiTotal = 1;
+  if(muChannel) lumiTotal = 34478;
+  if(eleChannel) lumiTotal = 35324;
+  cout<<lumiTotal<<endl;
+
   int nEntries = evR->AssignEventTreeFrom(f);
   if(nEntries == 0) {return; }
-  
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"));
   TH1F* intimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/intimepu"));
   TH1F* outoftimepu = (TH1F*)(f->Get("myMiniTreeProducer/MCINFO/outoftimepu"));
@@ -81,7 +86,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   }
   fillHisto("totalEvents", cutflowType, initialEvents, 1);
   MyEvent *ev;
-  int nTriggEvent = 0, nSelEvents = 0, matchjetcount= 0, threepairjet = 0;
+  int nSelEvents = 0, matchjetcount= 0, threepairjet = 0;
   double nVerticesFailCount = 0.0;
   ///double corr_jet_pair_cs = 0.0, corr_jet_pair_ud = 0.0;
   double matchedJet_q = 0.0, matchedJet_b = 0.0, matched_quark_eta_pt = 0.0, not_matchedJet_q = 0.0;
@@ -116,6 +121,31 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   TH2D* h2_BTaggingEff_Num_cL 		= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_cL"));
   TH2D* h2_BTaggingEff_Num_udsgL 	= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_udsgL")); 
   
+  //---------------------------------------------------//
+  //muon scale factors from 2D histograms 
+  //---------------------------------------------------//      
+  //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
+  //https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffsRun2 
+  //Trigger SF
+  TFile *f_trigSF_BCDEF 	= new TFile("stack/muonSF/triggreSF_BCDEF.root");
+  TFile *f_trigSF_GH 		= new TFile("stack/muonSF/triggreSF_GH.root");
+  TH2D *h2_trigSF_BCDEF 	= (TH2D*)f_trigSF_BCDEF->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+  TH2D *h2_trigSF_GH 		= (TH2D*)f_trigSF_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+  //Identification SF
+  TFile *f_idSF_BCDEF 		= new TFile("stack/muonSF/idSF_BCDEF.root");
+  TFile *f_idSF_GH 		= new TFile("stack/muonSF/idSF_GH.root");
+  TH2D *h2_idSF_BCDEF 		= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+  TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+  //Isolation SF
+  TFile *f_isoSF_BCDEF 		= new TFile("stack/muonSF/isoSF_BCDEF.root");
+  TFile *f_isoSF_GH 		= new TFile("stack/muonSF/isoSF_GH.root");
+  TH2D *h2_isoSF_BCDEF 		= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+  TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+  //Tracking SF
+  TFile *f_trackSF_BCDEF 	= new TFile("stack/muonSF/trackingSF_BCDEF.root");
+  TFile *f_trackSF_GH 		= new TFile("stack/muonSF/trackingSF_GH.root");
+  TGraphAsymmErrors *tg_trackSF_BCDEF 	= (TGraphAsymmErrors*)f_trackSF_BCDEF->Get("ratio_eff_aeta_dr030e030_corr");
+  TGraphAsymmErrors *tg_trackSF_GH 	= (TGraphAsymmErrors*)f_trackSF_GH->Get("ratio_eff_aeta_dr030e030_corr");
   
   //---------------------------------------------------//
   //Electron scale factors from 2D histograms 
@@ -127,17 +157,15 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //Identification SF
   TFile *f_ele_veto_idSF 	= new TFile("stack/eleSF/ele_veto_idSF.root");
   TH2D *h2_ele_veto_idSF 	= (TH2D*)f_ele_veto_idSF->Get("EGamma_SF2D");
+
   TFile *f_ele_loose_idSF 	= new TFile("stack/eleSF/ele_loose_idSF.root");
   TH2D *h2_ele_loose_idSF 	= (TH2D*)f_ele_loose_idSF->Get("EGamma_SF2D");
+  
   TFile *f_ele_medium_idSF 	= new TFile("stack/eleSF/ele_medium_idSF.root");
   TH2D *h2_ele_medium_idSF 	= (TH2D*)f_ele_medium_idSF->Get("EGamma_SF2D");
+  
   TFile *f_ele_tight_idSF 	= new TFile("stack/eleSF/ele_tight_idSF.root");
   TH2D *h2_ele_tight_idSF 	= (TH2D*)f_ele_tight_idSF->Get("EGamma_SF2D");
-  //Trigger scale factors
-  //https://indico.cern.ch/event/604912/
-  TFile *f_ele_trigSF 		= new TFile("stack/eleSF/ele_trigSF_Run2016All_v1.root");
-  TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("Ele27_WPTight_Gsf");
-
 
   //---------------------------------------------------//
   //get sigma of Jet Pt-resolution
@@ -218,19 +246,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
     
     //---------------------------------------------------//
-    //apply electron triggers
+    //apply triggers
     //---------------------------------------------------//
-    
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
-      if(trig[it].find("HLT_Ele27_WPTight_Gsf") != string::npos) passTrig = true;
+      if(muChannel){
+	 if(trig[it].find("HLT_IsoMu24") != string::npos) passTrig = true;
+      }
+      if(eleChannel){
+	 if(trig[it].find("HLT_Ele27_WPTight_Gsf") != string::npos) passTrig = true;
+      }
     }
-    if(!passTrig){
-    //cout << "not satisfying trigger" << endl;
-      continue;
-    }
-    nTriggEvent++;
+    if(!passTrig) continue;
+
     nCutPass++;
     fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
     nCutPass_NonIso++;
@@ -240,17 +269,15 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //get all objets e.g. leptons, jets, vertices etc.
     //---------------------------------------------------//
     vector<MyVertex> Vertices = ev->PrimaryVtxs;
-    if(Vertices.size() <= 0){
-      nVerticesFailCount+=evtWeight;
-      cout<<" no vertexes , exit"<<endl;
-      continue;
-    }
+    if(Vertices.size() <= 0) continue;
+    
+    //get objects
     vector<MyMuon> pfMuons = evR->getMuons(ev, mAlgo);
     vector<MyElectron> pfElectrons = evR->getElectrons(ev, eAlgo);
     vector<MyJet> pfJets = evR->getJets(ev, jAlgo);
     MyMET met = evR->getMET(ev, metAlgo);
 
-    // preselect objects 
+    //preselect objects 
     vector<int> m_init; m_init.clear();
     preSelectMuons(&m_init, pfMuons, Vertices[0], isPFlow);
     vector<int> e_init; e_init.clear();
@@ -258,7 +285,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<int> j_init; j_init.clear();
     preSelectJets(jAlgo, &j_init, pfJets, jes, jer, sigma_jetPtreso);
     
-    // clean objects //
+    //clean objects //
     vector<int> e_final; e_final.clear();
     ElectronCleaning( pfElectrons, pfMuons, &e_init, &e_final, &m_init, DRMIN_ELE);
     vector<int> j_final; j_final.clear();
@@ -347,65 +374,158 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
        }
     }
     //---------------------------------------------------//
-    //apply selection cuts on leptons
+    //muon +jets channel
     //---------------------------------------------------//
-    if(e_final.size() > 0){
+    if(muChannel){
+      if(m_init.size() > 0){
+        int m_i = m_init[0];
+        double mRelIso_no_iso = pfMuons[m_i].pfRelIso;
+        fillHisto("pre_RelIso_mu",cutflowType+"/Iso", mRelIso_no_iso, evtWeight);
+        fillHisto("pre_RelIso_mu",cutflowType+"/NonIso", mRelIso_no_iso, evtWeight);
+      }
+      int nMuon = m_init.size();
+      double pri_vtxs = Vertices[0].totVtx;
+      if(nMuon != 1)continue;
+      //check if 0th muon has mediumMuon ID
+      bool passID = false;
+      string input_file(url);
+      if(input_file.find("RunG") != string::npos 
+          	    ||input_file.find("RunH") != string::npos)
+              passID = isMediumMuonGH(&pfMuons[m_i], isPFlow);
+      else
+              passID = isMediumMuon(&pfMuons[m_i], isPFlow);
+      if(!passID) continue;
+      
+      //veto 0th muon, if other muons are stroger than the 0th.
+      //we veto 0th if it is a fake muon
+      if(looseMuonVeto( m_i, pfMuons, isPFlow) ) continue;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      nCutPass_NonIso++;
+      fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      
+      //events should not have any electron
+      if(looseElectronVeto(-1, pfElectrons, Vertices[0], isPFlow)) continue;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      nCutPass_NonIso++;
+      fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      
+      //Transverse mass b/w lepton and MET
+      double metPt = 0; 
+      double   leptonPt(0), deltaPhi(0);
+      metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, sigma_jetPtreso);
+      leptonPt = TMath::Abs(pfMuons[m_i].p4.pt());
+      deltaPhi = ROOT::Math::VectorUtil::DeltaPhi(pfMuons[m_i].p4, met.p4);
+      double mt = sqrt (  2*leptonPt*metPt*(1 - cos(deltaPhi) ) ) ;
+      int count_muon = m_init.size();
+      ///int muCharge = pfMuons[m_i].charge;
+      
+      //-------------------------------//
+      //apply muon SF to eventWeights 
+      //-------------------------------//
+      double lumi_BCDEF = 18.76; double lumi_GH = 15.71 ;	
+      double lumi = lumi_BCDEF + lumi_GH;
+      //trigger 	
+      double muSFtrig_BCDEF 	= getMuonTrigSF(h2_trigSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFtrig_GH 		= getMuonTrigSF(h2_trigSF_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFtrig 		= (muSFtrig_BCDEF*lumi_BCDEF + muSFtrig_GH*lumi_GH)/lumi; 
+      //identification
+      double muSFid_BCDEF 	= getMuonSF(h2_idSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFid_GH 		= getMuonSF(h2_idSF_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFid 		= (muSFid_BCDEF*lumi_BCDEF + muSFid_GH*lumi_GH)/lumi; 
+      //isolation 
+      double muSFiso_BCDEF 	= getMuonSF(h2_isoSF_BCDEF, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFiso_GH 		= getMuonSF(h2_isoSF_GH, pfMuons[m_i].p4.eta(), pfMuons[m_i].p4.pt());
+      double muSFiso 		= (muSFiso_BCDEF*lumi_BCDEF + muSFiso_GH*lumi_GH)/lumi; 
+      //tracking 
+      double muSFtrack_BCDEF 	= getMuonTrackSF(tg_trackSF_BCDEF, pfMuons[m_i].p4.eta()); 
+      double muSFtrack_GH 	= getMuonTrackSF(tg_trackSF_GH, pfMuons[m_i].p4.eta()); 
+      double muSFtrack 		= (muSFtrack_BCDEF*lumi_BCDEF + muSFtrack_GH*lumi_GH)/lumi;
+
+      //combined SF
+      double muSF =1.0;
+      if(!ev->isData) muSF = muSFtrig*muSFid*muSFiso*muSFtrack;	
+      fillHisto("SF_muonSF", cutflowType, muSF, 1);
+      evtWeight *= muSF;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      nCutPass_NonIso++;
+      fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      
+      //-------------------------------//
+      // Iso(<0.15) and Non-iso(>0.15) 
+      //-------------------------------//
+      bool noisofound = false;
+      bool isofound = false;
+      double tmp_iso = pfMuons[m_i].pfRelIso;
+      fillHisto("RelIso_mu",cutflowType, tmp_iso, evtWeight);
+      if(tmp_iso < 0.15) isofound = true;
+      if(tmp_iso > 0.15 && tmp_iso < 0.4) noisofound = true;
+    }//muChannel
+    
+    //---------------------------------------------------//
+    //electron+jets channel
+    //---------------------------------------------------//
+    if(eleChannel){
+      if(e_final.size() > 0){
+        int e_i = e_final[0];
+        double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
+        fillHisto("pre_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
+        fillHisto("pre_RelIso_ele",cutflowType+"/NonIso", eRelIso, evtWeight);
+      }
+      int nEle = e_final.size();
+      double pri_vtxs = Vertices[0].totVtx;
+      //select only one electron
+      if(nEle != 1)continue;
       int e_i = e_final[0];
-      double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
-      fillHisto("pre_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
-      fillHisto("pre_RelIso_ele",cutflowType+"/NonIso", eRelIso, evtWeight);
-    }
-    int nEle = e_final.size();
-    double pri_vtxs = Vertices[0].totVtx;
-    //select only one electron
-    if(nEle != 1)continue;
-    int e_i = e_final[0];
-    //loose electron veto
-    if(looseElectronVeto(e_final[0], pfElectrons, Vertices[0], isPFlow)) continue;
-    nCutPass++; 
-    fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
-    nCutPass_NonIso++;
-    fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
-    //remove any muon
-    if(looseMuonVeto( -1, pfMuons, isPFlow) ) continue;
-    nCutPass++; 
-    fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
-    nCutPass_NonIso++;
-    fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
-    
-    //Transverse mass b/w lepton and MET
-    double metPt = 0; 
-    double   leptonPt(0), deltaPhi(0);
-    metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, sigma_jetPtreso);
-    leptonPt = TMath::Abs(pfElectrons[e_i].p4.pt());
-    deltaPhi = ROOT::Math::VectorUtil::DeltaPhi(pfElectrons[e_i].p4, met.p4);
-    double mt = sqrt (  2*leptonPt*metPt*(1 - cos(deltaPhi) ) ) ;
-    int count_ele = e_final.size();
-    
-    //---------------------------------------------------//
-    //apply Electron SF to eventWeights 
-    //---------------------------------------------------//
-    double eleSF =1.0;
-    //Reco, ID, trigger	
-    double ele_recoSF 		= getEleSF(h2_ele_recoSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
-    double ele_medium_idSF  	= getEleSF(h2_ele_medium_idSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
-    double ele_trigSF 		= getEleTrigSF(h2_ele_trigSF, pfElectrons[e_i].p4.pt(), pfElectrons[e_i].eleSCEta);
-    if(!ev->isData){
-      eleSF = ele_recoSF*ele_medium_idSF*ele_trigSF;
-    }
-    fillHisto("SF_eleSF", cutflowType, eleSF, 1);
-    evtWeight *= eleSF;
-    nCutPass++; 
-    fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
-    //---------------------------------------------------//
-    // Iso(<0.08) and Non-iso(>0.08) region 
-    //---------------------------------------------------//
-    bool noisofound = false;
-    bool isofound = false;
-    double tmp_iso = pfElectrons[e_i].relCombPFIsoEA;
-    fillHisto("RelIso_ele",cutflowType, tmp_iso, evtWeight);
-    if(tmp_iso < 0.08) isofound = true;
-    if(tmp_iso > 0.08 && tmp_iso < 0.3) noisofound = true;
+      //loose electron veto
+      if(looseElectronVeto(e_final[0], pfElectrons, Vertices[0], isPFlow)) continue;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      nCutPass_NonIso++;
+      fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      //remove any muon
+      if(looseMuonVeto( -1, pfMuons, isPFlow) ) continue;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      nCutPass_NonIso++;
+      fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      
+      //Transverse mass b/w lepton and MET
+      double metPt = 0; 
+      double   leptonPt(0), deltaPhi(0);
+      metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, sigma_jetPtreso);
+      leptonPt = TMath::Abs(pfElectrons[e_i].p4.pt());
+      deltaPhi = ROOT::Math::VectorUtil::DeltaPhi(pfElectrons[e_i].p4, met.p4);
+      double mt = sqrt (  2*leptonPt*metPt*(1 - cos(deltaPhi) ) ) ;
+      int count_ele = e_final.size();
+      
+      //---------------------------------------------------//
+      //apply Electron SF to eventWeights 
+      //---------------------------------------------------//
+      //Reco	
+      double ele_recoSF 	= getEleSF(h2_ele_recoSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
+      //ID
+      double ele_medium_idSF  	= getEleSF(h2_ele_medium_idSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
+      double eleSF =1.0;
+      if(!ev->isData){
+        eleSF = ele_recoSF*ele_medium_idSF;	
+      }
+      fillHisto("SF_eleSF", cutflowType, eleSF, 1);
+      evtWeight *= eleSF;
+      nCutPass++; 
+      fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+      //---------------------------------------------------//
+      // Iso(<0.08) and Non-iso(>0.08) region 
+      //---------------------------------------------------//
+      bool noisofound = false;
+      bool isofound = false;
+      double tmp_iso = pfElectrons[e_i].relCombPFIsoEA;
+      fillHisto("RelIso_ele",cutflowType, tmp_iso, evtWeight);
+      if(tmp_iso < 0.08) isofound = true;
+      if(tmp_iso > 0.08 && tmp_iso < 0.3) noisofound = true;
+    }//eleChannel
 
     ////////////////////////////////////////////////////////////////  
     //  Isolation region
@@ -413,12 +533,22 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(isofound){
       nCutPass++;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
-      double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
-      fillHisto("pt_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.pt(), evtWeight);
-      fillHisto("final_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
-      fillHisto("eta_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.eta(), evtWeight);
-      fillHisto("phi_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.phi(), evtWeight);
-      // vertex just after one lepton selection
+      //muon channel
+      if(muChannel){ 
+        double mRelIso = pfMuons[m_i].pfRelIso;
+        fillHisto("pt_mu", cutflowType+"/Iso", pfMuons[m_i].p4.pt(), evtWeight);
+        fillHisto("final_RelIso_mu",cutflowType+"/Iso", mRelIso, evtWeight);
+        fillHisto("eta_mu", cutflowType+"/Iso", pfMuons[m_i].p4.eta(), evtWeight);
+        fillHisto("phi_mu", cutflowType+"/Iso", pfMuons[m_i].p4.phi(), evtWeight);
+      } 
+      //electron channel
+      if(eleChannel){ 
+        double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
+        fillHisto("pt_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.pt(), evtWeight);
+        fillHisto("final_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
+        fillHisto("eta_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.eta(), evtWeight);
+        fillHisto("phi_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.phi(), evtWeight);
+      } 
       //double pri_vtxs = Vertices.size();
       fillHisto("nvtx", cutflowType+"/Iso", pri_vtxs, evtWeight);
       fillHisto("nvtx_6Kbins", cutflowType+"/Iso", pri_vtxs, evtWeight);
@@ -426,7 +556,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         fillHisto("rhoAll", cutflowType+"/Iso", Vertices[n].rhoAll, evtWeight);
         fillHisto("chi2", cutflowType+"/Iso", Vertices[n].chi2, evtWeight);
         fillHisto("ndof", cutflowType+"/Iso", Vertices[n].ndof, evtWeight);
-        }
+      }
       
       //---------------------------------------------------//
       // Apply Jet Selection
@@ -453,7 +583,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, sigma_jetPtreso);
       fillHisto("pt_met", cutflowType+"/Iso", metPt, evtWeight);
       fillHisto("phi_met", cutflowType+"/Iso", met.p4.phi(), evtWeight);
-      if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+      if(metPt > 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
       nCutPass++;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
       fillHisto("final_pt_met", cutflowType+"/Iso", metPt, evtWeight);
@@ -509,8 +639,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           bdiscr.push_back(pfCISV);
         }
         else j_final_nob.push_back(ind_jet); 
-        if(pfCISV >0.5426) count_CSVL ++;
-        //if(pfCISV >0.8484) count_CSVL ++;
+        //if(pfCISV >0.5426) count_CSVL ++;
+        if(pfCISV >0.8484) count_CSVL ++;
+        //if(pfCISV >0.9535) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass = 8;
@@ -530,7 +661,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       double topPtWeights_offline = 1.0;
       if(!ev->isData){
         string sampleName = ev->sampleInfo.sampleName;
-        if(sampleName.find("TTJets") != string::npos || sampleName.find("HplusM120") != string::npos)
+        if(sampleName.find("TTJetsM") != string::npos || sampleName.find("TTJetsP") != string::npos)
 	{
           vector<double>topptweights = ev->sampleInfo.topPtWeights;
           if(topptweights.size() > 0){
@@ -608,10 +739,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //---------------------------------------------------//
       // add set of plots after BTag:
       //---------------------------------------------------//
-      fillHisto("pt_ele", cutflowType+"/Iso"+"/BTag",  pfElectrons[e_i].p4.pt(), evtWeight);
-      fillHisto("eta_ele", cutflowType+"/Iso"+"/BTag", pfElectrons[e_i].p4.eta(), evtWeight);
-      fillHisto("phi_ele", cutflowType+"/Iso"+"/BTag", pfElectrons[e_i].p4.phi(), evtWeight);
-      fillHisto("final_RelIso_ele",cutflowType+"/Iso"+"/BTag", eRelIso, evtWeight);
+      if(muChannel){
+        fillHisto("pt_mu", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.pt(), evtWeight);
+        fillHisto("eta_mu", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.eta(), evtWeight);
+        fillHisto("phi_mu", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.phi(), evtWeight);
+        fillHisto("final_RelIso_mu",cutflowType+"/Iso"+"/BTag", mRelIso, evtWeight);
+      }
+      if(eleChannel){
+        fillHisto("pt_ele", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.pt(), evtWeight);
+        fillHisto("eta_ele", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.eta(), evtWeight);
+        fillHisto("phi_ele", cutflowType+"/Iso"+"/BTag", pfMuons[m_i].p4.phi(), evtWeight);
+        fillHisto("final_RelIso_ele",cutflowType+"/Iso"+"/BTag", mRelIso, evtWeight);
+      }
       for(size_t ijet = 0; ijet < j_final.size(); ijet++){
         int ind_jet = j_final[ijet];
         double jetPt = jetPtWithJESJER(pfJets[ind_jet], 0, 0, sigma_jetPtreso);
@@ -633,20 +772,23 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       input_count++;
       if(input_count%10==0)
       cout << "input count iso: "<< input_count << endl;
-      //if(i > 30000) break;
+      if(i > 30000) break;
      
       //---------------------------------------------------//
       // add set of plots after KinFit:
       //---------------------------------------------------//
-      bool foundkfEle = false;
-      double dR =DeltaR(pfElectrons[e_i].p4 , kfLepton[0]);
-      fillHisto("dR_pfEle_kfLep", cutflowType, dR, evtWeight);
+      bool foundkfLepton = false;
       if(kfLepton.size()>0){
-        if(dR< 2)foundkfEle = true;
+        if(muChannel){  
+          if(DeltaR(pfMuons[m_i].p4 , kfLepton[0]) < 0.2)foundkfLepton = true;
+	}
+        if(eleChannel){  
+          if(DeltaR(pfMuons[m_i].p4 , kfLepton[0]) < 0.2)foundkfLepton = true;
+	}
       }
       //outfile_ << "chi2OfKinFit just after lepton selection:    " << chi2OfKinFit << endl;
       int count_cjet = 0, count_sjet = 0, count_bjet = 0, count_ujet = 0, count_djet = 0, other_jet = 0;
-      if(foundkfEle){
+      if(foundkfLepton){
         //---------------------------------------------------//
         //select maximum b-tag discriminator jet in KF
         //---------------------------------------------------//
@@ -737,10 +879,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           if(match_j1 && match_j2){
             if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 ){
               if(probOfKinFit > 0.1){
-                fillHisto("pt_ele", cutflowType+"/Iso/KinFit",  pfElectrons[e_i].p4.pt(), evtWeight);
-                fillHisto("eta_ele", cutflowType+"/Iso/KinFit", pfElectrons[e_i].p4.eta(), evtWeight);
-                fillHisto("phi_ele", cutflowType+"/Iso/KinFit", pfElectrons[e_i].p4.phi(), evtWeight);
-                for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+                if(muChannel){
+		  fillHisto("pt_mu", cutflowType+"/Iso/KinFit", pfMuons[m_i].p4.pt(), evtWeight);
+                  fillHisto("eta_mu", cutflowType+"/Iso/KinFit", pfMuons[m_i].p4.eta(), evtWeight);
+                  fillHisto("phi_mu", cutflowType+"/Iso/KinFit", pfMuons[m_i].p4.phi(), evtWeight);
+		}
+                if(eleChannel){
+		  fillHisto("pt_ele", cutflowType+"/Iso/KinFit", pfElectrons[e_i].p4.pt(), evtWeight);
+                  fillHisto("eta_ele", cutflowType+"/Iso/KinFit", pfElectrons[e_i].p4.eta(), evtWeight);
+                  fillHisto("phi_ele", cutflowType+"/Iso/KinFit", pfElectrons[e_i].p4.phi(), evtWeight);
+		}
+		for(size_t ijet = 0; ijet < j_final.size(); ijet++){
                   int ind_jet = j_final[ijet];
                   double jetPt = jetPtWithJESJER(pfJets[ind_jet], 0, 0, sigma_jetPtreso);
                   fillHisto("pt_jet", cutflowType+"/Iso/KinFit", jetPt, evtWeight);
@@ -776,8 +925,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             } //end-of  if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 )
           } // end-of if(match1 & match2) 
         } // end-of if(kfLightJets.size() >= 2)
-      } // end-of foundEle
-    }//isoEle
+      } // end-of foundMu
+    }//isomuon
     
     ////////////////////////////////////////////////////////////////  
     //  Non-isolation region
@@ -785,12 +934,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(noisofound){
       nCutPass_NonIso++;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
+      if(muChannel){ 
+        double mRelIso = pfMuons[m_i].pfRelIso;
+        fillHisto("pt_mu", cutflowType+"/NonIso", pfMuons[m_i].p4.pt(), evtWeight);
+        fillHisto("final_RelIso_mu",cutflowType+"/NonIso", mRelIso, evtWeight);
+        fillHisto("eta_mu", cutflowType+"/NonIso", pfMuons[m_i].p4.eta(), evtWeight);
+        fillHisto("phi_mu", cutflowType+"/NonIso", pfMuons[m_i].p4.phi(), evtWeight);
+      }
+      if(eleChannel){ 
         double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
         fillHisto("pt_ele", cutflowType+"/NonIso", pfElectrons[e_i].p4.pt(), evtWeight);
         fillHisto("final_RelIso_ele",cutflowType+"/NonIso", eRelIso, evtWeight);
         fillHisto("eta_ele", cutflowType+"/NonIso", pfElectrons[e_i].p4.eta(), evtWeight);
         fillHisto("phi_ele", cutflowType+"/NonIso", pfElectrons[e_i].p4.phi(), evtWeight);
-      // vertex just after one lepton selection
+      } 
       //double pri_vtxs = Vertices.size();
       fillHisto("nvtx", cutflowType+"/NonIso", pri_vtxs, evtWeight);
       fillHisto("nvtx_6Kbins", cutflowType+"/NonIso", pri_vtxs, evtWeight);
@@ -826,7 +983,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       ///else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
       fillHisto("pt_met", cutflowType+"/NonIso", metPt, evtWeight);
       fillHisto("phi_met", cutflowType+"/NonIso", met.p4.phi(), evtWeight);
-      if(metPt < 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+      if(metPt > 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
       nCutPass_NonIso++;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
       fillHisto("final_pt_met", cutflowType+"/NonIso", metPt, evtWeight);
@@ -882,8 +1039,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           bdiscr.push_back(pfCISV);
         }
         else j_final_nob.push_back(ind_jet); 
-        if(pfCISV >0.5426) count_CSVL ++;
-        //if(pfCISV >0.8484) count_CSVL ++;
+        if(pfCISV >0.8484) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass_NonIso = 8;
@@ -897,6 +1053,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //if(mt < 30) continue; // mt cuts
       nCutPass_NonIso = 10;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight); 
+      
       //---------------------------------------------------//
       // apply top re-weighting weight
       //---------------------------------------------------//
@@ -981,10 +1138,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //---------------------------------------------------//
       // add set of plots after BTag:
       //---------------------------------------------------//
+      if(muChannel){
+        fillHisto("pt_mu", cutflowType+"/NonIso"+"/BTag", pfMuons[m_i].p4.pt(), evtWeight);
+        fillHisto("eta_mu", cutflowType+"/NonIso"+"/BTag", pfMuons[m_i].p4.eta(), evtWeight);
+        fillHisto("phi_mu", cutflowType+"/NonIso"+"/BTag", pfMuons[m_i].p4.phi(), evtWeight);
+        fillHisto("final_RelIso_mu",cutflowType+"/NonIso"+"/BTag", mRelIso, evtWeight);
+      }
+      if(eleChannel){
         fillHisto("pt_ele", cutflowType+"/NonIso"+"/BTag", pfElectrons[e_i].p4.pt(), evtWeight);
         fillHisto("eta_ele", cutflowType+"/NonIso"+"/BTag", pfElectrons[e_i].p4.eta(), evtWeight);
         fillHisto("phi_ele", cutflowType+"/NonIso"+"/BTag", pfElectrons[e_i].p4.phi(), evtWeight);
         fillHisto("final_RelIso_ele",cutflowType+"/NonIso"+"/BTag", eRelIso, evtWeight);
+      }
       for(size_t ijet = 0; ijet < j_final.size(); ijet++){
         int ind_jet = j_final[ijet];
         double jetPt = jetPtWithJESJER(pfJets[ind_jet], 0, 0, sigma_jetPtreso);
@@ -1012,14 +1177,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //---------------------------------------------------//
       // add set of plots after KinFit:
       //---------------------------------------------------//
-      bool foundkfEle = false;
-      double dR =DeltaR(pfElectrons[e_i].p4 , kfLepton[0]);
+      bool foundkfLepton = false;
       if(kfLepton.size()>0){
-        if(dR< 2)foundkfEle = true;
+        if(DeltaR(pfMuons[m_i].p4 , kfLepton[0]) < 0.2)foundkfLepton = true;
       }
       //outfile_ << "chi2OfKinFit just after lepton selection:    " << chi2OfKinFit << endl;
       int count_cjet = 0, count_sjet = 0, count_bjet = 0, count_ujet = 0, count_djet = 0, other_jet = 0;
-      if(foundkfEle){
+      if(foundkfLepton){
         //---------------------------------------------------//
         //select maximum b-tag discriminator jet in KF
         //---------------------------------------------------//
@@ -1070,10 +1234,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           if(match_j1 && match_j2){
             if(kfLightJets[0].pt() > 25 && kfLightJets[1].pt() > 25 ){
               if(probOfKinFit > 0.1){
+		if(muChannel){
+                  fillHisto("pt_mu", cutflowType+"/NonIso/KinFit", pfMuons[m_i].p4.pt(), evtWeight);
+                  fillHisto("eta_mu", cutflowType+"/NonIso/KinFit", pfMuons[m_i].p4.eta(), evtWeight);
+                  fillHisto("phi_mu", cutflowType+"/NonIso/KinFit", pfMuons[m_i].p4.phi(), evtWeight);
+		}
+		if(eleChannel){
                   fillHisto("pt_ele", cutflowType+"/NonIso/KinFit", pfElectrons[e_i].p4.pt(), evtWeight);
                   fillHisto("eta_ele", cutflowType+"/NonIso/KinFit", pfElectrons[e_i].p4.eta(), evtWeight);
                   fillHisto("phi_ele", cutflowType+"/NonIso/KinFit", pfElectrons[e_i].p4.phi(), evtWeight);
-                for(size_t ijet = 0; ijet < j_final.size(); ijet++){
+		}
+		for(size_t ijet = 0; ijet < j_final.size(); ijet++){
                   int ind_jet = j_final[ijet];
                   double jetPt = jetPtWithJESJER(pfJets[ind_jet], 0, 0, sigma_jetPtreso);
                   fillHisto("pt_jet", cutflowType+"/NonIso/KinFit", jetPt, evtWeight);
@@ -1137,12 +1308,10 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("outFile_.root", "PF", "TTJets_MuMC_check"); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   
- // CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleData_kfitL_20170919/EleData_20170919/EleRunBver2v2_EleData_20170919/SingleElectron/EleRunBver2v2_EleData_20170919/170919_014053/0000/EleRunBver2v2_EleData_20170919_Ntuple_1.root", "PF", "data");
-
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170919/MuMC_20170919/TTJetsP_MuMC_20170919/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20170919/170919_013420/0000/TTJetsP_MuMC_20170919_Ntuple_1.root", "PF", "");
-
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170919/MuMC_20170919/TTJetsP_MuMC_20170919/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20170919/170919_013420/0000/TTJetsP_MuMC_20170919_Ntuple_1.root", "PF", "");
+  
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 
