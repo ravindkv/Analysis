@@ -350,6 +350,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
            }
        }
     }
+    ///double metPt_CR= metWithJESJER(pfJets, &j_final, met, 0, 0, sigma_jetPtreso);
+    ///if(metPt_CR > 20) continue;  // Missing transverse energy cut 30 GeV(CMS) for ATLAS 20 GeV 
+    
     //---------------------------------------------------//
     //apply selection cuts on leptons
     //---------------------------------------------------//
@@ -1180,8 +1183,6 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170919/MuMC_20170919/TTJetsP_MuMC_20170919/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20170919/170919_013420/0000/TTJetsP_MuMC_20170919_Ntuple_1.root", "PF", "");
-  
-
   //====================================
   //condor submission
   CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");

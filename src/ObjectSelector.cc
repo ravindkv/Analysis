@@ -17,7 +17,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00749	
      && abs(e->dPhiIn) 		< 0.228	
      && e->hadOverEm 		< 0.356	
-     && e->relCombPFIsoEA 	< 0.175	
+     //&& e->relCombPFIsoEA 	< 0.175	
      && abs(e->iEminusiP) 	< 0.299	
      && e->nInnerHits       	<= 2
      && e->passConversionVeto  
@@ -29,7 +29,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00895	 
      && abs(e->dPhiIn) 		< 0.213	
      && e->hadOverEm 		< 0.211	
-     && e->relCombPFIsoEA 	< 0.159	
+     //&& e->relCombPFIsoEA 	< 0.159	
      && abs(e->iEminusiP) 	< 0.15	
      && e->nInnerHits       	<= 3
      && e->passConversionVeto  
@@ -145,38 +145,37 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
   }
 }
 
-void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isPFlow){
-  
+void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData, double random_u1, double random_u2, int err_member, int err_set){
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
-    double mPt      = TMath::Abs(m->p4.pt());
+    ///double mPt      = TMath::Abs(m->p4.pt());
     double mD0      = fabs(m->D0);
-
+    double mPt   = muPtWithRochCorr(m, isData, random_u1, random_u2, err_set, err_member); 
+    /*
     bool isGlobalMuon = m->isGlobalMuon; 
     bool isPFMuon = m->isPFMuon; 
     bool passId = (isGlobalMuon && isPFMuon && m->nMuonHits >=1 
 		   && m->nPixelHits >= 1 && m->nMatchedStations >=2 
 		   && m->nTrackerLayers >= 6 && m->normChi2 < 10); 
-
+    */
     double zvertex   = vertex.XYZ.z();
     double zmuon     = m->vertex.z();
     double dz =  fabs(zvertex-zmuon);
     
-    if(passId && mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mD0 < M_D0_MAX_&& dz < ZMAX_ ){ 
+    if(mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mD0 < M_D0_MAX_&& dz < ZMAX_ ){ 
       m_i->push_back(i);
     }
   }
-  
 }
 
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer, double sigmaJER){
+void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer){
  
   for(unsigned int i=0;i<vJ.size();i++){
     const MyJet *jet = &vJ[i];
     double jetEta     = TMath::Abs(jet->p4.eta());
     //double jetPt      = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer, sigmaJER); 
+    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer); 
     double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
     double neutralEmEnFrac = jet->neutralEmEnergyFraction;
     double chargedHadEnFrac = jet->chargedHadronEnergyFraction;

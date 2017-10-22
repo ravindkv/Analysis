@@ -259,8 +259,8 @@ namespace reweight {
       //weights_->Draw();
    //int NBins = weights_->GetNbinsX();
    //for(int ibin = 1; ibin<NBins+1; ++ibin){
-  /*
-   for(int ibin = 1; ibin<60; ++ibin){
+   /*
+    for(int ibin = 1; ibin<75; ++ibin){
      std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
    }
    */

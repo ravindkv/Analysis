@@ -351,7 +351,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     if(e_final.size() > 0){
       int e_i = e_final[0];
-      double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
+      double eRelIso = pfElectrons[e_i].relCombPFIsoEA/pfElectrons[e_i].p4.pt();
       fillHisto("pre_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
       fillHisto("pre_RelIso_ele",cutflowType+"/NonIso", eRelIso, evtWeight);
     }
@@ -397,6 +397,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     evtWeight *= eleSF;
     nCutPass++; 
     fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight); // one lepton 
+    nCutPass_NonIso++;
+    fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
     //---------------------------------------------------//
     // Iso(<0.08) and Non-iso(>0.08) region 
     //---------------------------------------------------//
@@ -413,7 +415,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(isofound){
       nCutPass++;
       fillHisto("cutflow", cutflowType+"/Iso", nCutPass, evtWeight);
-      double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
+      double eRelIso = pfElectrons[e_i].relCombPFIsoEA/pfElectrons[e_i].p4.pt();
       fillHisto("pt_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.pt(), evtWeight);
       fillHisto("final_RelIso_ele",cutflowType+"/Iso", eRelIso, evtWeight);
       fillHisto("eta_ele", cutflowType+"/Iso", pfElectrons[e_i].p4.eta(), evtWeight);
@@ -509,8 +511,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           bdiscr.push_back(pfCISV);
         }
         else j_final_nob.push_back(ind_jet); 
-        //if(pfCISV >0.5426) count_CSVL ++;
-        if(pfCISV >0.8484) count_CSVL ++;
+        if(pfCISV >0.5426) count_CSVL ++;
+        //if(pfCISV >0.8484) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass = 8;
@@ -785,7 +787,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(noisofound){
       nCutPass_NonIso++;
       fillHisto("cutflow", cutflowType+"/NonIso", nCutPass_NonIso, evtWeight);
-        double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
+        double eRelIso = pfElectrons[e_i].relCombPFIsoEA/pfElectrons[e_i].p4.pt();
         fillHisto("pt_ele", cutflowType+"/NonIso", pfElectrons[e_i].p4.pt(), evtWeight);
         fillHisto("final_RelIso_ele",cutflowType+"/NonIso", eRelIso, evtWeight);
         fillHisto("eta_ele", cutflowType+"/NonIso", pfElectrons[e_i].p4.eta(), evtWeight);
@@ -882,7 +884,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           bdiscr.push_back(pfCISV);
         }
         else j_final_nob.push_back(ind_jet); 
-        if(pfCISV >0.8484) count_CSVL ++;
+        if(pfCISV >0.5426) count_CSVL ++;
+        //if(pfCISV >0.8484) count_CSVL ++;
       }
       if(count_CSVL >=2 ){
       nCutPass_NonIso = 8;
@@ -1135,6 +1138,7 @@ void hplusAnalyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("outFile_.root", "PF", "TTJets_MuMC_check"); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitL_20170919/MuMC_20170919/DY1JetsToLL_MuMC_20170919/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DY1JetsToLL_MuMC_20170919/170919_012434/0000/DY1JetsToLL_MuMC_20170919_Ntuple_14.root", "PF", "");
   
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleData_kfitL_20170919/EleData_20170919/EleRunBver2v2_EleData_20170919/SingleElectron/EleRunBver2v2_EleData_20170919/170919_014053/0000/EleRunBver2v2_EleData_20170919_Ntuple_1.root", "PF", "data");
 
@@ -1142,6 +1146,6 @@ void hplusAnalyzer::processEvents(){
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

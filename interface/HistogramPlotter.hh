@@ -33,7 +33,7 @@ public :
   void addHisto(TString name, TString dirname, int range, double min, double max);
   void add2DHisto(TString name, TString dirname, int range1, double min1, double max1, int range2, double min2, double max2);
   void fillHisto(TString name, TString dirname, double value, double weight=1.0);
-  void fillHistoPU(TString name, TString dirname, int bin, double binCont);
+  void addAndFillHisto(TFile *filename, TString dirname, TString subdir, TString histname, int range, double min, double max, double value, double weight);
   TH1* getHisto(TString name, TString dirname);
   void CreateAnalHistos(TString flowType, TFile* outFile_);
 

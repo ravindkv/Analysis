@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "BTagCalibrationStandalone.h"
-
 #endif
 using namespace std;
 class BtagSF{

@@ -1,18 +1,36 @@
 #include "interface/UncertaintyComputer.hh"
 #include <iostream>
 #include <iomanip>
+#include "TRandom3.h"
+#include <stack/Roch/RoccoR.cc>
 
 ClassImp(UncertaintyComputer)
 
 using namespace std;
+RoccoR  rc("stack/Roch/rcdata.2016.v3");
+double UncertaintyComputer::muPtWithRochCorr(const MyMuon *mu, bool isData, double u1, double u2, int s, int m){
+  //double genPt  = mu.Genp4.pt();  
+  double charge = mu->charge;
+  double pt 	= mu->p4.pt();
+  double eta 	= mu->p4.eta();
+  double phi 	= mu->p4.phi();
+  int nl 	= mu->nTrackerLayers;
+  double dataSF = rc.kScaleDT(charge, pt, eta, phi, s, m); 
+  double mcSF 	= rc.kScaleFromGenMC(charge, pt, eta, phi, nl, u1, u2, s, m); 
+  double SF = 1.0; 
+  if(isData)SF = dataSF;
+  else SF = mcSF;
+  return SF*pt;
+}
 
-double UncertaintyComputer::metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer, double sigmaJER){
+double UncertaintyComputer::metWithJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jer){
   double metX = MET.p4.px();
   double metY = MET.p4.py();
   for(size_t i = 0; i < j->size(); i++){
     int j_ind = j->at(i);
     double gen_pt = vJ[j_ind].Genp4.pt();
     double jet_pt = vJ[j_ind].p4.pt();
+    double sigmaJER = vJ[j_ind].resolution;
     //apply JER uncert, scaling
     double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
     double rCone = 0.4;
@@ -44,7 +62,7 @@ double UncertaintyComputer::getJERSF(double eta, int jer){
   return SF;
 }
 
-double UncertaintyComputer::metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes, double sigmaJER){
+double UncertaintyComputer::metWithJES(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes){
   double metX = MET.p4.px(); 
   double metY = MET.p4.py(); 
   for(size_t i = 0; i < j->size(); i++){ 
@@ -55,7 +73,7 @@ double UncertaintyComputer::metWithJES(const vector<MyJet> & vJ, vector<int> *j,
   return sqrt(metX*metX + metY*metY);
 }
 
-double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes, int jer, double sigmaJER) 
+double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes, int jer) 
 { 
   double metX = MET.p4.px(); 
   double metY = MET.p4.py(); 
@@ -64,6 +82,7 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
     int j_ind = j->at(i); 
     double gen_pt = vJ[j_ind].Genp4.pt(); 
     double jet_pt = vJ[j_ind].p4.pt();
+    double sigmaJER = vJ[j_ind].resolution;
     //apply JER uncert, scaling
     double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
     double rCone = 0.4;
@@ -133,15 +152,15 @@ double UncertaintyComputer::metWithUncl(const vector<MyJet> & vJ, vector<int> *j
     metX -= vJ[j_ind].p4.px(); 
     metY -= vJ[j_ind].p4.py(); 
  
-  } 
+  }
   return sqrt(metX*metX + metY*metY);
 }
 
-double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer, double sigmaJER){
+double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
 
   double gen_pt = jet.Genp4.pt();  
   double jet_pt = jet.p4.pt();
- 
+  double sigmaJER = jet.resolution ;
   //apply JES uncert scaling 
   jet_pt *= (1+(jet.JECUncertainty*double(jes)));
   //apply JER uncert, scaling

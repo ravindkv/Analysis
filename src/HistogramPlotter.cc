@@ -11,7 +11,7 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   //Define Histograms 
   //base histo
   InitHist(cutflowType, "", outFile_); 
-  addHisto("cutflow", cutflowType, 15 , 0., 15.); 
+  addHisto("cutflow", cutflowType, 15 , 1., 15.); 
   addHisto("totalEvents", cutflowType, 10 , 0., 10000000000.); 
   addHisto("intimepu", cutflowType, 6000, 0., 1000.);
   addHisto("outoftimepu", cutflowType, 6000, 0., 1000.);
@@ -19,8 +19,8 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("trueintimepu", cutflowType, 6000, 0., 1000.);
   addHisto("trueoutoftimepu", cutflowType, 6000, 0., 1000.);
   addHisto("truetotalpu", cutflowType, 6000, 0., 1000.);
-  addHisto("RelIso_mu",cutflowType, 40, 0, 1.0);
-  addHisto("RelIso_ele",cutflowType, 40, 0, 1.0);
+  addHisto("RelIso_mu",cutflowType, 400, 0, 1.0);
+  addHisto("RelIso_ele",cutflowType, 400, 0, 1.0);
   addHisto("hepNUP", cutflowType, 100, 1., 20.);
   //Scale factors
   addHisto("SF_hepNUP_WJets",cutflowType, 1000, 0, 1000);
@@ -32,15 +32,16 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("SF_eleSF",cutflowType, 1000, 0, 10);
   addHisto("dR_pfEle_kfLep",cutflowType, 100, 0, 20);
   addHisto("dR_pfMu_kfLep",cutflowType, 100, 0, 20);
+  addHisto("dR_pfJets_kfJets",cutflowType, 100, 0, 20);
  
   ////////////////// Isolation ///////////////// 
   //base/Iso histo
   InitHist("Iso", cutflowType, outFile_);
-  addHisto("cutflow", cutflowType+"/Iso", 15 , 0., 15.); 
-  addHisto("pre_RelIso_mu",cutflowType+"/Iso", 40,0,0.5);
-  addHisto("pre_RelIso_ele",cutflowType+"/Iso", 40,0,0.5);
-  addHisto("final_RelIso_mu",cutflowType+"/Iso", 40,0,0.5);
-  addHisto("final_RelIso_ele",cutflowType+"/Iso", 40,0,0.5);
+  addHisto("cutflow", cutflowType+"/Iso", 15 , 1., 15.); 
+  addHisto("pre_RelIso_mu",cutflowType+"/Iso", 1000,0,10);
+  addHisto("pre_RelIso_ele",cutflowType+"/Iso", 1000,0,10);
+  addHisto("final_RelIso_mu",cutflowType+"/Iso", 1000,0,10);
+  addHisto("final_RelIso_ele",cutflowType+"/Iso", 1000,0,10);
   addHisto("nvtx", cutflowType+"/Iso", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/Iso", 6000, 0., 1000.);
   addHisto("rhoAll", cutflowType+"/Iso", 100, 0., 100.);
@@ -100,11 +101,11 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   ////////////////// NonIsolation ///////////////// 
   //base/NonIso histo
   InitHist("NonIso", cutflowType, outFile_);
-  addHisto("cutflow", cutflowType+"/NonIso", 15 , 0., 15.); 
-  addHisto("pre_RelIso_mu",cutflowType+"/NonIso", 40,0,0.5);
-  addHisto("pre_RelIso_ele",cutflowType+"/NonIso", 40,0,0.5);
-  addHisto("final_RelIso_mu",cutflowType+"/NonIso", 40,0,0.5);
-  addHisto("final_RelIso_ele",cutflowType+"/NonIso", 40,0,0.5);
+  addHisto("cutflow", cutflowType+"/NonIso", 15 , 1, 15.); 
+  addHisto("pre_RelIso_mu",cutflowType+"/NonIso", 1000,0,10);
+  addHisto("pre_RelIso_ele",cutflowType+"/NonIso", 1000,0,10);
+  addHisto("final_RelIso_mu",cutflowType+"/NonIso", 1000,0,10);
+  addHisto("final_RelIso_ele",cutflowType+"/NonIso", 1000,0,10);
   addHisto("nvtx", cutflowType+"/NonIso", 100, 0., 100.);
   addHisto("nvtx_6Kbins", cutflowType+"/NonIso", 6000, 0., 1000.);
   addHisto("rhoAll", cutflowType+"/NonIso", 100, 0., 100.);
@@ -159,10 +160,8 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("mjj_kfit_Id_probfit2",cutflowType+"/NonIso/KinFit", 400, 0, 2000);
 }
 
-
   //void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file)
-  void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file)
-{
+  void HistogramPlotter::InitHist(TString dirname, TString parentDir, TFile *file){
   std::string name(dirname);
   std::string fullname;
   if(parentDir.Length() != 0){
@@ -232,8 +231,7 @@ void HistogramPlotter::addHisto(TString name, TString dirname, int range, double
   TString fullname = dirname+"/"+name;
   std::string hname(fullname);
   histos1_[fullname] = new TH1F(name.Data(), hname.c_str(), range, min, max); 
-  //histos1_[fullname] = new TH1D(name.Data(), hname.c_str(), range, min, max); 
-  //histos1_[fullname]->Sumw2();
+  histos1_[fullname]->Sumw2();
 }
 
 void HistogramPlotter::add2DHisto(TString name, TString dirname, int range1, double min1, double max1, int range2, double min2, double max2)
@@ -242,13 +240,23 @@ void HistogramPlotter::add2DHisto(TString name, TString dirname, int range1, dou
   TString fullname = dirname+"/"+name;
   std::string hname(fullname); 
   histos2_[fullname] = new TH2D(name.Data(), hname.c_str(), range1, min1, max1, range2, min2, max2);
-  //histos2_[fullname]->Sumw2();
+  histos2_[fullname]->Sumw2();
 }
 
-void HistogramPlotter::fillHistoPU(TString name, TString dirname, int bin, double binCont)
+void HistogramPlotter::addAndFillHisto(TFile *filename, TString dirname, TString subdir, TString histname, int range, double min, double max, double value, double weight)
 {
-  TH1* h = getHisto(name, dirname);
-  if(h != 0) h->SetBinContent(bin, binCont);
+  TDirectory *d = filename->GetDirectory(dirname+"/"+subdir);
+  if(!d) InitHist(subdir, dirname, filename);
+  //first, add histogram to the directory
+  TString fullname = dirname+"/"+subdir+"/"+histname;
+  std::string hname(fullname);
+  if(!histos1_[fullname]){ 
+    histos1_[fullname] = new TH1F(histname.Data(), hname.c_str(), range, min, max); 
+    histos1_[fullname]->Sumw2();
+    //histos1_[fullname]->SetDirectory(d);
+  }
+  //then, fill the histogram
+  histos1_[fullname]->Fill(value, weight);
 }
 
 void HistogramPlotter::fillHisto(TString name, TString dirname, double value, double weight)

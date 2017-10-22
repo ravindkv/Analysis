@@ -74,10 +74,8 @@ public :
     xss["ST_s"]              =  7.3;           evtDBS["ST_s"]              =  2989199;
     xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
-    //xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
-    //xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
-    xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  9931420;   
-    xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  75756300;   
+    xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
+    xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
   //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;

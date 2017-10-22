@@ -552,7 +552,7 @@ namespace ROOT {
       ::ObjectSelector *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::ObjectSelector >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("ObjectSelector", ::ObjectSelector::Class_Version(), "interface/ObjectSelector.hh", 29,
+         instance("ObjectSelector", ::ObjectSelector::Class_Version(), "interface/ObjectSelector.hh", 28,
                   typeid(::ObjectSelector), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::ObjectSelector::Dictionary, isa_proxy, 4,
                   sizeof(::ObjectSelector) );
@@ -616,7 +616,7 @@ namespace ROOT {
       ::BtagSF *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::BtagSF >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("BtagSF", ::BtagSF::Class_Version(), "interface/BtagSF.hh", 16,
+         instance("BtagSF", ::BtagSF::Class_Version(), "interface/BtagSF.hh", 15,
                   typeid(::BtagSF), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::BtagSF::Dictionary, isa_proxy, 4,
                   sizeof(::BtagSF) );

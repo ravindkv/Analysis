@@ -17,9 +17,9 @@ import datetime
 
 #USERS INPUTS
 #-------------------------------
-isMuon = True
-isElectron = False
-isMC = True
+isMuon = False
+isElectron = True
+isMC = False
 isData = True
 #-------------------------------
 
@@ -36,7 +36,7 @@ def getSampName(line, sampName, sampPaths):
         for n in range(1, len(s1)-1):
             sampPaths.append(s1[n].replace(" ",""))
 
-for line in open("ntupleT2Paths_20170608.txt"):
+for line in open("ntupleT2Paths_20170919.txt"):
     line = line.strip()
     if len(line)!=0:
         getSampName(line, "MUON MC", muMC_T2Paths)
@@ -46,9 +46,7 @@ for line in open("ntupleT2Paths_20170608.txt"):
 
 
 def execme(command):
-    print ""
     print "\033[01;32m"+ "Excecuting: "+ "\033[00m",  command
-    print ""
     os.system(command)
 
 #T2 path of one sample
@@ -143,6 +141,7 @@ if isMuon:
         mergeNtuples(muData_T2Paths, range_muData)
 
 #electron channel
+range_eleData = len(eleData_T2Paths)
 if isElectron:
     if isMC:
         mergeNtuples(eleMC_T2Paths, range_eleMC)
