@@ -28,16 +28,13 @@ public :
   HistogramPlotter(){}
   virtual ~HistogramPlotter(){}
   ///~HistogramPlotter(){}
-
-  void InitHist(TString dirname, TString parentDir, TFile *file);
   void addHisto(TString name, TString dirname, int range, double min, double max);
   void add2DHisto(TString name, TString dirname, int range1, double min1, double max1, int range2, double min2, double max2);
-  void fillHisto(TString name, TString dirname, double value, double weight=1.0);
   void fillHisto2d(TString name, TString dirname, double value1, double value2, double weight=1.0);
-  void addAndFillHisto(TFile *filename, TString dirname, TString subdir, TString histname, int range, double min, double max, double value, double weight);
+  void initHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max);
+  void fillHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max, double value, double weight);
   TH1* getHisto(TString name, TString dirname);
   TH2* getHisto2d(TString name, TString dirname);
-  void CreateAnalHistos(TString flowType, TFile* outFile_);
 
 private :
   std::map<TString, TH1*> histos1_;
@@ -45,7 +42,6 @@ private :
   //static std::map<TString, histos1_> histDir1_;
   //static std::map<TString, histos2_> histDir2_;
   //std::map<TString, TDirectory*> hDir_;
-
   ClassDef(HistogramPlotter, 1)
 };
 #endif
