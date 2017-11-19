@@ -55,14 +55,14 @@ public :
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
   //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
-    xss["HplusM100"]         =  1;             evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  1;             evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  1;             evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  1;             evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  1;             evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  1;             evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  1;             evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  1;             evtDBS["HplusM90"]          =  988480;
+    xss["HplusM100"]         =  831.76*0.32;   evtDBS["HplusM100"]         =  996170; 
+    xss["HplusM120"]         =  831.76*0.32;   evtDBS["HplusM120"]         =  994498; 
+    xss["HplusM140"]         =  831.76*0.32;   evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM150"]         =  831.76*0.32;   evtDBS["HplusM150"]         =  990645;
+    xss["HplusM155"]         =  831.76*0.32;   evtDBS["HplusM155"]         =  952984;
+    xss["HplusM160"]         =  831.76*0.32;   evtDBS["HplusM160"]         =  992264;
+    xss["HplusM80"]          =  831.76*0.32;   evtDBS["HplusM80"]          =  976710;
+    xss["HplusM90"]          =  831.76*0.32;   evtDBS["HplusM90"]          =  988480;
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
     xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
@@ -119,6 +119,8 @@ private :
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
   Double_t getEleSF(TH2D *h2, double etaSC, double pt);
   Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC);
+  double deltaPhi12(double phi1, double phi2);
+  double phi0to2pi(double phi);
 };
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
@@ -248,7 +250,6 @@ Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
 }
 
 Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
-  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   //since the Pt range of 2D histo is <120
@@ -269,6 +270,23 @@ Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
     if(sf!=0) return sf;
     else return 1.0;
   }	  
+}
+
+double phi0to2pi(double phi){
+    double pi = 3.1415926535;
+    while (phi >= 2.*pi) phi -= 2.*pi;
+    while (phi < 0.) phi += 2.*pi;
+    return phi;
+}
+
+double deltaPhi12(double phi1_, double phi2_){
+    // build the delta Phi angle between the two vectors
+    double pi = 3.1415926535;
+    double phi1 = phi0to2pi(phi1_);
+    double phi2 = phi0to2pi(phi2_);
+    double dPhi = phi0to2pi(phi1 - phi2);
+    dPhi = (dPhi > (2*pi - dPhi)) ? 2*pi - dPhi : dPhi;
+    return dPhi;
 }
 
 

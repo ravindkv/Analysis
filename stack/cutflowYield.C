@@ -5,21 +5,25 @@
 
 void cutflowYield(){
 
-  TFile *f_QCD = new TFile("stack_20170919_SR_Ele_highMET/all_QCD.root");
-  TFile *f_DY = new TFile("stack_20170919_SR_Ele_highMET/all_DY.root");
-  TFile *f_ST = new TFile("stack_20170919_SR_Ele_highMET/all_ST.root");
-  //TFile *f_TTJets = new TFile("stack_20170919_SR_Ele_highMET/all_TTJetsM.root");
-  TFile *f_TTJets = new TFile("stack_20170919_SR_Ele_highMET/all_TTJetsP.root");
-  TFile *f_VV = new TFile("stack_20170919_SR_Ele_highMET/all_VV.root");
-  TFile *f_WJets = new TFile("stack_20170919_SR_Ele_highMET/all_WJets.root");
-  TFile *f_muData = new TFile("stack_20170919_SR_Ele_highMET/all_EleData.root");
-  //TFile *f_muData = new TFile("stack_20170919_SR_Ele_highMET/all_muData.root");
+  //TFile *f_QCD = new TFile("histos_TT/all_TT_new_20171101.root");
+  TFile *f_QCD = new TFile("histos_TT/all_TT_old_20170919.root");
+  //TFile *f_QCD = new TFile("histos_TT/all_VV_new.root");
+  //TFile *f_QCD = new TFile("histos_TT/all_QCD.root");
+  TFile *f_DY = new TFile("histos_TT/all_DY.root");
+  TFile *f_ST = new TFile("histos_TT/all_ST.root");
+  //TFile *f_TTJets = new TFile("histos_TT/all_TTJetsM.root");
+  TFile *f_TTJets = new TFile("histos_TT/all_TTJetsP.root");
+  TFile *f_VV = new TFile("histos_TT/all_VV_old.root");
+  TFile *f_WJets = new TFile("histos_TT/all_WJets.root");
+  TFile *f_muData = new TFile("histos_TT/all_muData.root");
   
   //Isolation region 
   TH1F *h_QCD_Iso = (TH1F*)f_QCD->Get("base/Iso/cutflow");
   TH1F *h_DY_Iso = (TH1F*)f_DY->Get("base/Iso/cutflow");
   TH1F *h_ST_Iso = (TH1F*)f_ST->Get("base/Iso/cutflow");
   TH1F *h_TTJets_Iso = (TH1F*)f_TTJets->Get("base/Iso/cutflow");
+  //h_QCD_Iso->Scale(1.014200382);//new
+  h_QCD_Iso->Scale(1.045837553);//old
   TH1F *h_VV_Iso = (TH1F*)f_VV->Get("base/Iso/cutflow");
   TH1F *h_WJets_Iso = (TH1F*)f_WJets->Get("base/Iso/cutflow");
   TH1F *h_muData_Iso = (TH1F*)f_muData->Get("base/Iso/cutflow");
@@ -39,28 +43,33 @@ void cutflowYield(){
   for(int i=1; i<binN; i++){
     if(h_DY_Iso->GetBinContent(i)!=0){
       cout<<endl;
+      /*
       cout<<"------------ bin number= "<<i<<"-----------"<<endl;
       cout<<"Isolation region: "<<endl;
+      */
       double n_QCD_Iso=	h_QCD_Iso->GetBinContent(i)    ;
       double n_DY_Iso=		h_DY_Iso->GetBinContent(i)    ;
       double n_ST_Iso=		h_ST_Iso->GetBinContent(i)    ;
-      double n_TTJets_Iso=	1.007*h_TTJets_Iso->GetBinContent(i);
+      double n_TTJets_Iso=	h_TTJets_Iso->GetBinContent(i);
       //double n_TTJets_Iso=	h_TTJets_Iso->GetBinContent(i);
       double n_VV_Iso=		h_VV_Iso->GetBinContent(i)    ;
       double n_WJets_Iso=	h_WJets_Iso->GetBinContent(i) ;
       double n_muData_Iso=	h_muData_Iso->GetBinContent(i) ;
       cout<<"QCD_Iso= " 	<<n_QCD_Iso 		<<endl;	   
+      /*
       cout<<"DY_Iso= "      	<<n_DY_Iso 		<<endl;	   
       cout<<"ST_Iso= " 		<<n_ST_Iso 		<<endl;	   
       cout<<"TTJets_Iso= "  	<<n_TTJets_Iso 		<<endl;	   
       cout<<"VV_Iso= " 		<<n_VV_Iso 		<<endl;	   
       cout<<"WJets_Iso= " 	<<n_WJets_Iso 		<<endl;	   
       cout<<"muData_Iso= " 	<<n_muData_Iso 		<<endl;	   
+      */
       double nBkg_Iso = n_DY_Iso+ n_ST_Iso+ n_TTJets_Iso+ n_VV_Iso+ n_WJets_Iso;
       double totBkg = nBkg_Iso + n_QCD_Iso;
       double nData_Iso= n_muData_Iso;
       totEntr = totEntr+ nBkg_Iso+nData_Iso+n_QCD_Iso ;
       //std::cout << std::setprecision(3);
+      /*
       cout<<n_QCD_Iso 	<<" ("<<n_QCD_Iso*100/totBkg<<"%)" 	 <<endl;	   
       cout<<n_DY_Iso 	<<" ("<<n_DY_Iso*100/totBkg<<"%)"	 <<endl;	   
       cout<<n_ST_Iso 	<<" ("<<n_ST_Iso*100/totBkg<<"%)"	 <<endl;	   
@@ -83,6 +92,7 @@ void cutflowYield(){
 
       cout<<endl; 
       cout<<"NonIsolation region: "<<endl;
+      */
       double n_QCD_NonIso=	h_QCD_NonIso->GetBinContent(i)  	 ;
       double n_DY_NonIso=	h_DY_NonIso->GetBinContent(i)   	 ;
       double n_ST_NonIso=	h_ST_NonIso->GetBinContent(i)   	 ;
@@ -123,9 +133,9 @@ void cutflowYield(){
       cout<<totBkg_NonIso 					 <<endl;
       cout<<n_muData_NonIso 					 <<endl;
       */
-      cout<<nData_NonIso/totBkg_NonIso 				 <<endl;
+      ///cout<<nData_NonIso/totBkg_NonIso 				 <<endl;
       double qcd_sf = (nData_Iso -nBkg_Iso)/( nData_NonIso -nBkg_NonIso);
-      cout<<"----- QCD scale factor= "<< qcd_sf<<endl;
+      ///cout<<"----- QCD scale factor= "<< qcd_sf<<endl;
       }
   }
     cout<<"total entries = "<<totEntr<<endl;

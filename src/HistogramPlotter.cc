@@ -22,6 +22,17 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("RelIso_mu",cutflowType, 400, 0, 1.0);
   addHisto("RelIso_ele",cutflowType, 400, 0, 1.0);
   addHisto("hepNUP", cutflowType, 100, 1., 20.);
+
+  ////////////////////////////////////////////////////  
+  addHisto("ptOf1stJet",cutflowType, 1000, 0, 1000);
+  addHisto("ptOf2ndJet",cutflowType, 1000, 0, 1000);
+  addHisto("ptOf2Jet",cutflowType, 1000, 0, 1000);
+  addHisto("ptOf4Jet",cutflowType, 1000, 0, 1000);
+  addHisto("ratioPt12",cutflowType, 500, 0, 20);
+  addHisto("diffPhi12",cutflowType, 100, -10, 10);
+  add2DHisto("ptOf1st2ndJet", cutflowType, 1000, 0, 1000, 1000, 0, 1000);
+  ////////////////////////////////////////////////////  
+
   //Scale factors
   addHisto("SF_hepNUP_WJets",cutflowType, 1000, 0, 1000);
   addHisto("SF_hepNUP_DYJets",cutflowType, 1000, 0, 1000);
@@ -30,9 +41,6 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("SF_topPtWeights",cutflowType, 1000, 0, 10);
   addHisto("SF_muonSF",cutflowType, 1000, 0, 10);
   addHisto("SF_eleSF",cutflowType, 1000, 0, 10);
-  addHisto("dR_pfEle_kfLep",cutflowType, 100, 0, 20);
-  addHisto("dR_pfMu_kfLep",cutflowType, 100, 0, 20);
-  addHisto("dR_pfJets_kfJets",cutflowType, 100, 0, 20);
  
   ////////////////// Isolation ///////////////// 
   //base/Iso histo
@@ -71,12 +79,52 @@ void HistogramPlotter::CreateAnalHistos(TString cutflowType, TFile* outFile_)
   addHisto("wmt", cutflowType+"/Iso/BTag", 50, 0., 500.);
   addHisto("pt_bjet", cutflowType+"/Iso/BTag", 50, 0., 500.);
   addHisto("eta_bjet", cutflowType+"/Iso/BTag", 50, -5.0, 5.0);
+
+  ////////////////////////////////////////////////////  
+  addHisto("ptOf1stJet",cutflowType+"/Iso/BTag", 1000, 0, 1000);
+  addHisto("ptOf2ndJet",cutflowType+"/Iso/BTag", 1000, 0, 1000);
+  addHisto("ptOf2Jet",  cutflowType+"/Iso/BTag", 1000, 0, 1000);
+  addHisto("ptOf4Jet",  cutflowType+"/Iso/BTag", 1000, 0, 1000);
+  addHisto("diffPhi12",cutflowType+"/Iso/BTag", 100, -10, 10);
+  addHisto("ratioPt12",cutflowType+"/Iso/BTag", 500, 0, 20);
+  add2DHisto("ptOf1st2ndJet", cutflowType+"/Iso/BTag", 1000, 0, 1000, 1000, 0, 1000);
+  ////////////////////////////////////////////////////  
   
   //base/Iso/KinFit histo
   InitHist("Iso/KinFit", cutflowType, outFile_);
   addHisto("final_RelIso_mu",cutflowType+"/Iso/KinFit", 40,0,0.5);
   addHisto("final_RelIso_ele",cutflowType+"/Iso/KinFit", 40,0,0.5);
   addHisto("final_multi_jet", cutflowType+"/Iso/KinFit", 10,0,10);
+  
+  addHisto("kf_jet_multi", cutflowType+"/Iso/KinFit", 10,0,10);
+  addHisto("pt_pf_mu", cutflowType+"/Iso/KinFit", 100, 0, 500);
+  addHisto("eta_pf_mu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_pf_mu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  
+  addHisto("pt_kf_mu", cutflowType+"/Iso/KinFit",100, 0, 500);
+  addHisto("eta_kf_mu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_kf_mu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  
+  addHisto("pt_pf_mu_dRmu", cutflowType+"/Iso/KinFit", 100, 0, 500);
+  addHisto("eta_pf_mu_dRmu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_pf_mu_dRmu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  
+  addHisto("pt_kf_mu_dRmu", cutflowType+"/Iso/KinFit",100, 0, 500);
+  addHisto("eta_kf_mu_dRmu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_kf_mu_dRmu", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  
+  addHisto("pt_pf_mu_dRjet", cutflowType+"/Iso/KinFit", 100, 0, 500);
+  addHisto("eta_pf_mu_dRjet", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_pf_mu_dRjet", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  
+  addHisto("pt_kf_mu_dRjet", cutflowType+"/Iso/KinFit",100, 0, 500);
+  addHisto("eta_kf_mu_dRjet", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+  addHisto("phi_kf_mu_dRjet", cutflowType+"/Iso/KinFit", 50, -5.0, 5.0);
+ 
+  addHisto("dR_pfEle_kfLep",cutflowType+"/Iso/KinFit", 100, 0, 20);
+  addHisto("dR_pfMu_kfLep",cutflowType+"/Iso/KinFit", 100, 0, 20);
+  addHisto("dR_pfJets_kfJets",cutflowType+"/Iso/KinFit", 100, 0, 20);
+  
   addHisto("CSVL_count", cutflowType+"/Iso/KinFit", 50,0,10);
   addHisto("CSVM_count", cutflowType+"/Iso/KinFit", 10,0,10);
   addHisto("wmt", cutflowType+"/Iso/KinFit", 50, 0., 500.);
@@ -265,6 +313,20 @@ void HistogramPlotter::fillHisto(TString name, TString dirname, double value, do
   //TString fullname = dirname+"/"+name;
   TH1* h = getHisto(name, dirname);
   if(h != 0) h->Fill(value, weight);
+}
+
+void HistogramPlotter::fillHisto2d(TString name, TString dirname, double value1, double value2, double weight)
+{
+  TH2* h2 = getHisto2d(name, dirname);
+  if(h2 != 0) h2->Fill(value1,value2, weight);
+}
+
+TH2* HistogramPlotter::getHisto2d(TString name, TString dirname)
+{
+  TString fullname = dirname+"/"+name;
+  TH2 * h = 0;
+  if(histos2_.find(fullname) != histos2_.end())h = histos2_[fullname];
+  return h;
 }
 
 TH1* HistogramPlotter::getHisto(TString name, TString dirname)

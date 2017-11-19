@@ -43,15 +43,15 @@ public :
     ///////////////
 
     // Jets ///////////////////////////////////////////
-    JET_PT_MIN_        = 30;  
+    JET_PT_MIN_        = 25;  
     JET_ETA_MAX_       = 2.4; 
     JET_EMF_MIN_       = 0.01;
     JET_LEPTON_DRMIN_  = 0.5;
     //////////////////////////////////////////////////
 
     // electron //////////////////////////////////////
-    E_ETA_MAX_          = 2.5;
-    E_PT_MIN_           = 30;
+    E_ETA_MAX_          = 2.1;
+    E_PT_MIN_           = 25;
     E_D0_MAX_           = 0.05;
     //////////////////////////////////////////////////
 
@@ -59,8 +59,8 @@ public :
     // muon //////////////////////////////////////////
     M_RELISO_MAX_  = 0.15; //sync with muon POG
     //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2  
-    M_PT_MIN_      = 30;  
-    M_ETA_MAX_     = 2.4; 
+    M_PT_MIN_      = 25;  
+    M_ETA_MAX_     = 2.1; 
     M_D0_MAX_      = 0.2; 
     
     LOOSE_M_RELISO_MAX_ = 0.25;

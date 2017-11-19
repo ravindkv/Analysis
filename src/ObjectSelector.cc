@@ -141,7 +141,7 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
     
-    if(passID && ePt >30 && d0 < 0.05 && dz < 0.1){e_i->push_back(i);}
+    if(passID && ePt >25 && d0 < 0.05 && dz < 0.1){e_i->push_back(i);}
   }
 }
 
@@ -151,6 +151,7 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     double mEta     = TMath::Abs(m->p4.eta());
     ///double mPt      = TMath::Abs(m->p4.pt());
     double mD0      = fabs(m->D0);
+    //double mRelIso  = m->pfRelIso;
     double mPt   = muPtWithRochCorr(m, isData, random_u1, random_u2, err_set, err_member); 
     /*
     bool isGlobalMuon = m->isGlobalMuon; 
@@ -163,7 +164,8 @@ void ObjectSelector::preSelectMuons(vector<int> * m_i, const vector<MyMuon> & vM
     double zmuon     = m->vertex.z();
     double dz =  fabs(zvertex-zmuon);
     
-    if(mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mD0 < M_D0_MAX_&& dz < ZMAX_ ){ 
+    if(mPt > M_PT_MIN_ && mEta < M_ETA_MAX_ && mD0 < M_D0_MAX_&& dz < ZMAX_){ 
+    //if(passId && mPt > 20 && mEta < 2.1 && mRelIso <0.50){ 
       m_i->push_back(i);
     }
   }
@@ -182,10 +184,9 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
 
     ///double pujetid    = int(jet->puIDMVALoose);
     ///if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_ && pujetid==1.0  )
-    if(jetPt > JET_PT_MIN_ 
-      && jetEta < JET_ETA_MAX_
-      && neutralHadEnFrac < 0.9
-      && neutralEmEnFrac  < 0.9
+    if(jetPt > JET_PT_MIN_ && jetEta < JET_ETA_MAX_
+      && neutralHadEnFrac < 0.99
+      && neutralEmEnFrac  < 0.99
       && chargedHadEnFrac > 0
       ){
       j_i->push_back(i);
