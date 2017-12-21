@@ -133,6 +133,7 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     const MyElectron * e   = &vE[i];
 
     double ePt     	   = TMath::Abs(e->p4.pt());
+    double eEta     	   = TMath::Abs(e->p4.eta());
     double d0      	   = fabs(e->D0);
     double zvertex   	   = vertex.XYZ.z();
     double zelectron 	   = e->vertex.z();
@@ -141,7 +142,7 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
     
-    if(passID && ePt >25 && d0 < 0.05 && dz < 0.1){e_i->push_back(i);}
+    if(passID && ePt >30 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
   }
 }
 

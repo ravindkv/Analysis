@@ -74,15 +74,15 @@ void getEvtProcessed(){
       cout<<setw(30)<<inFile<<setw(15)<<event_dbs<<setw(15)<<event_cond<<setw(15)<<ratio<<endl;
     }
   }
-        
+       
   std::map<std::string, double> muDataEvtDBS;
-  muDataEvtDBS["MuRunB2v2_Merged.root"] =147530808 +5586576 ;  
-  muDataEvtDBS["MuRunCv1_Merged.root"]  =63880331 +762991 ;
-  muDataEvtDBS["MuRunDv1_Merged.root"]  =95873038 +734074 ;
-  muDataEvtDBS["MuRunEv1_Merged.root"]  =86439384 +1723910 ;
-  muDataEvtDBS["MuRunFv1_Merged.root"]  =65047318   ;
-  muDataEvtDBS["MuRunGv1_Merged.root"]  =146183276 +2545265 ;
-  muDataEvtDBS["MuRunH2v1_Merged.root"] =161032083 +5367903 ; 
+  muDataEvtDBS["MuRunB2v2_Merged.root"] =146581188 +6071342 ;  
+  muDataEvtDBS["MuRunCv1_Merged.root"]  =63756442  +886880  ;
+  muDataEvtDBS["MuRunDv1_Merged.root"]  =95674398  +932597  ;
+  muDataEvtDBS["MuRunEv1_Merged.root"]  =86236261  +1061687 ;
+  muDataEvtDBS["MuRunFv1_Merged.root"]  =65047318           ;
+  muDataEvtDBS["MuRunGv1_Merged.root"]  =145883039  +1940146;
+  muDataEvtDBS["MuRunH2v1_Merged.root"] =159964460  +6410252; 
   muDataEvtDBS["MuRunH3v1_Merged.root"] =4389914  ;
   
   std::map<std::string, double>::iterator itr_mudata;

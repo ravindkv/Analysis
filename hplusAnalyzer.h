@@ -22,6 +22,10 @@
 #include "interface/HistogramPlotter.hh"
 #include "interface/BTagCalibrationStandalone.h"
 
+
+//---------------------------------------------------//
+// Main Class
+//---------------------------------------------------//
 class hplusAnalyzer : public ObjectSelector, HistogramPlotter
 {
 public :
@@ -29,7 +33,6 @@ public :
   {
     DRMIN_JET = 0.4;
     DRMIN_ELE = 0.4;
-    METCUT_   = 30.0;
     //---------------------------------------------------//
     //Pileup reweigting 
     //---------------------------------------------------//
@@ -71,11 +74,19 @@ public :
     xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
-    xss["ST_s"]              =  7.3;           evtDBS["ST_s"]              =  2989199;
-    xss["ST_t"]              =  136.2;         evtDBS["ST_t"]              =  38811017;
-    xss["ST_tW"]             =  35.6;          evtDBS["ST_tW"]             =  6933094;
+    xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
+    xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
+    xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
     xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
+    //-------------------------
+    xss["TTJetsP_up"]        =  831.76;        evtDBS["TTJetsP_up"]        =  29310620;   
+    xss["TTJetsP_down"]      =  831.76;        evtDBS["TTJetsP_down"]      =  28354188;   
+    xss["TTJetsP_mtop1735"]  =  831.76;        evtDBS["TTJetsP_mtop1735"]  =  19419050;   
+    xss["TTJetsP_mtop1715"]  =  831.76;        evtDBS["TTJetsP_mtop1715"]  =  19578812;   
+    xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;   
+    xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
+    //-------------------------
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
   //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
@@ -83,9 +94,10 @@ public :
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
   //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
-    xss["WW"]                =  63.21;         evtDBS["WW"]                =  994012;
-    xss["WZ"]                =  22.82;         evtDBS["WZ"]                =  1000000;
-    xss["ZZ"]                =  10.32;         evtDBS["ZZ"]                =  990064; 
+    xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
+    xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
+    xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
+    xss["sampCode_"]         =  1;             evtDBS["sampCode_"]         =  1; 
     
     //Lumis(inverse pb) of single muon DATA at 13TeV
   };
@@ -289,4 +301,50 @@ double deltaPhi12(double phi1_, double phi2_){
     return dPhi;
 }
 
+//---------------------------------------------------//
+//muon scale factors from 2D histograms 
+//---------------------------------------------------//      
+//https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
+//https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffsRun2 
+//Trigger SF
+TFile *f_trigSF_BCDEF 	= new TFile("stack/muonSF/triggreSF_BCDEF.root");
+TFile *f_trigSF_GH 		= new TFile("stack/muonSF/triggreSF_GH.root");
+TH2D *h2_trigSF_BCDEF 	= (TH2D*)f_trigSF_BCDEF->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+TH2D *h2_trigSF_GH 		= (TH2D*)f_trigSF_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
+//Identification SF
+TFile *f_idSF_BCDEF 		= new TFile("stack/muonSF/idSF_BCDEF.root");
+TFile *f_idSF_GH 		= new TFile("stack/muonSF/idSF_GH.root");
+TH2D *h2_idSF_BCDEF 		= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+//Isolation SF
+TFile *f_isoSF_BCDEF 		= new TFile("stack/muonSF/isoSF_BCDEF.root");
+TFile *f_isoSF_GH 		= new TFile("stack/muonSF/isoSF_GH.root");
+TH2D *h2_isoSF_BCDEF 		= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+//Tracking SF
+TFile *f_trackSF_BCDEF 	= new TFile("stack/muonSF/trackingSF_BCDEF.root");
+TFile *f_trackSF_GH 		= new TFile("stack/muonSF/trackingSF_GH.root");
+TGraphAsymmErrors *tg_trackSF_BCDEF 	= (TGraphAsymmErrors*)f_trackSF_BCDEF->Get("ratio_eff_aeta_dr030e030_corr");
+TGraphAsymmErrors *tg_trackSF_GH 	= (TGraphAsymmErrors*)f_trackSF_GH->Get("ratio_eff_aeta_dr030e030_corr");
+
+//---------------------------------------------------//
+//Electron scale factors from 2D histograms 
+//---------------------------------------------------//      
+//https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Efficiencies_and_scale_factors
+//Reconstruction SF
+TFile *f_ele_recoSF 	  	= new TFile("stack/eleSF/ele_recoSF.root");
+TH2D *h2_ele_recoSF 		= (TH2D*)f_ele_recoSF->Get("EGamma_SF2D");
+//Identification SF
+TFile *f_ele_veto_idSF 	= new TFile("stack/eleSF/ele_veto_idSF.root");
+TH2D *h2_ele_veto_idSF 	= (TH2D*)f_ele_veto_idSF->Get("EGamma_SF2D");
+TFile *f_ele_loose_idSF 	= new TFile("stack/eleSF/ele_loose_idSF.root");
+TH2D *h2_ele_loose_idSF 	= (TH2D*)f_ele_loose_idSF->Get("EGamma_SF2D");
+TFile *f_ele_medium_idSF 	= new TFile("stack/eleSF/ele_medium_idSF.root");
+TH2D *h2_ele_medium_idSF 	= (TH2D*)f_ele_medium_idSF->Get("EGamma_SF2D");
+TFile *f_ele_tight_idSF 	= new TFile("stack/eleSF/ele_tight_idSF.root");
+TH2D *h2_ele_tight_idSF 	= (TH2D*)f_ele_tight_idSF->Get("EGamma_SF2D");
+//Trigger scale factors
+//https://indico.cern.ch/event/604912/
+TFile *f_ele_trigSF 		= new TFile("stack/eleSF/ele_trigSF_Run2016All_v1.root");
+TH2D *h2_ele_trigSF 		= (TH2D*)f_ele_trigSF->Get("Ele27_WPTight_Gsf");
 
