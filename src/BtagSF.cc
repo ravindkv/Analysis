@@ -26,8 +26,8 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
   Double_t promoteProb_btag=0; // ~probability to promote to tagged 
   Double_t demoteProb_btag=0; // ~probability to demote from tagged 
   if(fabs(jetflavor) == 5) {                // real b-jet 
-    SFb = getSFb(reader, eta, pt, csv, btagsys);
-    eff_b = getEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    SFb = getBTagSFb(reader, eta, pt, csv, btagsys);
+    eff_b = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
     if(SFb < 1) demoteProb_btag = fabs(1.0 - SFb); 
     else promoteProb_btag = fabs(SFb - 1.0)/((1/eff_b) - 1.0); 
     if(csv > csvOP){
@@ -50,8 +50,8 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
   Double_t promoteProb_mistag=0; // ~probability to promote to tagged 
   Double_t demoteProb_mistag=0; // ~probability to demote from tagged 
   if(fabs(jetflavor) == 4) {
-    SFl = getSFc(reader, eta, pt, csv, btagsys);
-    eff_l = getEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    SFl = getBTagSFc(reader, eta, pt, csv, btagsys);
+    eff_l = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
     if(SFl > 1) promoteProb_mistag = fabs(SFl - 1.0)/((1/eff_l) - 1.0); 
     else demoteProb_mistag = SFl; 
     if(csv > csvOP) {         // if tagged 
@@ -69,7 +69,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
   //for other(light) quarks and gluon jet     
   //----------------------------------------------
   else{
-    SFl = getSFl(reader, eta, pt, csv, btagsys);
+    SFl = getBTagSFl(reader, eta, pt, csv, btagsys);
     
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //
@@ -77,7 +77,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
     //
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    eff_l = getEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    eff_l = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
     ///if(SFl!=0) cout<<"SFl = "<<SFl<<endl;
     if(SFl > 1) promoteProb_mistag = fabs(SFl - 1.0)/((1/eff_l) - 1.0); 
     else demoteProb_mistag = SFl; 
@@ -98,7 +98,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
 //https://twiki.cern.ch/twiki/pub/CMS/BtagRecommendation80XReReco/CSVv2_Moriond17_B_H.csv
 //scale factors for b-quark
-Double_t BtagSF::getSFb(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
+Double_t BtagSF::getBTagSFb(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
   double SFb     = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
   double SFbUp   = reader.eval_auto_bounds("up", BTagEntry::FLAV_B, eta, pt, csv);
   double SFbDown = reader.eval_auto_bounds("down", BTagEntry::FLAV_B, eta, pt, csv);
@@ -109,7 +109,7 @@ Double_t BtagSF::getSFb(BTagCalibrationReader &reader, Float_t eta, Float_t pt, 
   return scalefactor;
 }
 //scale factors for c-quark
-Double_t BtagSF::getSFc(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
+Double_t BtagSF::getBTagSFc(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
   double SFc     = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, eta, pt,csv);
   double SFcUp   = reader.eval_auto_bounds("up", BTagEntry::FLAV_C, eta, pt, csv);
   double SFcDown = reader.eval_auto_bounds("down", BTagEntry::FLAV_C, eta, pt, csv);
@@ -121,7 +121,7 @@ Double_t BtagSF::getSFc(BTagCalibrationReader &reader, Float_t eta, Float_t pt, 
 }
 
 //scale factors for u, d, s-quark, gluon
-Double_t BtagSF::getSFl(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
+Double_t BtagSF::getBTagSFl(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t btagsys){
   double SFl     = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, eta, pt,csv);
   double SFlUp   = reader.eval_auto_bounds("up", BTagEntry::FLAV_UDSG, eta, pt, csv);
   double SFlDown = reader.eval_auto_bounds("down", BTagEntry::FLAV_UDSG, eta, pt, csv);
@@ -133,7 +133,7 @@ Double_t BtagSF::getSFl(BTagCalibrationReader &reader, Float_t eta, Float_t pt, 
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
-Double_t BtagSF::getEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, Float_t pt, Float_t eta){
+Double_t BtagSF::getBTagEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, Float_t pt, Float_t eta){
   double eff = 0.0;
   double bin_num = h2_BTaggingEff_Num->FindBin(pt, double(eta));
   double bin_denom = h2_BTaggingEff_Denom->FindBin(pt, double(eta));
