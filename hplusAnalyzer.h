@@ -122,10 +122,10 @@ private :
   std::map<string, double> evtDBS;
   std::map<string, double> muSF;
   /*
-  BTagCalibrationReader readCSVfile(const std::string &tagger, const std::string &filename);
+  BTagCalibrationReader readCSV(const std::string &tagger, const std::string &filename);
   */
   ofstream outfile_;
-  BTagCalibrationReader readCSVfile(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
+  BTagCalibrationReader readCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
   Double_t getMuonSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
@@ -157,7 +157,7 @@ float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
   else return 1 ;
 }
 
-BTagCalibrationReader hplusAnalyzer::readCSVfile(const std::string &filename, const std::string &tagger,  
+BTagCalibrationReader hplusAnalyzer::readCSV(const std::string &filename, const std::string &tagger,  
 		BTagEntry::OperatingPoint op, 
 		const std::string & measurementType,
 		const std::string & sysType, 
@@ -284,14 +284,14 @@ Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
   }	  
 }
 
-double phi0to2pi(double phi){
+double hplusAnalyzer::phi0to2pi(double phi){
     double pi = 3.1415926535;
     while (phi >= 2.*pi) phi -= 2.*pi;
     while (phi < 0.) phi += 2.*pi;
     return phi;
 }
 
-double deltaPhi12(double phi1_, double phi2_){
+double hplusAnalyzer::deltaPhi12(double phi1_, double phi2_){
     // build the delta Phi angle between the two vectors
     double pi = 3.1415926535;
     double phi1 = phi0to2pi(phi1_);

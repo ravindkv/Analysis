@@ -2,7 +2,7 @@
 
 ClassImp(BtagSF)
 
-Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, Float_t eta, Float_t pt, Float_t csv, Int_t jetflavor, Bool_t isdata, UInt_t btagsys) 
+Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, Float_t eta, Float_t pt, Float_t csv, Int_t jetflavor, Bool_t isdata, UInt_t btagsys) 
 { 
   //----------------------------------------------
   //for DATA     
@@ -27,7 +27,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
   Double_t demoteProb_btag=0; // ~probability to demote from tagged 
   if(fabs(jetflavor) == 5) {                // real b-jet 
     SFb = getBTagSFb(reader, eta, pt, csv, btagsys);
-    eff_b = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    eff_b = getBTagEff(h2_BTagEff_Num, h2_BTagEff_Denom, pt, eta);
     if(SFb < 1) demoteProb_btag = fabs(1.0 - SFb); 
     else promoteProb_btag = fabs(SFb - 1.0)/((1/eff_b) - 1.0); 
     if(csv > csvOP){
@@ -51,7 +51,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
   Double_t demoteProb_mistag=0; // ~probability to demote from tagged 
   if(fabs(jetflavor) == 4) {
     SFl = getBTagSFc(reader, eta, pt, csv, btagsys);
-    eff_l = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    eff_l = getBTagEff(h2_BTagEff_Num, h2_BTagEff_Denom, pt, eta);
     if(SFl > 1) promoteProb_mistag = fabs(SFl - 1.0)/((1/eff_l) - 1.0); 
     else demoteProb_mistag = SFl; 
     if(csv > csvOP) {         // if tagged 
@@ -77,7 +77,7 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num
     //
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    eff_l = getBTagEff(h2_BTaggingEff_Num, h2_BTaggingEff_Denom, pt, eta);
+    eff_l = getBTagEff(h2_BTagEff_Num, h2_BTagEff_Denom, pt, eta);
     ///if(SFl!=0) cout<<"SFl = "<<SFl<<endl;
     if(SFl > 1) promoteProb_mistag = fabs(SFl - 1.0)/((1/eff_l) - 1.0); 
     else demoteProb_mistag = SFl; 
@@ -133,12 +133,12 @@ Double_t BtagSF::getBTagSFl(BTagCalibrationReader &reader, Float_t eta, Float_t 
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
-Double_t BtagSF::getBTagEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, Float_t pt, Float_t eta){
+Double_t BtagSF::getBTagEff(TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, Float_t pt, Float_t eta){
   double eff = 0.0;
-  double bin_num = h2_BTaggingEff_Num->FindBin(pt, double(eta));
-  double bin_denom = h2_BTaggingEff_Denom->FindBin(pt, double(eta));
-  double num = h2_BTaggingEff_Num->GetBinContent(bin_num); 
-  double denom = h2_BTaggingEff_Denom->GetBinContent(bin_denom); 
+  double bin_num = h2_BTagEff_Num->FindBin(pt, double(eta));
+  double bin_denom = h2_BTagEff_Denom->FindBin(pt, double(eta));
+  double num = h2_BTagEff_Num->GetBinContent(bin_num); 
+  double denom = h2_BTagEff_Denom->GetBinContent(bin_denom); 
   eff = num/denom;
   return eff;  
 }

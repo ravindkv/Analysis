@@ -52,6 +52,7 @@ namespace std {} using namespace std;
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
 #include "interface/BtagSF.hh"
+#include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
 
@@ -636,6 +637,38 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
+   static void *new_CTagSF(void *p = 0);
+   static void *newArray_CTagSF(Long_t size, void *p);
+   static void delete_CTagSF(void *p);
+   static void deleteArray_CTagSF(void *p);
+   static void destruct_CTagSF(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::CTagSF*)
+   {
+      ::CTagSF *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::CTagSF >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("CTagSF", ::CTagSF::Class_Version(), "interface/CTagSF.hh", 15,
+                  typeid(::CTagSF), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::CTagSF::Dictionary, isa_proxy, 4,
+                  sizeof(::CTagSF) );
+      instance.SetNew(&new_CTagSF);
+      instance.SetNewArray(&newArray_CTagSF);
+      instance.SetDelete(&delete_CTagSF);
+      instance.SetDeleteArray(&deleteArray_CTagSF);
+      instance.SetDestructor(&destruct_CTagSF);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::CTagSF*)
+   {
+      return GenerateInitInstanceLocal((::CTagSF*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::CTagSF*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
    static void *new_SVEffUnc(void *p = 0);
    static void *newArray_SVEffUnc(Long_t size, void *p);
    static void delete_SVEffUnc(void *p);
@@ -680,7 +713,7 @@ namespace ROOT {
       ::UncertaintyComputer *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::UncertaintyComputer >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 38,
+         instance("UncertaintyComputer", ::UncertaintyComputer::Class_Version(), "interface/UncertaintyComputer.hh", 39,
                   typeid(::UncertaintyComputer), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::UncertaintyComputer::Dictionary, isa_proxy, 4,
                   sizeof(::UncertaintyComputer) );
@@ -836,6 +869,41 @@ TClass *BtagSF::Dictionary()
 TClass *BtagSF::Class()
 {
    if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BtagSF*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+atomic_TClass_ptr CTagSF::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *CTagSF::Class_Name()
+{
+   return "CTagSF";
+}
+
+//______________________________________________________________________________
+const char *CTagSF::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::CTagSF*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int CTagSF::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::CTagSF*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *CTagSF::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::CTagSF*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *CTagSF::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::CTagSF*)0x0)->GetClass(); }
    return fgIsA;
 }
 
@@ -1250,6 +1318,39 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::BtagSF
+
+//______________________________________________________________________________
+void CTagSF::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class CTagSF.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(CTagSF::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(CTagSF::Class(),this);
+   }
+}
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_CTagSF(void *p) {
+      return  p ? new(p) ::CTagSF : new ::CTagSF;
+   }
+   static void *newArray_CTagSF(Long_t nElements, void *p) {
+      return p ? new(p) ::CTagSF[nElements] : new ::CTagSF[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_CTagSF(void *p) {
+      delete ((::CTagSF*)p);
+   }
+   static void deleteArray_CTagSF(void *p) {
+      delete [] ((::CTagSF*)p);
+   }
+   static void destruct_CTagSF(void *p) {
+      typedef ::CTagSF current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::CTagSF
 
 //______________________________________________________________________________
 void SVEffUnc::Streamer(TBuffer &R__b)
@@ -2405,6 +2506,7 @@ namespace {
 "interface/ObjectSelector.hh",
 "interface/HistogramPlotter.hh",
 "interface/BtagSF.hh",
+"interface/CTagSF.hh",
 "interface/SVEffUnc.hh",
 "interface/UncertaintyComputer.hh",
 0
@@ -2437,6 +2539,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  Reader;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  ObjectSelector;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  HistogramPlotter;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  BtagSF;
+class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  CTagSF;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  SVEffUnc;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComputer;
 )DICTFWDDCLS";
@@ -2462,6 +2565,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
 #include "interface/BtagSF.hh"
+#include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
 
@@ -2469,6 +2573,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
 "BtagSF", payloadCode, "@",
+"CTagSF", payloadCode, "@",
 "HistogramPlotter", payloadCode, "@",
 "MyElectron", payloadCode, "@",
 "MyEvent", payloadCode, "@",

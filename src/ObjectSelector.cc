@@ -141,7 +141,6 @@ void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectr
     //bool passID = cutBasedElectronID_Summer16_80X_V1_loose(e);
     bool passID = cutBasedElectronID_Summer16_80X_V1_medium(e);
     //bool passID = cutBasedElectronID_Summer16_80X_V1_tight(e);
-    
     if(passID && ePt >30 && eEta <2.5 && d0 < 0.05 && dz < 0.2){e_i->push_back(i);}
   }
 }

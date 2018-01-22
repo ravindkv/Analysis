@@ -23,6 +23,7 @@
 #include "interface/Reader.h"
 #endif
 #include "interface/BtagSF.hh"
+#include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "BTagCalibrationStandalone.h"
 
@@ -41,12 +42,14 @@ public :
   UncertaintyComputer()
   {
     btsf = new BtagSF(12345);
+    ctsf = new CTagSF(12345);
     sveffunc = new SVEffUnc();
   }
 
    virtual ~UncertaintyComputer(){
    ///~UncertaintyComputer(){
      delete btsf;
+     delete ctsf;
      delete sveffunc;
   }
   double muPtWithRochCorr(const MyMuon *mu, bool isData=false, double u1=0.5, double u2=0.4, int s=0, int m=0); 
@@ -57,15 +60,16 @@ public :
   double getJERSF(double eta, int jer=0);
   double jetPtWithJESJER(MyJet jet, int jes=0, int jer=0); 
   bool getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, MyJet jet, bool isData, int scale);
+  Bool_t getCTagWithSF(BTagCalibrationReader &reader, TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t dCvsL, Float_t dCvsB, MyJet jet, bool isData, int scale);
   void  openCSVfile(const std::string &filename); 
   double EffUncOnSV(MyJet jet);
   double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
   
 private :
   BtagSF* btsf;
+  CTagSF* ctsf;
   enum BVariation{kNo = 0, kDown = 1, kUp = 2};
   SVEffUnc* sveffunc;
-
   ClassDef(UncertaintyComputer, 1)
 };
 #endif

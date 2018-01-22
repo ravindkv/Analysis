@@ -241,6 +241,7 @@ std::string BTagEntry::makeCSVHeader()
 std::string BTagEntry::makeCSVLine() const
 {
   std::stringstream buff;
+
   buff << params.operatingPoint
        << ", " << params.measurementType
        << ", " << params.sysType

@@ -174,20 +174,39 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
   }
   return jet_pt;
 }
-
-bool UncertaintyComputer::getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, MyJet jet, bool isData, int scale){
+//bottom mistagging
+bool UncertaintyComputer::getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, MyJet jet, bool isData, int scale){
   bool isBtagged = false;
   
   if(scale == 0){
-  isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo);
+  isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo);
   }
   else if(scale == 1){
-    isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp);
+    isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp);
   }
   else if(scale == -1){
-    isBtagged = btsf->isbtagged(reader, h2_BTaggingEff_Num, h2_BTaggingEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown);
+    isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown);
   }
   return isBtagged;
+}
+
+//Charm mistagging 
+Bool_t UncertaintyComputer::getCTagWithSF(BTagCalibrationReader &reader, TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t dCvsL, Float_t dCvsB, MyJet jet, bool isData, int scale){
+  Bool_t isCTagCvsB = false;
+  Bool_t isCTagCvsL = false;
+  if(scale == 0){
+  isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,    dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kNo);
+  isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,    dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kNo);
+  }                                                                                                                                                       
+  else if(scale == 1){                                                                                                                                    
+    isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kUp);
+    isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kUp);
+  }                                                                                                                                                       
+  else if(scale == -1){                                                                                                                                   
+    isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kDown);
+    isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kDown);
+  }
+  return isCTagCvsB && isCTagCvsL;
 }
 
 double UncertaintyComputer::EffUncOnSV(MyJet jet)

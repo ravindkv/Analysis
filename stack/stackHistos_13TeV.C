@@ -11,28 +11,37 @@
 
 using namespace std;
 ///////////////////////////////////////////  
+
+//CHANNEL
+bool isMuChannel = false;
+bool isEleChannel = true;
+
 //INPUT FILES
-TFile* fData  = TFile::Open("all_muData.root");
+TFile* fData = TFile::Open("all_EleData.root");
+
+//if(isMuChannel)fData  = TFile::Open("all_muData.root");
+//else(isEleChannel)fData = TFile::Open("all_EleData.root");
+
 TFile* fVV	= TFile::Open("all_VV.root");
 TFile* fDY	= TFile::Open("all_DY.root");
 TFile* fWJ	= TFile::Open("all_WJets.root");
 TFile* fQCD	= TFile::Open("all_QCD.root");
 TFile* fST	= TFile::Open("all_ST.root");
 TFile* fTT	= TFile::Open("all_TTJetsP.root");
-TFile *fSig   = TFile::Open("all_Hplus120.root");
+TFile *fSig     = TFile::Open("all_Hplus120.root");
+double sf_ttbar = 1.00218; 
 
 //USER'S INPUT FOR DATA DRIVEN QCD 
-bool isDataDrivenQCD = true;
-double qcd_sf_btag = 2.618 ; 
-double qcd_sf_kfit = 2.279 ;
-double qcd_sf_btag_err = 0.20;
-double qcd_sf_kfit_err = 0.34;
+bool isDataDrivenQCD = false;
+double qcd_sf_btag =  2.204 ; 
+double qcd_sf_kfit = 2.380 ;
+double qcd_sf_btag_err = 0.1416;
+double qcd_sf_kfit_err = 0.2842;
 TFile *f_QCD_dd = new TFile("all_QCD_dd.root","RECREATE");
   
 //SAVE HISTOS ON DISK
-////bool isSaveHisto = true;
 bool isSaveHisto = false;
-////////////////////////////////////////////////////////
+///////////////////////////////////////////  
 
 //--------------------------------------------//
 //various functions
@@ -44,19 +53,19 @@ double errBandDown(int iBin, TH1F *hCentral, TH1F *hJESMinus, TH1F *hJERMinus, T
 //unc graph
 TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1F *hJERPlus, TH1F *hJERMinus, TH1F *bTagPlus, TH1F *bTagMinus, TH1F* hQCD_dd, double qcd_sf_err, bool isFullGraph = false, bool isRatioGraph = false);
 //function to stack histos
-void stackHisto(TFile *filename, TString lable, TString histname, int color, double scale, bool axisrange, double xmin, double xmax, THStack* MuptStack, TH1F* hMC, TLegend* leg);
+void stackHisto(TFile *filename, TString lable, TString dir, TString histname, int color, double scale, bool axisrange, double xmin, double xmax, THStack* MuptStack, TH1F* hMC, TLegend* leg);
 //qcd from data
-TH1F* getDataDrivenQCD(TString histname, double qcd_sf=1);
+TH1F* getDataDrivenQCD(TString dir, TString histname, double qcd_sf=1);
 //function to add histograms
-TH1F* addHistoForUnc(TString histname, TString sys, bool isDataDrivenQCD = false, double qcd_sf=1);
+TH1F* addHistoForUnc(TString dir, TString histname, TString sys, bool isDataDrivenQCD = false, double qcd_sf=1);
 TPaveText *paveText(double minX, double minY, double maxX, double maxY, int lineColor, int fillColor, int size, int style, int font );
 //get histogram from root file. Return empty hist, if the hist does not exit.
-TH1F* getHisto(TFile *histFile, TString histPath, TString histName);
+TH1F* getHisto(TFile *histFile, TString histPath, TString dir, TString histName);
 
 //--------------------------------------------//
 //stack histos
 //--------------------------------------------//
-void example_stack(TString histname, TString xaxis_title, int bin, bool log=false, bool drawdata=true, bool ratio=false, bool drawsignal=false, bool axisrange=false, double xmin=0, double xmax=10, TString dir="BTag", bool label=false, double unc=false){
+void example_stack(TString dir, TString histname, TString xaxis_title, int bin, bool log=false, bool drawdata=true, bool ratio=false, bool drawsignal=false, bool axisrange=false, double xmin=0, double xmax=10, bool label=false, double unc=false){
   //Pad
   gStyle->SetOptStat(0);
   TCanvas *c1 = new TCanvas();
@@ -72,10 +81,9 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   TLegend* leg = new TLegend(0.7518792,0.6061504,0.9312081,0.8898861,NULL,"brNDC");
   leg->SetFillStyle(0); leg->SetBorderSize(0);
   leg->SetFillColor(10); leg->SetTextSize(0.03);
-  cout<<"AAA"<<endl; 
   //Data
-  TH1F* data = getHisto(fData, "base/Iso/", histname);
-  //TH1F* data = (TH1F*)(fData->Get("base/Iso/"+histname))->Clone("data");
+  TH1F* data = getHisto(fData, "base/Iso", dir, histname);
+  //TH1F* data = (TH1F*)(fData->Get("base/Iso/"+dir+"/"+histname))->Clone("data");
   //data->SetBinErrorOption(TH1::kPoisson);
   data->SetMarkerStyle(20); data->SetMarkerSize(0.8);
   if(axisrange) data->GetXaxis()->SetRangeUser(xmin,xmax);
@@ -85,12 +93,13 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   data->GetXaxis()->SetTitle(xaxis_title);
   ///data->Rebin(bin);
   data->SetTitle("");
-  data->SetAxisRange(1.0, 1.0e6 ,"Y");
+  if(label) data->SetAxisRange(1.0, 1.0e9 ,"Y");
+  else data->SetAxisRange(1.0, 1.0e6 ,"Y");
   if(drawdata)data->Draw("E"); 
   if(drawdata)leg->AddEntry(data,"Data","PE"); 
   
   //VV is the base histo
-  TH1F* h1_base = getHisto(fVV, "base/Iso/", histname);
+  TH1F* h1_base = getHisto(fVV, "base/Iso", dir, histname);
   h1_base->SetFillColor(13);
   if(axisrange) h1_base->GetXaxis()->SetRangeUser(xmin,xmax);
   leg->AddEntry(h1_base,"VV","F");
@@ -103,29 +112,34 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   //---------------------------
   // QCD from Data
   //---------------------------
-  TH1F * hQCD_dd;
+  TH1F * hQCD_dd = getHisto(fQCD, "base/Iso", dir, histname);
+  hQCD_dd->Add(hQCD_dd, -1); // initialize empty hist
   if(isDataDrivenQCD){
-    if(dir=="BTag") hQCD_dd = getDataDrivenQCD(histname, qcd_sf_btag);
-    if(dir=="KinFit") hQCD_dd = getDataDrivenQCD(histname, qcd_sf_kfit);
-    if(axisrange)hQCD_dd->GetXaxis()->SetRangeUser(xmin,xmax);
+    if(dir=="BTag") hQCD_dd = getDataDrivenQCD(dir, histname, qcd_sf_btag);
+    if(dir=="KinFit") hQCD_dd = getDataDrivenQCD(dir, histname, qcd_sf_kfit);
+    else hQCD_dd = getDataDrivenQCD(dir, histname, qcd_sf_btag);
     hQCD_dd->SetFillColor(kGreen);
-    cout<<hQCD_dd->GetEntries()<<endl;
-    cout<<hQCD_dd->Integral()<<endl;
+    if(axisrange)hQCD_dd->GetXaxis()->SetRangeUser(xmin,xmax);
+    //create same dir to the data driven qcd file
+    std::string histPath = std::string("base/Iso/"+dir);
+    TDirectory *d = f_QCD_dd->GetDirectory(histPath.c_str());
+    if(!d) f_QCD_dd->mkdir(histPath.c_str());
+    f_QCD_dd->cd(histPath.c_str());
     //hQCD->Draw();
-    f_QCD_dd->cd();
     hQCD_dd->Write();
     leg->AddEntry(hQCD_dd,"QCD","F");
     MuptStack->Add(hQCD_dd);
     hMC->Add(hQCD_dd);
   }
-  else stackHisto(fQCD, "QCD", histname, 3, 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
-  stackHisto(fDY, "Z+jets", histname, 9, 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
-  stackHisto(fST, "Single t", histname, 800 , 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
-  stackHisto(fWJ, "W+ jets", histname, 6 , 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
-  stackHisto(fTT,"t#bar{t}", histname, 433, 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
+  else stackHisto(fQCD, "QCD", dir, histname, 3, 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
+  stackHisto(fDY, "Z+jets", dir, histname, 9, 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
+  stackHisto(fST, "Single t", dir, histname, 800 , 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
+  stackHisto(fWJ, "W+ jets", dir, histname, 6 , 1, axisrange, xmin, xmax, MuptStack, hMC, leg);
+  stackHisto(fTT,"t#bar{t}", dir, histname, 433, sf_ttbar, axisrange, xmin, xmax, MuptStack, hMC, leg);
 
   //Signal 
-  TH1F* hSig = (TH1F*)(fSig->Get("base/Iso/"+histname))->Clone("Signal");
+  TH1F* hSig = getHisto(fSig, "base/Iso", dir, histname);
+  //TH1F* hSig = (TH1F*)(fSig->Get("base/Iso/"+dirhistname))->Clone("Signal");
   hSig->SetLineColor(kRed); hSig->SetLineStyle(2);
   hSig->SetLineWidth(3); hSig->SetFillColor(0);
   
@@ -151,7 +165,6 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   if(drawsignal)hSig->Draw("HISTSAME"); // only for hSig histogram 
   //if(drawsignal)hSigBkg->Draw("HISTSAME"); //  
   
-  
   //-------------------------------------///
   //unc band
   //-------------------------------------///
@@ -167,13 +180,13 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   }
   if(unc){
   TGraphAsymmErrors *UncBand;
-  UncBand = UNCGRAPH(addHistoForUnc(histname, "base", isDataDrivenQCD, qcd_sf),
-      	    addHistoForUnc(histname, "JESPlus"),
-      	    addHistoForUnc(histname, "JESMinus"),
-      	    addHistoForUnc(histname, "JERPlus"),
-      	    addHistoForUnc(histname, "JERMinus"),
-      	    addHistoForUnc(histname, "bTagPlus"),
-      	    addHistoForUnc(histname, "bTagMinus"),
+  UncBand = UNCGRAPH(addHistoForUnc(dir, histname, "base", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JESPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JESMinus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JERPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JERMinus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "bTagPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "bTagMinus", isDataDrivenQCD, qcd_sf),
 	    hQCD_dd, qcd_sf_err, true, false);
   UncBand->SetFillColor(1);
   UncBand->SetFillStyle(3017);
@@ -191,18 +204,27 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   cct->SetTextSize(0.049);
   cct->AddText("M_{H^{+}} = 120 GeV");
   ///cct->AddText("Br(t#rightarrow H^{+}b) = 0.1");
+  
+  //hist name
+  TPaveText *hLable = paveText(0.6513423,0.7754898,0.6010067,0.8962187, 0, 19, 1, 0, 132);
+  hLable->SetTextSize(0.080);
+  hLable->AddText(xaxis_title);
+  
   //channel
   TPaveText *ch = paveText(0.953,0.9154898,0.6210067,0.9762187, 0, 19, 1, 0, 132);
-  ch->AddText("#mu + jets");
+  ch->SetTextSize(0.08);
+  if(isMuChannel) ch->AddText("#mu + jets");
+  if(isEleChannel) ch->AddText("e + jets");
   //CMS prili
   TPaveText *pt = paveText(0.09,0.9354,0.88,0.9362, 0, 19, 1, 0, 132);
   if(drawdata) pt->SetTextSize(0.059);
   else pt->SetTextSize(0.039);
-  TText *text = pt->AddText(dir+":   CMS Preliminary,    #sqrt{s} = 13 TeV,    35.45 fb^{-1}");
+  TText *text = pt->AddText(dir+": CMS Preliminary, #sqrt{s} = 13 TeV, 34.94 fb^{-1}");
   text->SetTextAlign(11);
   pt->Draw();
   if(drawsignal) cct->Draw();
   ch->Draw();
+  hLable->Draw();
   gPad->RedrawAxis();
   c1->Update();
   
@@ -225,10 +247,12 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     hRatio->GetYaxis()->SetTitle("Data/Bkg"); hRatio->GetYaxis()->CenterTitle();
     hRatio->GetYaxis()->SetTitleSize(0.1); hRatio->GetXaxis()->SetTitleSize(0.1);
     hRatio->GetXaxis()->SetLabelSize(0.12); hRatio->GetXaxis()->LabelsOption("u"); // extra
-    hRatio->GetYaxis()->SetLabelSize(0.06);
+    hRatio->GetYaxis()->SetLabelSize(0.08); hRatio->GetXaxis()->LabelsOption("u"); // extra
   //lable x-axis, for cutflow
   if(label){
-    TString steps[15] = {"muon trig","= 1 muon","0 electron","muon SF","RelIso", "#geq 4 jets","#slash{E}_{T} #geq 20 GeV", "MT >20 GeV", "#geq 2 b-jets","BTag SF", "fit converges","kfJetPt >25 GeV","dRJets <0.2",""};
+    TString steps[15]={"electron trig","= 1 electron","0 muon","electron SF","RelIso < 0.8", "#geq 4 jets","#slash{E}_{T} #geq 20 GeV", "MT >20 GeV", "#geq 2 b-jets","BTag SF", "fit converges","kfJetPt >25 GeV","dRJets <0.2",""}; 
+    //if(isMuChannel) steps[15] = {"muon trig","= 1 muon","0 electron","muon SF","RelIso", "#geq 4 jets","#slash{E}_{T} #geq 20 GeV", "MT >20 GeV", "#geq 2 b-jets","BTag SF", "fit converges","kfJetPt >25 GeV","dRJets <0.2",""};
+    //if(isEleChannel) steps[15] = {"electron trig","= 1 electron","0 muon","electron SF","RelIso < 0.8", "#geq 4 jets","#slash{E}_{T} #geq 20 GeV", "MT >20 GeV", "#geq 2 b-jets","BTag SF", "fit converges","kfJetPt >25 GeV","dRJets <0.2",""};
     const size_t nsteps = sizeof(steps)/sizeof(TString);
     for(int istep=0; istep<nsteps; istep++ ){
       hRatio->GetXaxis()->SetBinLabel(istep+1, steps[istep]);
@@ -240,15 +264,15 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
     //unc band
     if(unc){
     TGraphAsymmErrors *UncBand_Ratio;
-    UncBand_Ratio = UNCGRAPH(addHistoForUnc(histname, "base", isDataDrivenQCD, qcd_sf),
-      	    addHistoForUnc(histname, "JESPlus"),
-      	    addHistoForUnc(histname, "JESMinus"),
-      	    addHistoForUnc(histname, "JERPlus"),
-      	    addHistoForUnc(histname, "JERMinus"),
-      	    addHistoForUnc(histname, "bTagPlus"),
-      	    addHistoForUnc(histname, "bTagMinus"),
+    UncBand_Ratio = UNCGRAPH(addHistoForUnc(dir, histname, "base", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JESPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JESMinus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JERPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "JERMinus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "bTagPlus", isDataDrivenQCD, qcd_sf),
+      	    addHistoForUnc(dir, histname, "bTagMinus", isDataDrivenQCD, qcd_sf),
 	    hQCD_dd, qcd_sf_err, false, true);
-    UncBand_Ratio->SetFillColor(20);
+    UncBand_Ratio->SetFillColor(9);
     UncBand_Ratio->SetFillStyle(3001);
     UncBand_Ratio->Draw(" E2 same");
     }
@@ -260,8 +284,9 @@ void example_stack(TString histname, TString xaxis_title, int bin, bool log=fals
   }
   if(isSaveHisto){
     TString outFile("$PWD/");
-    outFile += histname;
-    outFile += "_mu"+dir+".png";
+    outFile += dir+"/"+histname;
+    if(isMuChannel) outFile += "_mu"+dir+".png";
+    if(isEleChannel) outFile += "_ele"+dir+".png";
     c1->SaveAs(outFile);
     c1->Close();
   }
@@ -289,7 +314,7 @@ TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1
   double *Yval, *errorU, *errorD, *XerrorU, *XerrorD, *Xval ;
   Yval = new double[n1]; errorU = new double[n1]; errorD = new double[n1];
   XerrorU=new double[n1]; XerrorD=new double[n1]; Xval=new double[n1];
-  cout << "No. of bins= " << n1 << endl;
+  //cout << "No. of bins= " << n1 << endl;
   for(int i=0; i<n1; i++){
     if(isFullGraph){
     Yval[i]   = hCentral->GetBinContent(i+1);
@@ -303,7 +328,8 @@ TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1
     errorU[i] = errorU[i]/hCentral->GetBinContent(i+1);
     errorD[i] = errorD[i]/hCentral->GetBinContent(i+1);
     }
-    //cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<errorD[i]<<endl;
+    //cout<<"bin = "<<i<<endl;
+    ///cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<errorD[i]<<endl;
     Xval[i]   = hCentral->GetBinCenter(i+1);
     XerrorU[i]= hCentral->GetBinWidth(i+1)/2;
     XerrorD[i]= hCentral->GetBinWidth(i+1)/2;
@@ -313,17 +339,17 @@ TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1
   delete [] Yval; delete [] errorU; delete [] errorD; delete [] XerrorU; delete [] XerrorD; delete [] Xval;
 } 
 
-TH1F* getHisto(TFile *histFile, TString histPath, TString histName){
+TH1F* getHisto(TFile *histFile, TString histPath, TString dir, TString histName){
   TH1F* hist; 
-  if(!(histFile->Get(histPath+histName))){
-    hist = (TH1F*)(fTT->Get(histPath+histName))->Clone(histName);
+  if(!(histFile->Get(histPath+"/"+dir+"/"+histName))){
+    hist = (TH1F*)(fTT->Get(histPath+"/"+dir+"/"+histName))->Clone(histName);
     hist->Add(hist, -1);
-  }else hist = (TH1F*)(histFile->Get(histPath+histName))->Clone(histName);
+  }else hist = (TH1F*)(histFile->Get(histPath+"/"+dir+"/"+histName))->Clone(histName);
   return hist;
 }
 
-void stackHisto(TFile *filename, TString lable, TString histname, int color, double scale, bool axisrange, double xmin, double xmax, THStack* MuptStack, TH1F* hMC, TLegend* leg){
-  TH1F* h2_base = getHisto(filename, "base/Iso/", histname);
+void stackHisto(TFile *filename, TString lable, TString dir, TString histname, int color, double scale, bool axisrange, double xmin, double xmax, THStack* MuptStack, TH1F* hMC, TLegend* leg){
+  TH1F* h2_base = getHisto(filename, "base/Iso", dir, histname);
   //h2_base->Draw();
   h2_base->Scale(scale);  
   h2_base->SetFillColor(color);
@@ -336,13 +362,14 @@ void stackHisto(TFile *filename, TString lable, TString histname, int color, dou
 }
 
 
-TH1F* getDataDrivenQCD(TString histname, double qcd_sf=1){
-  TH1F* hVV = getHisto(fVV, "base/NonIso/", histname); 
-  TH1F* hDY = getHisto(fDY, "base/NonIso/", histname); 
-  TH1F* hWJ = getHisto(fWJ, "base/NonIso/", histname); 
-  TH1F* hST = getHisto(fST, "base/NonIso/", histname); 
-  TH1F* hTT = getHisto(fTT, "base/NonIso/", histname); 
-  TH1F* hData = getHisto(fData, "base/NonIso/", histname); 
+TH1F* getDataDrivenQCD(TString dir, TString histname, double qcd_sf=1){
+  
+  TH1F* hVV = getHisto(fVV, "base/NonIso", dir, histname); 
+  TH1F* hDY = getHisto(fDY, "base/NonIso", dir, histname); 
+  TH1F* hWJ = getHisto(fWJ, "base/NonIso", dir, histname); 
+  TH1F* hST = getHisto(fST, "base/NonIso", dir, histname); 
+  TH1F* hTT = getHisto(fTT, "base/NonIso", dir, histname); 
+  TH1F* hData = getHisto(fData, "base/NonIso", dir, histname); 
   TH1F* hOtherMC = (TH1F*)hVV->Clone("hOtherMC"); 
   hOtherMC->Add(hDY); 
   hOtherMC->Add(hST); 
@@ -354,21 +381,20 @@ TH1F* getDataDrivenQCD(TString histname, double qcd_sf=1){
   return hQCD;
 }
 
-TH1F* addHistoForUnc(TString histname, TString sys, bool isDataDrivenQCD = false, double qcd_sf=1){
-  TH1F* hVV = getHisto(fVV, sys+"/Iso/", histname); 
-  TH1F* hDY = getHisto(fDY, sys+"/Iso/", histname); 
-  TH1F* hQCD_mc = getHisto(fQCD, sys+"/Iso/", histname); 
-  TH1F* hWJ = getHisto(fWJ, sys+"/Iso/", histname); 
-  TH1F* hST = getHisto(fST, sys+"/Iso/", histname); 
-  TH1F* hTT = getHisto(fTT, sys+"/Iso/", histname); 
+TH1F* addHistoForUnc(TString dir, TString histname, TString sys, bool isDataDrivenQCD = false, double qcd_sf=1){
+  TH1F* hVV = getHisto(fVV, sys+"/Iso", dir, histname); 
+  TH1F* hDY = getHisto(fDY, sys+"/Iso", dir, histname); 
+  TH1F* hQCD_mc = getHisto(fQCD, sys+"/Iso", dir, histname); 
+  TH1F* hWJ = getHisto(fWJ, sys+"/Iso", dir, histname); 
+  TH1F* hST = getHisto(fST, sys+"/Iso", dir, histname); 
+  TH1F* hTT = getHisto(fTT, sys+"/Iso", dir, histname); 
   TH1F* hAll = (TH1F*)hVV->Clone("hAllMC");
   hAll->Add(hDY);
   hAll->Add(hWJ);
   hAll->Add(hST);
   hAll->Add(hTT);
-  TH1F* hQCD_dd = getDataDrivenQCD(histname, qcd_sf); 
-  if(isDataDrivenQCD) hAll->Add(hQCD_dd);
-  else hAll->Add(hQCD_mc);
+  if(isDataDrivenQCD) hQCD_mc = getDataDrivenQCD(dir, histname, qcd_sf);
+  hAll->Add(hQCD_mc);
   return hAll;
 }
 
@@ -381,39 +407,46 @@ TPaveText *paveText(double minX, double minY, double maxX, double maxY, int line
   pt->SetTextFont(font);
   return pt;
 }
-
 void example_stack_all(){
-  example_stack("cutflow", "cutflow", 1, true, true, true, true, true, 0, 15, "", true, false);
+  example_stack("", "cutflow", "cutflow", 1, true, true, true, true, true, 0, 15, true, true);
   //example_stack("final_RelIso_mu", "RelIso of muons", 1, true, true, true, false, false, 0, 1, false, dir);
 }
 
-//void example_stack(TString histname, TString xaxis_title, int bin, bool log=false, bool drawdata=true, bool ratio=false, bool drawsignal=false, bool axisrange=false, double xmin=0, double xmax=10, TString dir="BTag", bool label=false, double unc=false){
-//void example_stack_btag(TString dir="BTag"){//dir=KinFit, BTag
-void example_stack_kfit(TString dir="KinFit"){//dir=KinFit, BTag
- //example_stack(dir+"/pt_mu","Pt^{#mu}[GeV]", 1, true,true,true,true, true,   0.0,    500.0, dir, false, true);
- //example_stack(dir+"/eta_mu","#eta^{#mu}", 1, true,true,true,true,true,       -2.5,   3.5,  dir, false, true);
- //example_stack(dir+"/pt_jet","Pt^{jets}[GeV]", 1, true,true,true,true, true,  0.0,    500,  dir, false, true);
- //example_stack(dir+"/eta_jet","#eta^{jets}", 1, true,true,true,true,true,     -2.5,   3.5,  dir, false, true);
- //example_stack(dir+"/final_multi_jet","N^{jets}",1,true,true,true,true,true,   3,      15,  dir, false, true);
- //example_stack(dir+"/final_pt_met","MET", 1, true,true,true,true, true,        0.0,    500, dir, false, true);
+//void example_stack(TString dir, TString histname, TString xaxis_title, int bin, bool log=false, bool drawdata=true, bool ratio=false, bool drawsignal=false, bool axisrange=false, double xmin=0, double xmax=10, bool label=false, double unc=false){
+
+void example_stack_btag(TString dir="BTag"){//dir=KinFit, BTag
+//void example_stack_kfit(TString dir="KinFit"){//dir=KinFit, BTag
+ if(isMuChannel){
+   example_stack(dir,"pt_mu","Pt^{#mu}[GeV]", 1, true,true,true,true, true,   0.0,    500.0, false, true);
+   example_stack(dir,"eta_mu","#eta^{#mu}", 1, true,true,true,true,true,       -2.5,   3.5,  false, true);
+ }
+ if(isEleChannel){
+   example_stack(dir,"pt_ele","Pt^{e}[GeV]", 1, true,true,true,true, true,   0.0,    500.0, false, true);
+   example_stack(dir,"eta_ele","#eta^{e}", 1, true,true,true,true,true,       -2.5,   3.5,  false, true);
+ }
+ example_stack(dir,"pt_jet","Pt^{jets}[GeV]", 1, true,true,true,true, true,  0.0,    500,  false, true);
+ example_stack(dir,"eta_jet","#eta^{jets}", 1, true,true,true,true,true,     -2.5,   3.5,  false, true);
+ example_stack(dir,"final_multi_jet","N^{jets}",1,true,true,true,true,true,   3,      15,  false, true);
+ example_stack(dir,"final_pt_met","MET", 1, true,true,true,true, true,        0.0,    500, false, true);
  if(dir=="BTag"){
-   example_stack(dir+"/mjj","m^{jj}",1,true,true,true,true, true,                 0.0,    400.0, dir, false, true);
-   example_stack(dir+"/CSVL_count","N^{bjet}",1,true,true, true,true,true,       1,      10, dir, false, true);
-   example_stack(dir+"/pfCCvsL","pfCombinedCvsLJetTags",1,true,true, true,true,true,   -1.5, 2, dir, false, true);
-   example_stack(dir+"/pfCCvsB","pfCombinedCvsBJetTags",1,true,true, true,true,true,   -1.5, 2, dir, false, true);
+   example_stack(dir,"mjj","m^{jj}",1,true,true,true,true, true,                 0.0,    400.0, false, true);
+   example_stack(dir,"CSVL_count","N^{bjet}",1,true,true, true,true,true,       1,      10,  false, true);
+   //example_stack(dir,"pfCCvsL","pfCombinedCvsLJetTags",1,true,true, true,true,true,   -1.5, 2, false, true);
+   //example_stack(dir,"pfCCvsB","pfCombinedCvsBJetTags",1,true,true, true,true,true,   -1.5, 2, false, true);
  }
  if(dir=="KinFit"){
-   example_stack(dir+"/mjj_kfit","m^{jj}",1,true,true,true, true, true,      0.0,    400.0, dir, false, true);
-   //example_stack(dir+"/mjj_kfit","m^{jj}",1,true,false,false, true, true,       0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_CTagL","mjj_kfit_CTagL",1,true,false,false, true, true,  0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_noCTagL","mjj_kfit_noCTagL",1,true,false,false, true, true, 0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_CTagM","mjj_kfit_CTagM",1,true,false,false, true, true,   0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_noCTagM","mjj_kfit_noCTagM",1,true,false,false, true, true,  0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_CTagT","mjj_kfit_CTagT",1,true,false,false, true, true,   0.0,    200.0, dir, false, false);
-   //example_stack(dir+"/mjj_kfit_noCTagT","mjj_kfit_noCTagT",1,true,false,false, true, true, 0.0,    200.0, dir, false, false);
+   example_stack(dir, "mjj_kfit","m^{jj}",1,true,true,true, true, true,      0.0,    400.0,  false, true);
+   /*
+   example_stack(dir,"mjj_kfit_CTagL","mjj_kfit_CTagL",1,true,true,true, true, true,  0.0,    200.0,  false, true);
+   example_stack(dir,"mjj_kfit_noCTagL","mjj_kfit_noCTagL",1,true,true,true, true, true, 0.0,    200.0, false, true);
+   example_stack(dir,"mjj_kfit_CTagM","mjj_kfit_CTagM",1,true,true,true, true, true,   0.0,    200.0, false, true);
+   example_stack(dir,"mjj_kfit_noCTagM","mjj_kfit_noCTagM",1,true,true,true, true, true,  0.0,    200.0, false, true);
+   example_stack(dir,"mjj_kfit_CTagT","mjj_kfit_CTagT",1,true,true,true, true, true,   0.0,    200.0,  false, true);
+   example_stack(dir,"mjj_kfit_noCTagT","mjj_kfit_noCTagT",1,true,true,true, true, true, 0.0,    200.0, false, true);
+   */
  }
- ///example_stack(dir+"/nvtx","N^{vertex}",1,true,true,true,true, true,           0.0,    70.0, dir, false, true);
- ///example_stack(dir+"/rhoAll","#rho",1,true,true,true,true, true,               0.0,    70.0, dir, false, true);
- ///example_stack(dir+"/wmt","MT[GeV]",1,true,true,true,true,true,                0,      165,  dir, false, true);
+ example_stack(dir,"nvtx","N^{vertex}",1,true,true,true,true, true,           0.0,    70.0,  false, true);
+ example_stack(dir,"rhoAll","#rho",1,true,true,true,true, true,               0.0,    70.0,  false, true);
+ example_stack(dir,"wmt","MT[GeV]",1,true,true,true,true,true,                0,      300,   false, true);
 } 
 

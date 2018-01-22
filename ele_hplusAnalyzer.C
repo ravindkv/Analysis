@@ -26,12 +26,11 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
+  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
-  /*
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
   CutFlowProcessor(url, myKey, "baseIso20LowMET", outFile_);
-  */
   //---------------------------------------------------//
   //for systematics (all sys in one go)
   //---------------------------------------------------//  
@@ -47,6 +46,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtMinus", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -116,13 +116,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   if(bscale==-1)const std::string &sysType 		= "down"; 
   const std::vector<std::string> & otherSysTypes = {"up", "down"};
   //b-quark
-  BTagCalibrationReader readCSVbL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readCSVbM= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
     	      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_B);
   //c-quark
-  BTagCalibrationReader readCSVcL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readCSVcM= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
     	      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_C);
   //other(light) quarks and gluon
-  BTagCalibrationReader readCSVlL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readCSVlM= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
     	      "incl", sysType, otherSysTypes, BTagEntry::FLAV_UDSG);
   
   //getBTagEffHistos(f);
@@ -224,7 +224,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     bool passTrig = false;
     vector<string> trig = ev->hlt;
     for(size_t it = 0; it < trig.size(); it++){
-      if(trig[it].find("HLT_Ele27_WPTight_Gsf") != string::npos) passTrig = true;
+      if(trig[it].find("HLT_Ele27_WPLoose_Gsf") != string::npos) passTrig = true;
     }
     if(!passTrig){
     //cout << "not satisfying trigger" << endl;
@@ -358,7 +358,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     if(e_final.size() > 0){
       int e_i = e_final[0];
-      double eRelIso = pfElectrons[e_i].relCombPFIsoEA/pfElectrons[e_i].p4.pt();
+      double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
       fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, eRelIso, evtWeight);
       fillHisto(outFile_, cutflowType+"/NonIso", "", "RelIso", 100, 0, 1, eRelIso, evtWeight);
     }
@@ -488,12 +488,12 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
       //b-quark
       if(abs(pfJets[ind_jet].partonFlavour) ==5)
-        isBtag = getBtagWithSF(readCSVbL, h2_BTaggingEff_Num_bL, h2_BTaggingEff_Denom_b, pfJets[ind_jet], ev->isData, bscale); 
+        isBtag = getBtagWithSF(readCSVbM, h2_BTaggingEff_Num_bL, h2_BTaggingEff_Denom_b, pfJets[ind_jet], ev->isData, bscale); 
       //c-quark
       else if(abs(pfJets[ind_jet].partonFlavour) ==4) 
-        isBtag = getBtagWithSF(readCSVcL, h2_BTaggingEff_Num_cL, h2_BTaggingEff_Denom_c, pfJets[ind_jet], ev->isData, bscale); 
+        isBtag = getBtagWithSF(readCSVcM, h2_BTaggingEff_Num_cL, h2_BTaggingEff_Denom_c, pfJets[ind_jet], ev->isData, bscale); 
       //other quarks and gluon
-      else isBtag = getBtagWithSF(readCSVlL, h2_BTaggingEff_Num_udsgL, h2_BTaggingEff_Denom_udsg, pfJets[ind_jet], ev->isData, bscale); 
+      else isBtag = getBtagWithSF(readCSVlM, h2_BTaggingEff_Num_udsgL, h2_BTaggingEff_Denom_udsg, pfJets[ind_jet], ev->isData, bscale); 
       
       if(isBtag){
         count_CSVL_SF++; 

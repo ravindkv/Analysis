@@ -15,7 +15,7 @@
 #include <iomanip>
 #include <iostream>
 
-void getEvtProcessed(){
+void getProcessedEvent_13TeV(){
   
   bool isMC = true;
   bool isMuData = true;
@@ -44,10 +44,16 @@ void getEvtProcessed(){
   mcEvtDBS["QCD_Pt-170to300_Mu_Merged.root"]=  7947159;
   mcEvtDBS["QCD_Pt-300to470_Mu_Merged.root"]=  7937590;
   mcEvtDBS["ST_s_Merged.root"]              =  2989199;
-  mcEvtDBS["ST_t__Merged.root"]              =  38811017;
+  mcEvtDBS["ST_t_Merged.root"]              =  38811017;
   mcEvtDBS["ST_tW_Merged.root"]             =  6933094;
   mcEvtDBS["TTJetsM_Merged.root"]           =  10139950;   
   mcEvtDBS["TTJetsP_Merged.root"]           =  77081156;   
+  mcEvtDBS["TTJetsP_up_Merged.root"]        =  29310620;   
+  mcEvtDBS["TTJetsP_down_Merged.root"]      =  28354188;   
+  mcEvtDBS["TTJetsP_mtop1735_Merged.root"]  =  19419050;   
+  mcEvtDBS["TTJetsP_mtop1715_Merged.root"]  =  19578812;   
+  mcEvtDBS["TTJetsP_hdampUP_Merged.root"]   =  29689380;   
+  mcEvtDBS["TTJetsP_hdampDOWN_Merged.root"] =  29117820;   
   mcEvtDBS["W1JetsToLNu_Merged.root"]       =  44813600;
   mcEvtDBS["W2JetsToLNu_Merged.root"]       =  29878415;
   mcEvtDBS["W3JetsToLNu_Merged.root"]       =  19798117;
@@ -104,37 +110,33 @@ void getEvtProcessed(){
     }
   }
 
- /* 
-  TString ele_data_file[9] = {
-  " EleRunBver2v2_Merged.root", 
-  " EleRunCv1_Merged.root    ", 
-  " EleRunDv1_Merged.root    ", 
-  " EleRunEv1_Merged.root    ", 
-  " EleRunFv1_Merged.root    ", 
-  " EleRunGv1_Merged.root    ", 
-  " EleRunHver2v1_Merged.root", 
-  " EleRunHver3v1_Merged.root",
-  " all_EleData.root"
-  };
- 
+  std::map<std::string, double> eleDataEvtDBS;
+  eleDataEvtDBS["EleRunBver2v2_Merged.root"]  =235362706  ;  
+  eleDataEvtDBS["EleRunCv1_Merged.root"    ]  =91537460   ;
+  eleDataEvtDBS["EleRunDv1_Merged.root"    ]  =141901645  ;
+  eleDataEvtDBS["EleRunEv1_Merged.root"    ]  =111732063  ;
+  eleDataEvtDBS["EleRunFv1_Merged.root"    ]  =68855145   ;
+  eleDataEvtDBS["EleRunGv1_Merged.root"    ]  =151022050  ;
+  eleDataEvtDBS["EleRunHver2v1_Merged.root"]  =121561193  ; 
+  eleDataEvtDBS["EleRunHver3v1_Merged.root"]  =3189661  ;
+
+  std::map<std::string, double>::iterator itr_eledata;
   if(isEleData){ 
-    cout<<endl;
     cout<<"=============================="<<endl;
-    cout<<" ALL ELECTRON DATA SAMPLES    "<<endl;
+    cout<<" ALL Electron Data SAMPLES    "<<endl;
     cout<<"=============================="<<endl;
-    for(int i= 0; i<9; i++){
-      TString inFile(ele_data_file[i]);
+    for(itr_eledata = eleDataEvtDBS.begin(); itr_eledata != eleDataEvtDBS.end(); ++itr_eledata){
+      TString inFile(itr_eledata->first);
       TFile* ttbar= new TFile(inFile);
       TString path= "base/totalEvents";
       TH1F* hist= (TH1F*)(ttbar->Get(path));
       int entries= hist->GetBinContent(1);
       double mean= hist->GetMean();
-      double events = entries*mean;
-      cout<<events<<" : "<<"\t"<<inFile<<endl;
-      //cout<<" Total Events= "<<events<<endl;
-      //hist->Draw();
+      double event_cond = entries*mean;//events from condor submission
+      double event_dbs = itr_eledata->second;//events at data base server
+      double ratio = event_dbs/event_cond;
+      cout<<setw(30)<<inFile<<setw(15)<<event_dbs<<setw(15)<<event_cond<<setw(15)<<ratio<<endl;
     }
   }
-  */
 }
 

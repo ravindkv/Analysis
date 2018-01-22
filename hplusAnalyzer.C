@@ -42,6 +42,8 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     //CutFlowProcessor(url, myKey, "METUCMinus", 	outFile_);
     CutFlowProcessor(url, myKey, "bTagPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "bTagMinus", 	outFile_);
+    CutFlowProcessor(url, myKey, "cTagPlus", 	outFile_);
+    CutFlowProcessor(url, myKey, "cTagMinus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtMinus", 	outFile_);
   }
@@ -60,7 +62,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   string eAlgo("Electrons"), mAlgo("Muons"), jAlgo("Jets"), metAlgo("METs");
   
   //Uncertainty variations, JES, JER, MET unclustered, bTag
-  int jes = 0, jer = 0, metuc = 0, bscale = 0, minMET =20, minMT =0;
+  int jes = 0, jer = 0, metuc = 0, bScale = 0, cScale =0, minMET =20, minMT =0;
   //to estimate unc in the data-driven qcd 
   bool isLowMET = false, isIso20 = false;
 
@@ -70,8 +72,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   else if (cutflowType.Contains("JERMinus"))jer = -1;
   else if (cutflowType.Contains("METUCPlus"))metuc = 1;
   else if (cutflowType.Contains("METUCMinus"))metuc = -1;
-  else if (cutflowType.Contains("bTagPlus"))bscale = 1;
-  else if (cutflowType.Contains("bTagMinus"))bscale = -1; 
+  else if (cutflowType.Contains("bTagPlus"))bScale = 1;
+  else if (cutflowType.Contains("bTagMinus"))bScale = -1; 
+  else if (cutflowType.Contains("cTagPlus"))cScale = 1;
+  else if (cutflowType.Contains("cTagMinus"))cScale = -1; 
   //to estimate unc in the data-driven qcd 
   else if (cutflowType.Contains("baseIso")){ 
     if (cutflowType.Contains("Iso20HighMET"))isIso20 = true; 
@@ -106,31 +110,90 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //BTag SF: read CSV file for SF, 2D histos for eff 
   //---------------------------------------------------//      
   //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco#Data_MC_Scale_Factors_period_dep
-  const std::string & filename 		= "stack/CSVv2_Moriond17_B_H.csv";
-  const std::string & tagger 		= "CSVv2";
-  const std::string & measurementType 	= "comb";
-  const std::string & sysType 		= "central"; 
-  if(bscale==1) const std::string &sysType 		= "up"; 
-  if(bscale==-1)const std::string &sysType 		= "down"; 
+  const std::string & bTagCSVfile 	= "stack/CSVv2_Moriond17_B_H.csv";
+  const std::string & bTagName 		= "CSVv2";
+  const std::string & bTagSys 		= "central"; 
+  if(bScale==1) const std::string &bTagSys 		= "up"; 
+  if(bScale==-1)const std::string &bTagSys 		= "down"; 
   const std::vector<std::string> & otherSysTypes = {"up", "down"};
   //b-quark
-  BTagCalibrationReader readCSVbL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
-    	      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_B);
+  BTagCalibrationReader readBTagCSV_bM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+    	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_B);
   //c-quark
-  BTagCalibrationReader readCSVcL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
-    	      measurementType, sysType, otherSysTypes, BTagEntry::FLAV_C);
+  BTagCalibrationReader readBTagCSV_cM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+    	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_C);
   //other(light) quarks and gluon
-  BTagCalibrationReader readCSVlL= readCSVfile(filename, tagger, BTagEntry::OP_MEDIUM,
-    	      "incl", sysType, otherSysTypes, BTagEntry::FLAV_UDSG);
+  BTagCalibrationReader readBTagCSV_lM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+    	      "incl", bTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
   
   //getBTagEffHistos(f);
   TString histPath("myMiniTreeProducer/Jets/");
-  TH2D* h2_BTaggingEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_b"));
-  TH2D* h2_BTaggingEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_c"));
-  TH2D* h2_BTaggingEff_Denom_udsg 	= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Denom_udsg")); 
-  TH2D* h2_BTaggingEff_Num_bL 		= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_bL"));
-  TH2D* h2_BTaggingEff_Num_cL 		= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_cL"));
-  TH2D* h2_BTaggingEff_Num_udsgL 	= (TH2D*)(f->Get(histPath+"h2_BTaggingEff_Num_udsgL")); 
+  TH2D* h2_BTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_b"));
+  TH2D* h2_BTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_c"));
+  TH2D* h2_BTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_udsg")); 
+  TH2D* h2_BTagEff_Num_bM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_bM"));
+  TH2D* h2_BTagEff_Num_cM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_cM"));
+  TH2D* h2_BTagEff_Num_udsgM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_udsgM")); 
+  
+  //---------------------------------------------------//
+  //CTag SF: read CSV file for SF, 2D histos for eff 
+  //---------------------------------------------------//      
+  //https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco#Data_MC_Scale_Factors_period_dep
+  const std::string & cTagCSVfile 		= "stack/ctagger_Moriond17_B_H.csv";
+  const std::string & cTagName 			= "cTag";
+  const std::string & cTagSys 			= "central"; 
+  if(cScale==1) const std::string &cTagSys 		= "up"; 
+  if(cScale==-1)const std::string &cTagSys 		= "down"; 
+  
+  //LOOSE WP
+  //b-quark
+  BTagCalibrationReader readCTagCSV_bL= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_LOOSE,
+    	      "TnP", cTagSys, otherSysTypes, BTagEntry::FLAV_B);
+  //c-quark
+  BTagCalibrationReader readCTagCSV_cL= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_LOOSE,
+    	      "comb", cTagSys, otherSysTypes, BTagEntry::FLAV_C);
+  //other(light) quarks and gluon
+  BTagCalibrationReader readCTagCSV_lL= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_LOOSE,
+    	      "incl", cTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
+  
+  //MEDIUM WP
+  //b-quark
+  BTagCalibrationReader readCTagCSV_bM= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_MEDIUM,
+    	      "TnP", cTagSys, otherSysTypes, BTagEntry::FLAV_B);
+  //c-quark
+  BTagCalibrationReader readCTagCSV_cM= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_MEDIUM,
+    	      "comb", cTagSys, otherSysTypes, BTagEntry::FLAV_C);
+  //other(light) quarks and gluon
+  BTagCalibrationReader readCTagCSV_lM= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_MEDIUM,
+    	      "incl", cTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
+  
+  //TIGHT WP
+  //b-quark
+  BTagCalibrationReader readCTagCSV_bT= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_TIGHT,
+    	      "TnP", cTagSys, otherSysTypes, BTagEntry::FLAV_B);
+  //c-quark
+  BTagCalibrationReader readCTagCSV_cT= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_TIGHT,
+    	      "comb", cTagSys, otherSysTypes, BTagEntry::FLAV_C);
+  //other(light) quarks and gluon
+  BTagCalibrationReader readCTagCSV_lT= readCSV(cTagCSVfile, cTagName, BTagEntry::OP_TIGHT,
+    	      "incl", cTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
+  
+  //getCTagEffHistos(f);
+  TH2D* h2_CTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Denom_b"));
+  TH2D* h2_CTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Denom_c"));
+  TH2D* h2_CTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Denom_udsg")); 
+  //LOOSE
+  TH2D* h2_CTagEff_Num_bL 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_bL"));
+  TH2D* h2_CTagEff_Num_cL 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_cL"));
+  TH2D* h2_CTagEff_Num_udsgL 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_udsgL")); 
+  //MEDIUM
+  TH2D* h2_CTagEff_Num_bM 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_bM"));
+  TH2D* h2_CTagEff_Num_cM 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_cM"));
+  TH2D* h2_CTagEff_Num_udsgM 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_udsgM")); 
+  //TIGHT
+  TH2D* h2_CTagEff_Num_bT 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_bT"));
+  TH2D* h2_CTagEff_Num_cT		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_cT"));
+  TH2D* h2_CTagEff_Num_udsgT 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_udsgT")); 
   
   //---------------------------------------------------//
   //loop over each event, of the ntuple
@@ -482,7 +545,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     
     //---------------------------------------------------//
-    //apply B-tagging, C-tagging
+    //apply B-tagging
     //---------------------------------------------------//
     vector<int> j_final_nob; j_final_nob.clear();
     vector<int> j_final_b; j_final_b.clear();
@@ -519,13 +582,12 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
       //b-quark
       if(abs(pfJets[ind_jet].partonFlavour) ==5)
-        isBtag = getBtagWithSF(readCSVbL, h2_BTaggingEff_Num_bL, h2_BTaggingEff_Denom_b, pfJets[ind_jet], ev->isData, bscale); 
+        isBtag = getBtagWithSF(readBTagCSV_bM, h2_BTagEff_Num_bM, h2_BTagEff_Denom_b, pfJets[ind_jet], ev->isData, bScale); 
       //c-quark
       else if(abs(pfJets[ind_jet].partonFlavour) ==4) 
-        isBtag = getBtagWithSF(readCSVcL, h2_BTaggingEff_Num_cL, h2_BTaggingEff_Denom_c, pfJets[ind_jet], ev->isData, bscale); 
+        isBtag = getBtagWithSF(readBTagCSV_cM, h2_BTagEff_Num_cM, h2_BTagEff_Denom_c, pfJets[ind_jet], ev->isData, bScale); 
       //other quarks and gluon
-      else isBtag = getBtagWithSF(readCSVlL, h2_BTaggingEff_Num_udsgL, h2_BTaggingEff_Denom_udsg, pfJets[ind_jet], ev->isData, bscale); 
-      
+      else isBtag = getBtagWithSF(readBTagCSV_lM, h2_BTagEff_Num_udsgM, h2_BTagEff_Denom_udsg, pfJets[ind_jet], ev->isData, bScale); 
       if(isBtag){
         count_CSVL_SF++; 
         double jetPt = jetPtWithJESJER(pfJets[ijet], jes, jer);
@@ -715,6 +777,113 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     kfCount++;
     nCutPass = 13;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
+    //---------------------------------------------------//
+    //apply CTagging
+    //---------------------------------------------------//
+    double pfCCvsL0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsLJetTags"];
+    double pfCCvsL1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsLJetTags"];
+    double pfCCvsB0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsBJetTags"]; 
+    double pfCCvsB1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsBJetTags"];
+    
+    MyLorentzVector diJet_tag = kfLightJets[0]+kfLightJets[1];
+    bool isCTagL = false; //loose
+    bool isCTagM = false; //medium
+    bool isCTagT = false; //tight
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
+    Float_t dCvsL_L = -0.48;
+    Float_t dCvsB_L = -0.17;
+    Float_t dCvsL_M = -0.1;
+    Float_t dCvsB_M = -0.08;
+    Float_t dCvsL_T =  0.69;
+    Float_t dCvsB_T = -0.45;
+    if((pfCCvsL0 > -0.48  &&  pfCCvsB0 > -0.17) ||(pfCCvsL1 > -0.48 && pfCCvsB1 > -0.17))isCTagL = true;
+    if((pfCCvsL0 > -0.1  && pfCCvsB0 > 0.08) ||(pfCCvsL1 > -0.1 && pfCCvsB1 > 0.08))isCTagM = true;
+    if((pfCCvsL0 > 0.69  && pfCCvsB0 > -0.45) ||(pfCCvsL1 > 0.69  && pfCCvsB1 > -0.45))isCTagT = true;
+    //loose, medium, tight
+    if(isCTagL)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    if(isCTagM)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    if(isCTagT)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    
+    //---------------------------------------------------//
+    //Charm mistag scale factors 
+    //---------------------------------------------------//
+    bool isCTagL_SF_0 = false;
+    bool isCTagM_SF_0 = false;
+    bool isCTagT_SF_0 = false;
+    //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
+    //get scale factor for 0th jet
+    //b-quark
+    if(abs(pfJets[indexForCTag0].partonFlavour) ==5){
+      isCTagL_SF_0 = getCTagWithSF(readCTagCSV_bL, h2_CTagEff_Num_bL, h2_CTagEff_Denom_b, dCvsL_L, dCvsB_L, pfJets[indexForCTag0], ev->isData, cScale); 
+      isCTagM_SF_0 = getCTagWithSF(readCTagCSV_bM, h2_CTagEff_Num_bM, h2_CTagEff_Denom_b, dCvsL_M, dCvsB_M, pfJets[indexForCTag0], ev->isData, cScale); 
+      isCTagT_SF_0 = getCTagWithSF(readCTagCSV_bT, h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, dCvsL_T, dCvsB_T, pfJets[indexForCTag0], ev->isData, cScale); 
+    }
+    //c-quark
+    else if(abs(pfJets[indexForCTag0].partonFlavour) ==4){ 
+      isCTagL_SF_0 = getCTagWithSF(readCTagCSV_cL, h2_CTagEff_Num_cL, h2_CTagEff_Denom_c, dCvsL_L, dCvsB_L, pfJets[indexForCTag0], ev->isData, cScale); 
+      isCTagM_SF_0 = getCTagWithSF(readCTagCSV_cM, h2_CTagEff_Num_cM, h2_CTagEff_Denom_c, dCvsL_M, dCvsB_M, pfJets[indexForCTag0], ev->isData, cScale); 
+      isCTagT_SF_0 = getCTagWithSF(readCTagCSV_cT, h2_CTagEff_Num_cT, h2_CTagEff_Denom_c, dCvsL_T, dCvsB_T, pfJets[indexForCTag0], ev->isData, cScale); 
+    }
+    //other quarks and gluon
+    else{
+    isCTagL_SF_0 = getCTagWithSF(readCTagCSV_lL, h2_CTagEff_Num_udsgL, h2_CTagEff_Denom_udsg, dCvsL_L, dCvsB_L, pfJets[indexForCTag0], ev->isData, cScale); 
+    isCTagM_SF_0 = getCTagWithSF(readCTagCSV_lM, h2_CTagEff_Num_udsgM, h2_CTagEff_Denom_udsg, dCvsL_M, dCvsB_M, pfJets[indexForCTag0], ev->isData, cScale); 
+    isCTagT_SF_0 = getCTagWithSF(readCTagCSV_lT, h2_CTagEff_Num_udsgT, h2_CTagEff_Denom_udsg, dCvsL_T, dCvsB_T, pfJets[indexForCTag0], ev->isData, cScale); 
+    }
+   
+    bool isCTagL_SF_1 = false;
+    bool isCTagM_SF_1 = false;
+    bool isCTagT_SF_1 = false;
+    //get scale factor for 1st jet
+    //b-quark
+    if(abs(pfJets[indexForCTag1].partonFlavour) ==5){
+      isCTagL_SF_1 = getCTagWithSF(readCTagCSV_bL, h2_CTagEff_Num_bL, h2_CTagEff_Denom_b, dCvsL_L, dCvsB_L, pfJets[indexForCTag1], ev->isData, cScale); 
+      isCTagM_SF_1 = getCTagWithSF(readCTagCSV_bM, h2_CTagEff_Num_bM, h2_CTagEff_Denom_b, dCvsL_M, dCvsB_M, pfJets[indexForCTag1], ev->isData, cScale); 
+      isCTagT_SF_1 = getCTagWithSF(readCTagCSV_bT, h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, dCvsL_T, dCvsB_T, pfJets[indexForCTag1], ev->isData, cScale); 
+    }
+    //c-quark
+    else if(abs(pfJets[indexForCTag1].partonFlavour) ==4){ 
+      isCTagL_SF_1 = getCTagWithSF(readCTagCSV_cL, h2_CTagEff_Num_cL, h2_CTagEff_Denom_c, dCvsL_L, dCvsB_L, pfJets[indexForCTag1], ev->isData, cScale); 
+      isCTagM_SF_1 = getCTagWithSF(readCTagCSV_cM, h2_CTagEff_Num_cM, h2_CTagEff_Denom_c, dCvsL_M, dCvsB_M, pfJets[indexForCTag1], ev->isData, cScale); 
+      isCTagT_SF_1 = getCTagWithSF(readCTagCSV_cT, h2_CTagEff_Num_cT, h2_CTagEff_Denom_c, dCvsL_T, dCvsB_T, pfJets[indexForCTag1], ev->isData, cScale); 
+    }
+    //other quarks and gluon
+    else{
+    isCTagL_SF_1 = getCTagWithSF(readCTagCSV_lL, h2_CTagEff_Num_udsgL, h2_CTagEff_Denom_udsg, dCvsL_L, dCvsB_L, pfJets[indexForCTag1], ev->isData, cScale); 
+    isCTagM_SF_1 = getCTagWithSF(readCTagCSV_lM, h2_CTagEff_Num_udsgM, h2_CTagEff_Denom_udsg, dCvsL_M, dCvsB_M, pfJets[indexForCTag1], ev->isData, cScale); 
+    isCTagT_SF_1 = getCTagWithSF(readCTagCSV_lT, h2_CTagEff_Num_udsgT, h2_CTagEff_Denom_udsg, dCvsL_T, dCvsB_T, pfJets[indexForCTag1], ev->isData, cScale); 
+    }
+
+    //combined scale factors
+    bool isCTagL_SF = false;
+    bool isCTagM_SF = false;
+    bool isCTagT_SF = false;
+    bool isCTagOther_SF = false;
+    if(isCTagL_SF_0 || isCTagL_SF_1) isCTagL_SF = true;
+    if(isCTagM_SF_0 || isCTagM_SF_1) isCTagM_SF=true; 
+    if(isCTagT_SF_0 || isCTagT_SF_1) isCTagT_SF = true;
+    if(!isCTagL_SF)if(!isCTagM_SF) if(!isCTagT_SF) isCTagOther_SF = true;
+    
+    if(isCTagL_SF) fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL_SF", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    if(isCTagM_SF) fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM_SF", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    if(isCTagT_SF) fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+  
+    //Categorisation 
+    if(isCTagT_SF) //if(!isCTagL_SF) if(!isCTagM_SF)if(!isCTagOther_SF) 
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    else if(isCTagM_SF) //if(!isCTagL_SF) if(!isCTagT_SF)if(!isCTagOther_SF) 
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    else if(isCTagL_SF) //if(!isCTagM_SF)if(!isCTagT_SF)if(!isCTagOther_SF) 
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    else fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagO_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    
+    if(isCTagL){
+    nCutPass = 14;
+    fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
+    }
+    if(!isCTagL_SF) continue; 
+    nCutPass = 15;
+    fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
     fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit", 200, 0, 1000, diJet.mass(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","pt_mu", 50, 0, 500, muonPt, evtWeight );
@@ -742,33 +911,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType_, "KinFit","pt_kfjet1", 50, 0, 500, kfLightJets[1].pt(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","eta_kfjet1", 50, -5, 5, kfLightJets[1].eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","phi_kfjet1", 50, -5, 5, kfLightJets[1].phi(), evtWeight );
-    
-    //---------------------------------------------------//
-    // category depending on C-tagging
-    //---------------------------------------------------//
-    double pfCCvsL0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsLJetTags"];
-    double pfCCvsL1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsLJetTags"];
-    double pfCCvsB0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsBJetTags"]; 
-    double pfCCvsB1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsBJetTags"];
-    
-    MyLorentzVector diJet_tag = kfLightJets[0]+kfLightJets[1];
-    bool isCTagL = false; //loose
-    bool isCTagM = false; //medium
-    bool isCTagT = false; //tight
-    //Recommended values:
-    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
-    if((pfCCvsL0 > -0.48  &&  pfCCvsB0 > -0.17) ||(pfCCvsL1 > -0.48 && pfCCvsB1 > -0.17))isCTagL = true;
-    if((pfCCvsL0 > -0.1  && pfCCvsB0 > 0.08) ||(pfCCvsL1 > -0.1 && pfCCvsB1 > 0.08))isCTagM = true;
-    if((pfCCvsL0 > 0.69  && pfCCvsB0 > -0.45) ||(pfCCvsL1 > 0.69  && pfCCvsB1 > -0.45))isCTagT = true;
-    //loose
-    if(isCTagL)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_noCTagL", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    //medium
-    if(isCTagM)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_noCTagM", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    //tight
-    if(isCTagT)fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_noCTagT", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+    double dPhi_csbar = deltaPhi12(kfLightJets[0].phi(), kfLightJets[1].phi());
+    fillHisto(outFile_, cutflowType_, "KinFit","dPhi_csbar", 50, -5, 5, dPhi_csbar, evtWeight );
     
     //---------------------------------------------------//
     // cuts on chi2 and prob of KinFit
@@ -791,10 +935,10 @@ void hplusAnalyzer::processEvents(){
   
   //Data, MC sample from lxplus and T2
   ///CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
-  //CutFlowAnalysis("outFile_.root", "PF", ""); 
+  //CutFlowAnalysis("outFile_muCh.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20171115/MuMC_20171115/TTJetsP_MuMC_20171115/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20171115/171115_113943/0000/TTJetsP_MuMC_20171115_Ntuple_99.root", "PF", "");
-  
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20180116/MuMC_20180116/TTJetsP_MuMC_20180116/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20180116/180116_144240/0000/TTJetsP_MuMC_20180116_Ntuple_1.root", "PF", "");
+
   //====================================
   //condor submission
   CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
