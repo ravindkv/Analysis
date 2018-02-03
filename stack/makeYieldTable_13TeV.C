@@ -2,65 +2,20 @@
 #include <fstream>
 #include <iomanip>
 
-void makeCutFlowTable(bool NOTANPAS = false)
-{
-  TString inFile("$PWD/");
 
-  cout << "inFile  " << inFile << endl;
-
-  TFile *ttbar = new TFile(inFile+"all_TTJetsP.root");
-  TH1F* h_ttbar = (TH1F*)ttbar->Get("base/Iso/cutflow")->Clone("h_ttbar");
-
-  TH1F* httbar_toppt = (TH1F*)ttbar->Get("base/SF_topPtWeights"); 
-  double avgTop = httbar_toppt->GetMean();
-  double wh_scale = 0.32; // 2x(1-x) assuming x = 0.2  
-  h_ttbar->Scale(1.0/avgTop);
-
-  ofstream outFile;
-  outFile.open("muon_cutflow.tex");
-  outFile<< fixed << showpoint <<setprecision(1);
-  if(NOTANPAS){
-    outFile<<"\\documentclass[landscape,letterpaper]{article}"<<endl; 
-    outFile<<"\\pagestyle{empty}"<<endl; 
-    outFile<<"\\usepackage{epsfig}"<<endl; 
-    outFile<<"\\usepackage{amsmath}"<<endl; 
-    outFile<<"\\usepackage{array}"<<endl; 
-    outFile<<"\\usepackage{multirow}"<<endl; 
-    outFile<<"\\usepackage[cm]{fullpage}"<<endl; 
-    outFile<<"\\textheight = 8.in"<<endl; 
-    outFile<<"\\textwidth 7.0in"<<endl; 
-    outFile<<"\\setlength{\\topmargin}{-.5in}"<<endl;
-    outFile<<"\\setlength{\\textheight}{9in}"<<endl;
-    outFile<<"\\setlength{\\oddsidemargin}{-.875in}"<<endl;
-    
-    outFile<<"\\begin{document}"<<endl; 
-    outFile<<"Electron $p_T$ $\\ge$ 25 GeV,  $|\\eta|$ $<$ 2.5 ,$~~$ Jet  $p_T$ $\\ge$ 30 GeV, $|\\eta|$ $<$ 2.5 and 4 jets"<<" \\\\ "<<endl;
-    outFile<<"$\\not\\!\\!E_T \\ge 20GeV $"<<" \\\\ "<< endl;
-    outFile<<" With pt $\\ge$ 25 GeV in Kinematic fit and also applied MET px, py correction" << " \\\\ "<< endl;
-    outFile<<"2 btag jet(2 Medium )  working point "<<" \\\\ "<<endl;
-    outFile<<" Luminosity for full 2012 is 19.7 inv fb"<<" \\\\ "<<endl;
-  }
-  outFile<<"\\begin{center}"<<endl; 
-  outFile<<"%\\begin{LARGE}"<<endl; 
-  outFile<<"\\begin{tabular}{ | c| c| c| c| c|}"<<endl; 
-  outFile<<"\\multicolumn{5}{c}{ } \\\\"<<endl; 
-  outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{| c|}{ } & \\multicolumn{1}{ c|}{ $N_{electron}=1$ } & \\multicolumn{1}{ c|}{ $N_{jets}\\ge 4$ } & \\multicolumn{1}{ c|}{ $\\not\\!\\!E_T \\ge 20GeV$ }  &\\multicolumn{1}{ c |}{ $\\ge$ 2btag } \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
-
-  outFile<<"SM $t\\bar{t}$"<<" & "<<h_ttbar->GetBinContent(2)<<" & "<<h_ttbar->GetBinContent(3)<<" & "<<h_ttbar->GetBinContent(4)<<" & "<<h_ttbar->GetBinContent(5)<<" \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
-  
-  outFile<<"\\end{tabular}"<<endl;
-  //outFile<<"%\\end{LARGE}"<<endl; 
-  outFile<<"\\end{center}"<<endl; 
-  if(NOTANPAS){
-    outFile<<"\\end{document}"<<endl;
-  }
-  outFile.close();
-
+double sysUncJESTopPt( TH1F * h_JESPlus, TH1F * h_base, TH1F * h_JESMinus, TH1F * h_JERPlus, TH1F * h_JERMinus, TH1F * h_TopPtPlus, TH1F * h_TopPtMinus, int b){
+  double uncJES = pow(TMath::Max(fabs(h_JESPlus->GetBinContent(b) - h_base->GetBinContent(b)), fabs(h_base->GetBinContent(b) - h_JESMinus->GetBinContent(b))), 2);
+  double uncJER = pow(TMath::Max(fabs(h_JERPlus->GetBinContent(b) - h_base->GetBinContent(b)), fabs(h_base->GetBinContent(b) - h_JERMinus->GetBinContent(b))), 2);
+  double uncTop = pow(TMath::Max(fabs(h_TopPtPlus->GetBinContent(b) - h_base->GetBinContent(b)), fabs(h_base->GetBinContent(b) - h_TopPtMinus->GetBinContent(b))), 2);
+  double unc = sqrt(uncJES +uncJER  +uncTop);
+  return unc ;
 }
+
+double sysUncBCTag (TH1F * h_bTagPlus, TH1F * h_base, TH1F * h_bTagMinus, int b){
+	double uncTag = TMath::Max(fabs(h_bTagPlus->GetBinContent(b) - h_base->GetBinContent(b)), fabs(h_base->GetBinContent(b) - h_bTagMinus->GetBinContent(b)));
+	return uncTag;
+}	
+
 string printCutFlowHist(string histname, TH1F *h, int Nbin, double sf){
    string allBinValue = histname;
    for(int i =1; i<Nbin; i++){
@@ -89,11 +44,11 @@ void makeCutFlowTableAny(ofstream &outFile, string sys, int Nbin,
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
   //outFile<<"%\\begin{LARGE}"<<endl;
-  outFile<<"\\footnotesize\\setlength{\\tabcolsep}{2.8pt}"<<endl;
-  outFile<<"\\begin{tabular}{ | c| c| c| c| c| c| c| c| c| c| c| c| c|c|}"<<endl; 
+  outFile<<"\\footnotesize\\setlength{\\tabcolsep}{0.3pt}"<<endl;
+  outFile<<"\\begin{tabular}{ | c| c| c| c| c| c| c| c| c| c| c| c| c|c|c|c|}"<<endl; 
   outFile<<"\\multicolumn{5}{c}{ } \\\\"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{| c|}{"+ sys +" } & \\multicolumn{1}{ c|}{ $HLT\\_IsoMu24$ } & \\multicolumn{1}{ c|}{ $N_{muon}=1$ } & \\multicolumn{1}{ c|}{ $N_{ele}=0$} & \\multicolumn{1}{ c|}{ Muon SF } & \\multicolumn{1}{ c|}{ $\\mu^{Iso} < 0.15$ } &\\multicolumn{1}{ c|}{ $N_{jets}\\ge 4$ } & \\multicolumn{1}{ c|}{ $\\not\\!\\!E_T \\ge 20GeV$ }&  \\multicolumn{1}{ c|}{MT $\\ge$ 20 GeV} & \\multicolumn{1}{ c |}{ $\\ge$ 2btag }& \\multicolumn{1}{ c |}{ BTag SF }& \\multicolumn{1}{ c|}{fit converges } & \\multicolumn{1}{ c|}{$Pt_{jets}^{kf}\\ge 25 GeV$ } & \\multicolumn{1}{ c|}{$\\Delta R_{jets}^{pf,kf}\\le 0.2$}  \\\\ "<<endl;
+  outFile<<"\\multicolumn{1}{| c|}{"+ sys +" } & \\multicolumn{1}{ c|}{ $HLT\\_IsoMu24$ } & \\multicolumn{1}{ c|}{ $N_{muon}=1$ } & \\multicolumn{1}{ c|}{ $N_{ele}=0$} & \\multicolumn{1}{ c|}{ Muon SF } & \\multicolumn{1}{ c|}{ $\\mu^{Iso} < 0.15$ } &\\multicolumn{1}{ c|}{ $N_{jets}\\ge 4$ } & \\multicolumn{1}{ c|}{ $\\not\\!\\!E_T \\ge 20GeV$ }&  \\multicolumn{1}{ c|}{MT $\\ge$ 0 GeV} & \\multicolumn{1}{ c |}{ $\\ge$ 2btag }& \\multicolumn{1}{ c |}{ BTag SF }& \\multicolumn{1}{ c|}{fit converges } & \\multicolumn{1}{ c|}{$Pt_{jets}^{kf}\\ge 25 GeV$ } & \\multicolumn{1}{ c|}{$\\Delta R_{jets}^{pf,kf}\\le 0.2$} & \\multicolumn{1}{ c|}{CTagL} & \\multicolumn{1}{ c|}{CTagLSF} \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   TH1F* h_MC = (TH1F*)h_ttbar->Clone("Bkg MC");
@@ -152,11 +107,11 @@ void getSignalCutFlowTable(ofstream &outFile, string sys, int Nbin,
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
   //outFile<<"%\\begin{LARGE}"<<endl;
-  outFile<<"\\footnotesize\\setlength{\\tabcolsep}{2.8pt}"<<endl;
-  outFile<<"\\begin{tabular}{ | c| c| c| c| c| c| c| c| c| c| c| c| c|c|}"<<endl; 
+  outFile<<"\\footnotesize\\setlength{\\tabcolsep}{0.3pt}"<<endl;
+  outFile<<"\\begin{tabular}{ | c| c| c| c| c| c| c| c| c| c| c| c| c|c|c|c|}"<<endl; 
   outFile<<"\\multicolumn{5}{c}{ } \\\\"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{| c|}{"+ sys +" } & \\multicolumn{1}{ c|}{ $HLT\\_IsoMu24$ } & \\multicolumn{1}{ c|}{ $N_{muon}=1$ } & \\multicolumn{1}{ c|}{ $N_{ele}=0$} & \\multicolumn{1}{ c|}{ Muon SF } & \\multicolumn{1}{ c|}{ $\\mu^{Iso} < 0.15$ } &\\multicolumn{1}{ c|}{ $N_{jets}\\ge 4$ } & \\multicolumn{1}{ c|}{ $\\not\\!\\!E_T \\ge 20GeV$ }&  \\multicolumn{1}{ c|}{MT $\\ge$ 20 GeV} & \\multicolumn{1}{ c |}{ $\\ge$ 2btag }& \\multicolumn{1}{ c |}{ BTag SF }& \\multicolumn{1}{ c|}{fit converges } & \\multicolumn{1}{ c|}{$Pt_{jets}^{kf}\\ge 25 GeV$ } & \\multicolumn{1}{ c|}{$\\Delta R_{jets}^{pf,kf}\\le 0.2$}  \\\\ "<<endl;
+  outFile<<"\\multicolumn{1}{| c|}{"+ sys +" } & \\multicolumn{1}{ c|}{ $HLT\\_IsoMu24$ } & \\multicolumn{1}{ c|}{ $N_{muon}=1$ } & \\multicolumn{1}{ c|}{ $N_{ele}=0$} & \\multicolumn{1}{ c|}{ Muon SF } & \\multicolumn{1}{ c|}{ $\\mu^{Iso} < 0.15$ } &\\multicolumn{1}{ c|}{ $N_{jets}\\ge 4$ } & \\multicolumn{1}{ c|}{ $\\not\\!\\!E_T \\ge 20GeV$ }&  \\multicolumn{1}{ c|}{MT $\\ge$ 0 GeV} & \\multicolumn{1}{ c |}{ $\\ge$ 2btag }& \\multicolumn{1}{ c |}{ BTag SF }& \\multicolumn{1}{ c|}{fit converges } & \\multicolumn{1}{ c|}{$Pt_{jets}^{kf}\\ge 25 GeV$ } & \\multicolumn{1}{ c|}{$\\Delta R_{jets}^{pf,kf}\\le 0.2$} & \\multicolumn{1}{ c|}{CTagL} & \\multicolumn{1}{ c|}{CTagLSF} \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
 
@@ -243,7 +198,7 @@ void makeBaseTable(TString histSubDir="Iso/", TString histName="cutflow"){
   outFile<<"\\begin{document}"<<endl;  
   outFile<<""<<endl;
   //Add another table with JESUP
-  double Nbin = 14;
+  double Nbin = 16;
   makeCutFlowTableAny(outFile, "base", Nbin, h_wh_base,	h_ttbar_base, h_stop_base, h_wjet_base, h_zjet_base, h_qcd_base, h_stop_base, h_diboson_base, h_data);
   outFile<<"\\end{document}"<<endl;  
   outFile.close(); 
@@ -272,6 +227,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh80_TopPtMinus 		= (TH1F*)wh80->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh80_bTagPlus 		= (TH1F*)wh80->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh80_bTagMinus 		= (TH1F*)wh80->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh80_cTagPlus 		= (TH1F*)wh80->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh80_cTagMinus 		= (TH1F*)wh80->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   //Hplus  M90   signal 
   TH1F* h_wh90_base  			= (TH1F*)wh90->Get("base/"+histPath)->Clone("h_wh_base"); 
@@ -283,6 +240,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh90_TopPtMinus 		= (TH1F*)wh90->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh90_bTagPlus 		= (TH1F*)wh90->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh90_bTagMinus 		= (TH1F*)wh90->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh90_cTagPlus 		= (TH1F*)wh90->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh90_cTagMinus 		= (TH1F*)wh90->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   //Hplus  M100   signal 
   TH1F* h_wh100_base  			= (TH1F*)wh100->Get("base/"+histPath)->Clone("h_wh_base"); 
@@ -294,6 +253,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh100_TopPtMinus 		= (TH1F*)wh100->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh100_bTagPlus 		= (TH1F*)wh100->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh100_bTagMinus 		= (TH1F*)wh100->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh100_cTagPlus 		= (TH1F*)wh100->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh100_cTagMinus 		= (TH1F*)wh100->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
   //Hplus  M120   signal 
@@ -306,6 +267,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh120_TopPtMinus 		= (TH1F*)wh120->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh120_bTagPlus 		= (TH1F*)wh120->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh120_bTagMinus 		= (TH1F*)wh120->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh120_cTagPlus 		= (TH1F*)wh120->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh120_cTagMinus 		= (TH1F*)wh120->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
   //Hplus  M140   signal 
@@ -318,6 +281,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh140_TopPtMinus 		= (TH1F*)wh140->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh140_bTagPlus 		= (TH1F*)wh140->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh140_bTagMinus 		= (TH1F*)wh140->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh140_cTagPlus 		= (TH1F*)wh140->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh140_cTagMinus 		= (TH1F*)wh140->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
   //Hplus  M150   signal 
@@ -330,6 +295,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh150_TopPtMinus 		= (TH1F*)wh150->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh150_bTagPlus 		= (TH1F*)wh150->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh150_bTagMinus 		= (TH1F*)wh150->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh150_cTagPlus 		= (TH1F*)wh150->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh150_cTagMinus 		= (TH1F*)wh150->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
   //Hplus  M155   signal 
@@ -342,6 +309,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh155_TopPtMinus 		= (TH1F*)wh155->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh155_bTagPlus 		= (TH1F*)wh155->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh155_bTagMinus 		= (TH1F*)wh155->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh155_cTagPlus 		= (TH1F*)wh155->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh155_cTagMinus 		= (TH1F*)wh155->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
   //Hplus  M160   signal 
@@ -354,6 +323,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   TH1F* h_wh160_TopPtMinus 		= (TH1F*)wh160->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh160_bTagPlus 		= (TH1F*)wh160->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh160_bTagMinus 		= (TH1F*)wh160->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh160_cTagPlus 		= (TH1F*)wh160->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh160_cTagMinus 		= (TH1F*)wh160->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   
 
@@ -370,6 +341,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh80_TopPtMinus->Scale(sf80/sig_avgTop80);
   h_wh80_bTagPlus->Scale(sf80/sig_avgTop80);
   h_wh80_bTagMinus->Scale(sf80/sig_avgTop80);
+  h_wh80_cTagPlus->Scale(sf80/sig_avgTop80);
+  h_wh80_cTagMinus->Scale(sf80/sig_avgTop80);
 
 
   //get average of top pt-reweighting 
@@ -385,6 +358,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh90_TopPtMinus->Scale(sf90/sig_avgTop90);
   h_wh90_bTagPlus->Scale(sf90/sig_avgTop90);
   h_wh90_bTagMinus->Scale(sf90/sig_avgTop90);
+  h_wh90_cTagPlus->Scale(sf90/sig_avgTop90);
+  h_wh90_cTagMinus->Scale(sf90/sig_avgTop90);
 
 
   //get average of top pt-reweighting 
@@ -400,6 +375,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh100_TopPtMinus->Scale(sf100/sig_avgTop100);
   h_wh100_bTagPlus->Scale(sf100/sig_avgTop100);
   h_wh100_bTagMinus->Scale(sf100/sig_avgTop100);
+  h_wh100_cTagPlus->Scale(sf100/sig_avgTop100);
+  h_wh100_cTagMinus->Scale(sf100/sig_avgTop100);
 
 
   //get average of top pt-reweighting 
@@ -415,6 +392,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh120_TopPtMinus->Scale(sf120/sig_avgTop120);
   h_wh120_bTagPlus->Scale(sf120/sig_avgTop120);
   h_wh120_bTagMinus->Scale(sf120/sig_avgTop120);
+  h_wh120_cTagPlus->Scale(sf120/sig_avgTop120);
+  h_wh120_cTagMinus->Scale(sf120/sig_avgTop120);
 
 
   //get average of top pt-reweighting 
@@ -430,6 +409,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh140_TopPtMinus->Scale(sf140/sig_avgTop140);
   h_wh140_bTagPlus->Scale(sf140/sig_avgTop140);
   h_wh140_bTagMinus->Scale(sf140/sig_avgTop140);
+  h_wh140_cTagPlus->Scale(sf140/sig_avgTop140);
+  h_wh140_cTagMinus->Scale(sf140/sig_avgTop140);
 
 
   //get average of top pt-reweighting 
@@ -445,6 +426,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh150_TopPtMinus->Scale(sf150/sig_avgTop150);
   h_wh150_bTagPlus->Scale(sf150/sig_avgTop150);
   h_wh150_bTagMinus->Scale(sf150/sig_avgTop150);
+  h_wh150_cTagPlus->Scale(sf150/sig_avgTop150);
+  h_wh150_cTagMinus->Scale(sf150/sig_avgTop150);
 
 
   //get average of top pt-reweighting 
@@ -460,6 +443,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh155_TopPtMinus->Scale(sf155/sig_avgTop155);
   h_wh155_bTagPlus->Scale(sf155/sig_avgTop155);
   h_wh155_bTagMinus->Scale(sf155/sig_avgTop155);
+  h_wh155_cTagPlus->Scale(sf155/sig_avgTop155);
+  h_wh155_cTagMinus->Scale(sf155/sig_avgTop155);
 
 
   //get average of top pt-reweighting 
@@ -475,6 +460,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   h_wh160_TopPtMinus->Scale(sf160/sig_avgTop160);
   h_wh160_bTagPlus->Scale(sf160/sig_avgTop160);
   h_wh160_bTagMinus->Scale(sf160/sig_avgTop160);
+  h_wh160_cTagPlus->Scale(sf160/sig_avgTop160);
+  h_wh160_cTagMinus->Scale(sf160/sig_avgTop160);
 
   ofstream outFile; 
   outFile.open("signalTable.tex"); 
@@ -493,7 +480,7 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   outFile<<""<<endl;
   
   //Add another table with JESUP
-  double Nbin = 14;
+  double Nbin = 16;
   getSignalCutFlowTable(outFile, "base", Nbin, 		h_wh80_base,  		h_wh90_base,  		h_wh100_base,  	  	h_wh120_base,  	   h_wh140_base,      h_wh150_base,  	 h_wh155_base,       h_wh160_base      ); 
   getSignalCutFlowTable(outFile, "JESPlus", Nbin, 	h_wh80_JESPlus, 	h_wh90_JESPlus,         h_wh100_JESPlus,        h_wh120_JESPlus,   h_wh140_JESPlus,   h_wh150_JESPlus,   h_wh155_JESPlus,    h_wh160_JESPlus   ); 
   getSignalCutFlowTable(outFile, "JESMinus", Nbin, 	h_wh80_JESMinus, 	h_wh90_JESMinus,        h_wh100_JESMinus,       h_wh120_JESMinus,  h_wh140_JESMinus,  h_wh150_JESMinus,  h_wh155_JESMinus,   h_wh160_JESMinus  );
@@ -503,6 +490,8 @@ void makeSignalTable(TString histSubDir="Iso/", TString histName="cutflow"){
   getSignalCutFlowTable(outFile, "TopPtMinus", Nbin, 	h_wh80_TopPtMinus, 	h_wh90_TopPtMinus,      h_wh100_TopPtMinus,     h_wh120_TopPtMinus,h_wh140_TopPtMinus,h_wh150_TopPtMinus,h_wh155_TopPtMinus, h_wh160_TopPtMinus);
   getSignalCutFlowTable(outFile, "bTagPlus", Nbin, 	h_wh80_bTagPlus, 	h_wh90_bTagPlus,        h_wh100_bTagPlus,       h_wh120_bTagPlus,  h_wh140_bTagPlus,  h_wh150_bTagPlus,  h_wh155_bTagPlus,   h_wh160_bTagPlus  );
   getSignalCutFlowTable(outFile, "bTagMinus", Nbin, 	h_wh80_bTagMinus, 	h_wh90_bTagMinus,       h_wh100_bTagMinus,      h_wh120_bTagMinus, h_wh140_bTagMinus, h_wh150_bTagMinus, h_wh155_bTagMinus,  h_wh160_bTagMinus );
+  getSignalCutFlowTable(outFile, "cTagPlus", Nbin, 	h_wh80_cTagPlus, 	h_wh90_cTagPlus,        h_wh100_cTagPlus,       h_wh120_cTagPlus,  h_wh140_cTagPlus,  h_wh150_cTagPlus,  h_wh155_cTagPlus,   h_wh160_cTagPlus  );
+  getSignalCutFlowTable(outFile, "cTagMinus", Nbin, 	h_wh80_cTagMinus, 	h_wh90_cTagMinus,       h_wh100_cTagMinus,      h_wh120_cTagMinus, h_wh140_cTagMinus, h_wh150_cTagMinus, h_wh155_cTagMinus,  h_wh160_cTagMinus );
   outFile<<"\\end{document}"<<endl;  
   outFile.close(); 
 } 
@@ -529,6 +518,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_wh_TopPtMinus 	= (TH1F*)wh->Get("TopPtMinus/"+histPath)->Clone("h_wh_TopPtMinus");
   TH1F* h_wh_bTagPlus 		= (TH1F*)wh->Get("bTagPlus/"+histPath)->Clone("h_wh_bTagPlus");
   TH1F* h_wh_bTagMinus 		= (TH1F*)wh->Get("bTagMinus/"+histPath)->Clone("h_wh_bTagMinus");
+  TH1F* h_wh_cTagPlus 		= (TH1F*)wh->Get("cTagPlus/"+histPath)->Clone("h_wh_cTagPlus");
+  TH1F* h_wh_cTagMinus 		= (TH1F*)wh->Get("cTagMinus/"+histPath)->Clone("h_wh_cTagMinus");
   
   //ttbar+jets
   TH1F* h_ttbar_base  		= (TH1F*)ttbar->Get("base/"+histPath)->Clone("h_ttbar_base");  
@@ -540,6 +531,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_ttbar_TopPtMinus 	= (TH1F*)ttbar->Get("TopPtMinus/"+histPath)->Clone("h_ttbar_TopPtMinus"); 
   TH1F* h_ttbar_bTagPlus 	= (TH1F*)ttbar->Get("bTagPlus/"+histPath)->Clone("h_ttbar_bTagPlus"); 
   TH1F* h_ttbar_bTagMinus 	= (TH1F*)ttbar->Get("bTagMinus/"+histPath)->Clone("h_ttbar_bTagMinus"); 
+  TH1F* h_ttbar_cTagPlus 	= (TH1F*)ttbar->Get("cTagPlus/"+histPath)->Clone("h_ttbar_cTagPlus"); 
+  TH1F* h_ttbar_cTagMinus 	= (TH1F*)ttbar->Get("cTagMinus/"+histPath)->Clone("h_ttbar_cTagMinus"); 
   //w+jets
   TH1F* h_wjet_base  		= (TH1F*)wjet->Get("base/"+histPath)->Clone("h_wjet_base");  
   TH1F* h_wjet_JESPlus 		= (TH1F*)wjet->Get("JESPlus/"+histPath)->Clone("h_wjet_JESPlus"); 
@@ -550,6 +543,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_wjet_TopPtMinus 	= (TH1F*)wjet->Get("TopPtMinus/"+histPath)->Clone("h_wjet_TopPtMinus"); 
   TH1F* h_wjet_bTagPlus 	= (TH1F*)wjet->Get("bTagPlus/"+histPath)->Clone("h_wjet_bTagPlus"); 
   TH1F* h_wjet_bTagMinus 	= (TH1F*)wjet->Get("bTagMinus/"+histPath)->Clone("h_wjet_bTagMinus"); 
+  TH1F* h_wjet_cTagPlus 	= (TH1F*)wjet->Get("cTagPlus/"+histPath)->Clone("h_wjet_cTagPlus"); 
+  TH1F* h_wjet_cTagMinus 	= (TH1F*)wjet->Get("cTagMinus/"+histPath)->Clone("h_wjet_cTagMinus"); 
   //dy+jets
   TH1F* h_zjet_base  		= (TH1F*)zjet->Get("base/"+histPath)->Clone("h_zjet_base");
   TH1F* h_zjet_JESPlus 		= (TH1F*)zjet->Get("JESPlus/"+histPath)->Clone("h_zjet_JESPlus");
@@ -560,6 +555,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_zjet_TopPtMinus 	= (TH1F*)zjet->Get("TopPtMinus/"+histPath)->Clone("h_zjet_TopPtMinus");
   TH1F* h_zjet_bTagPlus 	= (TH1F*)zjet->Get("bTagPlus/"+histPath)->Clone("h_zjet_bTagPlus");
   TH1F* h_zjet_bTagMinus 	= (TH1F*)zjet->Get("bTagMinus/"+histPath)->Clone("h_zjet_bTagMinus");
+  TH1F* h_zjet_cTagPlus 	= (TH1F*)zjet->Get("cTagPlus/"+histPath)->Clone("h_zjet_cTagPlus");
+  TH1F* h_zjet_cTagMinus 	= (TH1F*)zjet->Get("cTagMinus/"+histPath)->Clone("h_zjet_cTagMinus");
   //qcd
   TH1F* h_qcd_base 		= (TH1F*)qcd->Get("base/"+histPath)->Clone("h_qcd_base");
   TH1F* h_qcd_JESPlus 		= (TH1F*)qcd->Get("JESPlus/"+histPath)->Clone("h_qcd_JESPlus");
@@ -570,6 +567,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_qcd_TopPtMinus 	= (TH1F*)qcd->Get("TopPtMinus/"+histPath)->Clone("h_qcd_TopPtMinus");
   TH1F* h_qcd_bTagPlus 		= (TH1F*)qcd->Get("bTagPlus/"+histPath)->Clone("h_qcd_bTagPlus");
   TH1F* h_qcd_bTagMinus 	= (TH1F*)qcd->Get("bTagMinus/"+histPath)->Clone("h_qcd_bTagMinus");
+  TH1F* h_qcd_cTagPlus 		= (TH1F*)qcd->Get("cTagPlus/"+histPath)->Clone("h_qcd_cTagPlus");
+  TH1F* h_qcd_cTagMinus 	= (TH1F*)qcd->Get("cTagMinus/"+histPath)->Clone("h_qcd_cTagMinus");
   //single top
   TH1F* h_stop_base  		= (TH1F*)stop->Get("base/"+histPath)->Clone("h_stop_base");
   TH1F* h_stop_JESPlus 		= (TH1F*)stop->Get("JESPlus/"+histPath)->Clone("h_stop_JESPlus");
@@ -580,6 +579,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_stop_TopPtMinus 	= (TH1F*)stop->Get("TopPtMinus/"+histPath)->Clone("h_stop_TopPtMinus");
   TH1F* h_stop_bTagPlus 	= (TH1F*)stop->Get("bTagPlus/"+histPath)->Clone("h_stop_bTagPlus");
   TH1F* h_stop_bTagMinus 	= (TH1F*)stop->Get("bTagMinus/"+histPath)->Clone("h_stop_bTagMinus");
+  TH1F* h_stop_cTagPlus 	= (TH1F*)stop->Get("cTagPlus/"+histPath)->Clone("h_stop_cTagPlus");
+  TH1F* h_stop_cTagMinus 	= (TH1F*)stop->Get("cTagMinus/"+histPath)->Clone("h_stop_cTagMinus");
   //vv
   TH1F* h_diboson_base 		= (TH1F*)diboson->Get("base/"+histPath)->Clone("h_diboson_base");
   TH1F* h_diboson_JESPlus 	= (TH1F*)diboson->Get("JESPlus/"+histPath)->Clone("h_diboson_JESPlus");
@@ -590,6 +591,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   TH1F* h_diboson_TopPtMinus 	= (TH1F*)diboson->Get("TopPtMinus/"+histPath)->Clone("h_diboson_TopPtMinus");
   TH1F* h_diboson_bTagPlus 	= (TH1F*)diboson->Get("bTagPlus/"+histPath)->Clone("h_diboson_bTagPlus");
   TH1F* h_diboson_bTagMinus 	= (TH1F*)diboson->Get("bTagMinus/"+histPath)->Clone("h_diboson_bTagMinus");
+  TH1F* h_diboson_cTagPlus 	= (TH1F*)diboson->Get("cTagPlus/"+histPath)->Clone("h_diboson_cTagPlus");
+  TH1F* h_diboson_cTagMinus 	= (TH1F*)diboson->Get("cTagMinus/"+histPath)->Clone("h_diboson_cTagMinus");
 
   //get average of top pt-reweighting 
   TH1F* hsig_avgTop120 = (TH1F*)wh->Get("base/SF_topPtWeights"); 
@@ -604,11 +607,13 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   h_wh_TopPtMinus->Scale(sf120/sig_avgTop120);
   h_wh_bTagPlus->Scale(sf120/sig_avgTop120);
   h_wh_bTagMinus->Scale(sf120/sig_avgTop120);
+  h_wh_cTagPlus->Scale(sf120/sig_avgTop120);
+  h_wh_cTagMinus->Scale(sf120/sig_avgTop120);
 
   
   TH1F* httbar_avgTop = (TH1F*)ttbar->Get("base/SF_topPtWeights"); 
   double ttbar_avgTop = httbar_avgTop->GetMean();
-  double sf_top = 1.00218;
+  double sf_top = 1;
   h_ttbar_base->Scale(sf_top/ttbar_avgTop);
   h_ttbar_JESPlus->Scale(sf_top/ttbar_avgTop);
   h_ttbar_JESMinus->Scale(sf_top/ttbar_avgTop);
@@ -618,6 +623,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   h_ttbar_TopPtMinus->Scale(sf_top/ttbar_avgTop);
   h_ttbar_bTagPlus->Scale(sf_top/ttbar_avgTop);
   h_ttbar_bTagMinus->Scale(sf_top/ttbar_avgTop);
+  h_ttbar_cTagPlus->Scale(sf_top/ttbar_avgTop);
+  h_ttbar_cTagMinus->Scale(sf_top/ttbar_avgTop);
 
   TH1F* h_TotalBkg = (TH1F*)h_wjet_base->Clone("h_TotalBkg");
   h_TotalBkg->Reset();
@@ -654,31 +661,28 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   outFile<<"\\begin{tabular}{ | c| c| }"<<endl;  
   outFile<<"\\multicolumn{2}{c}{ } \\\\"<<endl;  
   outFile<<"\\hline "<<endl; 
-  outFile<<"\\multicolumn{1}{|c|}{Source} & \\multicolumn{1}{|c|}{N$_{\rm events}$ $\\pm$ MC stat $\\pm$ JES/MET scale $\\pm$ bTag } \\\\"<<endl;
+  outFile<<"\\multicolumn{1}{|c|}{Source} & \\multicolumn{1}{|c|}{N$_{\rm events}$ $\\pm$ MC stat $\\pm$ JES/MET/Top $\\pm$ bTag $\\pm$ cTag } \\\\"<<endl;
   outFile<<"\\hline "<<endl; 
   outFile<<"\\hline "<<endl;
-  int b = 13;
-  outFile<<"HW, $M_{H}=120~GeV/c^{2}$"<<" & "<<h_wh_base->GetBinContent(b)<<" $\\pm$ "<<h_wh_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_wh_JESPlus->GetBinContent(b) - h_wh_base->GetBinContent(b)), fabs(h_wh_base->GetBinContent(b) - h_wh_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_wh_JERPlus->GetBinContent(b) - h_wh_base->GetBinContent(b)), fabs(h_wh_base->GetBinContent(b) - h_wh_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_wh_TopPtPlus->GetBinContent(b) - h_wh_base->GetBinContent(b)), fabs(h_wh_base->GetBinContent(b) - h_wh_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_wh_bTagPlus->GetBinContent(b) - h_wh_base->GetBinContent(b)), fabs(h_wh_base->GetBinContent(b) - h_wh_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl; 
-  outFile<<"\\hline "<<endl;  
-  outFile<<"SM $t\\bar{t}$"<<" & "<<h_ttbar_base->GetBinContent(b)<<" $\\pm$ "<<h_ttbar_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_ttbar_JESPlus->GetBinContent(b) - h_ttbar_base->GetBinContent(b)), fabs(h_ttbar_base->GetBinContent(b) - h_ttbar_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_ttbar_JERPlus->GetBinContent(b) - h_ttbar_base->GetBinContent(b)), fabs(h_ttbar_base->GetBinContent(b) - h_ttbar_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_ttbar_TopPtPlus->GetBinContent(b) - h_ttbar_base->GetBinContent(b)), fabs(h_ttbar_base->GetBinContent(b) - h_ttbar_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_ttbar_bTagPlus->GetBinContent(b) - h_ttbar_base->GetBinContent(b)), fabs(h_ttbar_base->GetBinContent(b) - h_ttbar_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
+  int b = 15;
 
-  outFile<<"W+Jets"<<" & "<<h_wjet_base->GetBinContent(b)<<" $\\pm$ "<<h_wjet_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_wjet_JESPlus->GetBinContent(b) - h_wjet_base->GetBinContent(b)), fabs(h_wjet_base->GetBinContent(b) - h_wjet_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_wjet_JERPlus->GetBinContent(b) - h_wjet_base->GetBinContent(b)), fabs(h_wjet_base->GetBinContent(b) - h_wjet_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_wjet_TopPtPlus->GetBinContent(b) - h_wjet_base->GetBinContent(b)), fabs(h_wjet_base->GetBinContent(b) - h_wjet_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_wjet_bTagPlus->GetBinContent(b) - h_wjet_base->GetBinContent(b)), fabs(h_wjet_base->GetBinContent(b) - h_wjet_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;  
-  outFile<<"\\hline "<<endl;  
   
-  outFile<<"Z+Jets"<<" & "<<h_zjet_base->GetBinContent(b)<<" $\\pm$ "<<h_zjet_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_zjet_JESPlus->GetBinContent(b) - h_zjet_base->GetBinContent(b)), fabs(h_zjet_base->GetBinContent(b) - h_zjet_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_zjet_JERPlus->GetBinContent(b) - h_zjet_base->GetBinContent(b)), fabs(h_zjet_base->GetBinContent(b) - h_zjet_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_zjet_TopPtPlus->GetBinContent(b) - h_zjet_base->GetBinContent(b)), fabs(h_zjet_base->GetBinContent(b) - h_zjet_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_zjet_bTagPlus->GetBinContent(b) - h_zjet_base->GetBinContent(b)), fabs(h_zjet_base->GetBinContent(b) - h_zjet_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;
+  outFile<<"HW, $M_{H}=120~GeV/c^{2}$"<< " & "<<h_wh_base->GetBinContent(b)<<" $\\pm$ "<<h_wh_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_wh_JESPlus, h_wh_base, h_wh_JESMinus, h_wh_JERPlus, h_wh_JERMinus, h_wh_TopPtPlus, h_wh_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_wh_bTagPlus, h_wh_base, h_wh_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_wh_cTagPlus, h_wh_base, h_wh_cTagMinus, b)<<" \\\\ "<<endl;
+  outFile<<"\\hline "<<endl;  
+  outFile<<"SM $t\\bar{t}$"<<" & "<<h_ttbar_base->GetBinContent(b)<<" $\\pm$ "<<h_ttbar_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_ttbar_JESPlus, h_ttbar_base, h_ttbar_JESMinus, h_ttbar_JERPlus, h_ttbar_JERMinus, h_ttbar_TopPtPlus, h_ttbar_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_ttbar_bTagPlus, h_ttbar_base, h_ttbar_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_ttbar_cTagPlus, h_ttbar_base, h_ttbar_cTagMinus, b)<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
-
-  outFile<<"QCD"<<" & "<<h_qcd_base->GetBinContent(b)<<" $\\pm$ "<<h_qcd_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_qcd_JESPlus->GetBinContent(b) - h_qcd_base->GetBinContent(b)), fabs(h_qcd_base->GetBinContent(b) - h_qcd_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_qcd_JERPlus->GetBinContent(b) - h_qcd_base->GetBinContent(b)), fabs(h_qcd_base->GetBinContent(b) - h_qcd_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_qcd_TopPtPlus->GetBinContent(b) - h_qcd_base->GetBinContent(b)), fabs(h_qcd_base->GetBinContent(b) - h_qcd_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_qcd_bTagPlus->GetBinContent(b) - h_qcd_base->GetBinContent(b)), fabs(h_qcd_base->GetBinContent(b) - h_qcd_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;
+  outFile<<"W+Jets"<< " & "<<h_wjet_base->GetBinContent(b)<<" $\\pm$ "<<h_wjet_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_wjet_JESPlus, h_wjet_base, h_wjet_JESMinus, h_wjet_JERPlus, h_wjet_JERMinus, h_wjet_TopPtPlus, h_wjet_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_wjet_bTagPlus, h_wjet_base, h_wjet_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_wjet_cTagPlus, h_wjet_base, h_wjet_cTagMinus, b)<<" \\\\ "<<endl;
+  outFile<<"\\hline "<<endl;  
+  outFile<<"Z+Jets"<< " & "<<h_zjet_base->GetBinContent(b)<<" $\\pm$ "<<h_zjet_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_zjet_JESPlus, h_zjet_base, h_zjet_JESMinus, h_zjet_JERPlus, h_zjet_JERMinus, h_zjet_TopPtPlus, h_zjet_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_zjet_bTagPlus, h_zjet_base, h_zjet_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_zjet_cTagPlus, h_zjet_base, h_zjet_cTagMinus, b)<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
-
-  outFile<<"SingleTop"<<" & "<<h_stop_base->GetBinContent(b)<<" $\\pm$ "<<h_stop_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_stop_JESPlus->GetBinContent(b) - h_stop_base->GetBinContent(b)), fabs(h_stop_base->GetBinContent(b) - h_stop_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_stop_JERPlus->GetBinContent(b) - h_stop_base->GetBinContent(b)), fabs(h_stop_base->GetBinContent(b) - h_stop_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_stop_TopPtPlus->GetBinContent(b) - h_stop_base->GetBinContent(b)), fabs(h_stop_base->GetBinContent(b) - h_stop_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_stop_bTagPlus->GetBinContent(b) - h_stop_base->GetBinContent(b)), fabs(h_stop_base->GetBinContent(b) - h_stop_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;
+  outFile<<"QCD"<< " & "<<h_qcd_base->GetBinContent(b)<<" $\\pm$ "<<h_qcd_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_qcd_JESPlus, h_qcd_base, h_qcd_JESMinus, h_qcd_JERPlus, h_qcd_JERMinus, h_qcd_TopPtPlus, h_qcd_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_qcd_bTagPlus, h_qcd_base, h_qcd_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_qcd_cTagPlus, h_qcd_base, h_qcd_cTagMinus, b)<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
-
-  outFile<<"Dibosons"<<" & "<<h_diboson_base->GetBinContent(b)<<" $\\pm$ "<<h_diboson_base->GetBinError(b)<<" $\\pm$ "<< sqrt(pow(TMath::Max(fabs(h_diboson_JESPlus->GetBinContent(b) - h_diboson_base->GetBinContent(b)), fabs(h_diboson_base->GetBinContent(b) - h_diboson_JESMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_diboson_JERPlus->GetBinContent(b) - h_diboson_base->GetBinContent(b)), fabs(h_diboson_base->GetBinContent(b) - h_diboson_JERMinus->GetBinContent(b))), 2) + pow(TMath::Max(fabs(h_diboson_TopPtPlus->GetBinContent(b) - h_diboson_base->GetBinContent(b)), fabs(h_diboson_base->GetBinContent(b) - h_diboson_TopPtMinus->GetBinContent(b))), 2)) <<" $\\pm$ "<<TMath::Max(fabs(h_diboson_bTagPlus->GetBinContent(b) - h_diboson_base->GetBinContent(b)), fabs(h_diboson_base->GetBinContent(b) - h_diboson_bTagMinus->GetBinContent(b))) <<" \\\\ "<<endl;
+  outFile<<"SingleTop"<< " & "<<h_stop_base->GetBinContent(b)<<" $\\pm$ "<<h_stop_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_stop_JESPlus, h_stop_base, h_stop_JESMinus, h_stop_JERPlus, h_stop_JERMinus, h_stop_TopPtPlus, h_stop_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_stop_bTagPlus, h_stop_base, h_stop_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_stop_cTagPlus, h_stop_base, h_stop_cTagMinus, b)<<" \\\\ "<<endl;
+  outFile<<"\\hline "<<endl;
+  outFile<<"VV"<< " & "<<h_diboson_base->GetBinContent(b)<<" $\\pm$ "<<h_diboson_base->GetBinError(b)<<" $\\pm$ "<< sysUncJESTopPt( h_diboson_JESPlus, h_diboson_base, h_diboson_JESMinus, h_diboson_JERPlus, h_diboson_JERMinus, h_diboson_TopPtPlus, h_diboson_TopPtMinus, b) <<" $\\pm$ "<< sysUncBCTag (h_diboson_bTagPlus, h_diboson_base, h_diboson_bTagMinus, b) << " $\\pm$ "<< sysUncBCTag (h_diboson_cTagPlus, h_diboson_base, h_diboson_cTagMinus, b)<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
-  outFile<<"Total Bkg"<<" & "<<h_TotalBkg->GetBinContent(b)<<" $\\pm$ "<<h_TotalBkg->GetBinError(b)<<" $\\pm$ "<<" -- "<<" $\\pm$ "<<" -- "<<" \\\\ "<<endl;
+  outFile<<"Total Bkg"<<" & "<<h_TotalBkg->GetBinContent(b)<<" $\\pm$ "<<h_TotalBkg->GetBinError(b)<<" $\\pm$ "<<" -- "<<" $\\pm$ "<<" -- "<<"$\\pm$ "<<" -- "<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;   
   outFile<<"\\hline "<<endl;  
   outFile<<" Data "<<" & "<<h_data->GetBinContent(b)<<" \\\\ "<<endl; 
@@ -691,7 +695,7 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   outFile<<"\\end{table}"<<endl;
 
   //Add another table with JESUP
-  double Nbin = 14;
+  double Nbin = 16;
  
   makeCutFlowTableAny(outFile, "base", Nbin, 		h_wh_base,  	h_ttbar_base, h_stop_base, h_wjet_base, h_zjet_base, h_qcd_base, h_stop_base, h_diboson_base, h_data);
   makeCutFlowTableAny(outFile, "JESPlus", Nbin, 	h_wh_JESPlus, 	h_ttbar_JESPlus, h_stop_JESPlus, h_wjet_JESPlus, h_zjet_JESPlus, h_qcd_JESPlus, h_stop_JESPlus, h_diboson_JESPlus, h_data);
@@ -702,6 +706,8 @@ void makeSummaryTableWithSys(TString histSubDir="Iso/", TString histName="cutflo
   makeCutFlowTableAny(outFile, "TopPtMinus", Nbin, 	h_wh_TopPtMinus, h_ttbar_TopPtMinus, h_stop_TopPtMinus, h_wjet_TopPtMinus, h_zjet_TopPtMinus, h_qcd_TopPtMinus, h_stop_TopPtMinus, h_diboson_TopPtMinus, h_data);
   makeCutFlowTableAny(outFile, "bTagPlus", Nbin, 	h_wh_bTagPlus, 	h_ttbar_bTagPlus, h_stop_bTagPlus, h_wjet_bTagPlus, h_zjet_bTagPlus, h_qcd_bTagPlus, h_stop_bTagPlus, h_diboson_bTagPlus, h_data);
   makeCutFlowTableAny(outFile, "bTagMinus", Nbin, 	h_wh_bTagMinus, h_ttbar_bTagMinus, h_stop_bTagMinus, h_wjet_bTagMinus, h_zjet_bTagMinus, h_qcd_bTagMinus, h_stop_bTagMinus, h_diboson_bTagMinus, h_data);
+  makeCutFlowTableAny(outFile, "cTagPlus", Nbin, 	h_wh_cTagPlus, 	h_ttbar_cTagPlus, h_stop_cTagPlus, h_wjet_cTagPlus, h_zjet_cTagPlus, h_qcd_cTagPlus, h_stop_cTagPlus, h_diboson_cTagPlus, h_data);
+  makeCutFlowTableAny(outFile, "cTagMinus", Nbin, 	h_wh_cTagMinus, h_ttbar_cTagMinus, h_stop_cTagMinus, h_wjet_cTagMinus, h_zjet_cTagMinus, h_qcd_cTagMinus, h_stop_cTagMinus, h_diboson_cTagMinus, h_data);
   outFile<<"\\end{document}"<<endl;  
   outFile.close(); 
 } 

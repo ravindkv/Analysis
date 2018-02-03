@@ -11,15 +11,14 @@
 /////////////////////////// USERS INPUT ///////////////////////////
 ///INPUT FILES
 //data
-double totLumi = 35.45;
+double totLumi = LUMI;
 TString inFileDir="inFileDir_";
 //MAKE DATA CARD of mjj
 TString histname="inShapeHisto_";
 bool isMuChannel = isMuonChannel_;
 bool isEleChannel = isEleChannel_;
 
-TFile* fData    = TFile::Open(inFileDir+"/all_muData.root");
-//TFile* fData    = TFile::Open("all_EleData.root");
+TFile* fData    = TFile::Open(inFileDir+"/all_Data.root");
 //OUTPUT FILE
 TString outShapeFile ="HplusShapes";
 TFile *fout = new TFile(outShapeFile+"_CHANNEL_"+histname+"_13TeV.root", "RECREATE");
@@ -33,6 +32,8 @@ TFile* fST      = TFile::Open(inFileDir+"/all_ST.root");
 TFile* fTT      = TFile::Open(inFileDir+"/all_TTJetsP.root");
 TFile* fTT_up      	= TFile::Open(inFileDir+"/all_TTJetsP_up.root");
 TFile* fTT_down      	= TFile::Open(inFileDir+"/all_TTJetsP_down.root");
+TFile* fTT_mtop1715     = TFile::Open(inFileDir+"/all_TTJetsP_mtop1715.root");
+TFile* fTT_mtop1735     = TFile::Open(inFileDir+"/all_TTJetsP_mtop1735.root");
 TFile* fTT_hdampUP      = TFile::Open(inFileDir+"/all_TTJetsP_hdampUP.root");
 TFile* fTT_hdampDOWN    = TFile::Open(inFileDir+"/all_TTJetsP_hdampDOWN.root");
 //signal
@@ -97,6 +98,8 @@ TH1F* ttbar_topPtUp = readWriteHisto(fTT, "TopPtPlus/Iso/KinFit/", histname, sf_
 TH1F* ttbar_topPtDown = readWriteHisto(fTT, "TopPtMinus/Iso/KinFit/", histname, sf_ttbar, fout, "ttbar_topPtDown", true);
 TH1F* ttbar_bTagUp = readWriteHisto(fTT, "bTagPlus/Iso/KinFit/", histname, sf_ttbar, fout, "ttbar_bTagUp", true);
 TH1F* ttbar_bTagDown = readWriteHisto(fTT, "bTagMinus/Iso/KinFit/", histname, sf_ttbar, fout, "ttbar_bTagDown", true);
+TH1F* ttbar_cTagUp = readWriteHisto(fTT, "cTagPlus/Iso/KinFit/", histname, sf_ttbar, fout, "ttbar_cTagUp", true);
+TH1F* ttbar_cTagDown = readWriteHisto(fTT, "cTagMinus/Iso/KinFit/", histname, sf_ttbar, fout, "ttbar_cTagDown", true);
 
 //ttbar scaleUp
 double sf_ttbar_scaleUp_lumi = 1; 
@@ -115,6 +118,24 @@ TH1F* ttbar_scaleDown_ = readWriteHisto(fTT_down, "base/Iso/KinFit/", histname, 
 double sf_ttbar_scaleDown_norm = ttbar->Integral()/ttbar_scaleDown_->Integral();
 double sf_ttbar_scaleDown = (sf_ttbar_scaleDown_lumi/sf_ttbar_scaleDown_ptRewt)*sf_ttbar_scaleDown_norm;
 TH1F* ttbar_scaleDown = readWriteHisto(fTT_down, "base/Iso/KinFit/", histname, sf_ttbar_scaleDown, fout, "ttbar_scaleDown", true);
+
+//ttbar mtop1715
+double sf_ttbar_mtop1715_lumi = 1; 
+TH1F* ttbar_mtop1715_topPtweight = readWriteHisto(fTT_mtop1715, "base/", "SF_topPtWeights", 1, fout, "topPtWeights", false);
+double sf_ttbar_mtop1715_ptRewt = ttbar_mtop1715_topPtweight->GetMean();
+TH1F* ttbar_mtop1715_ = readWriteHisto(fTT_mtop1715, "base/Iso/KinFit/", histname, 1, fout, "ttbar_massUp", false);
+double sf_ttbar_mtop1715_norm = ttbar->Integral()/ttbar_mtop1715_->Integral();
+double sf_ttbar_mtop1715 = (sf_ttbar_mtop1715_lumi/sf_ttbar_mtop1715_ptRewt)*sf_ttbar_mtop1715_norm;
+TH1F* ttbar_mtop1715 = readWriteHisto(fTT_mtop1715, "base/Iso/KinFit/", histname, sf_ttbar_mtop1715, fout, "ttbar_massUp", true);
+
+//ttbar mtop1735
+double sf_ttbar_mtop1735_lumi = 1; 
+TH1F* ttbar_mtop1735_topPtweight = readWriteHisto(fTT_mtop1735, "base/", "SF_topPtWeights", 1, fout, "topPtWeights", false);
+double sf_ttbar_mtop1735_ptRewt = ttbar_mtop1735_topPtweight->GetMean();
+TH1F* ttbar_mtop1735_ = readWriteHisto(fTT_mtop1735, "base/Iso/KinFit/", histname, 1, fout, "ttbar_massDown", false);
+double sf_ttbar_mtop1735_norm = ttbar->Integral()/ttbar_mtop1735_->Integral();
+double sf_ttbar_mtop1735 = (sf_ttbar_mtop1735_lumi/sf_ttbar_mtop1735_ptRewt)*sf_ttbar_mtop1735_norm;
+TH1F* ttbar_mtop1735 = readWriteHisto(fTT_mtop1735, "base/Iso/KinFit/", histname, sf_ttbar_mtop1735, fout, "ttbar_massDown", true);
 
 //ttbar matchingUp
 double sf_ttbar_matchingUp_lumi = 1; 
@@ -149,6 +170,8 @@ TH1F* wjet_JESDown = readWriteHisto(fWJ, "JESMinus/Iso/KinFit/", histname, sf_wj
 TH1F* wjet_JERDown = readWriteHisto(fWJ, "JERMinus/Iso/KinFit/", histname, sf_wjet, fout, "wjet_JERDown", true);
 TH1F* wjet_bTagUp = readWriteHisto(fWJ, "bTagPlus/Iso/KinFit/", histname, sf_wjet, fout, "wjet_bTagUp", true);
 TH1F* wjet_bTagDown = readWriteHisto(fWJ, "bTagMinus/Iso/KinFit/", histname, sf_wjet, fout, "wjet_bTagDown", true); 
+TH1F* wjet_cTagUp = readWriteHisto(fWJ, "cTagPlus/Iso/KinFit/", histname, sf_wjet, fout, "wjet_cTagUp", true);
+TH1F* wjet_cTagDown = readWriteHisto(fWJ, "cTagMinus/Iso/KinFit/", histname, sf_wjet, fout, "wjet_cTagDown", true); 
 
 //Z+Jets
 double sf_zjet = 1;
@@ -159,6 +182,8 @@ TH1F* zjet_JESDown = readWriteHisto(fDY, "JESMinus/Iso/KinFit/", histname, sf_zj
 TH1F* zjet_JERDown = readWriteHisto(fDY, "JERMinus/Iso/KinFit/", histname, sf_zjet, fout, "zjet_JERDown", true);
 TH1F* zjet_bTagUp = readWriteHisto(fDY, "bTagPlus/Iso/KinFit/", histname, sf_zjet, fout, "zjet_bTagUp", true);
 TH1F* zjet_bTagDown = readWriteHisto(fDY, "bTagMinus/Iso/KinFit/", histname, sf_zjet, fout, "zjet_bTagDown", true);
+TH1F* zjet_cTagUp = readWriteHisto(fDY, "cTagPlus/Iso/KinFit/", histname, sf_zjet, fout, "zjet_cTagUp", true);
+TH1F* zjet_cTagDown = readWriteHisto(fDY, "cTagMinus/Iso/KinFit/", histname, sf_zjet, fout, "zjet_cTagDown", true);
 
 //SingleTop
 double sf_stop = 1;
@@ -169,6 +194,8 @@ TH1F* stop_JESDown = readWriteHisto(fST, "JESMinus/Iso/KinFit/", histname, sf_st
 TH1F* stop_JERDown = readWriteHisto(fST, "JERMinus/Iso/KinFit/", histname, sf_stop, fout, "stop_JERDown", true);
 TH1F* stop_bTagUp = readWriteHisto(fST, "bTagPlus/Iso/KinFit/", histname, sf_stop, fout, "stop_bTagUp", true);
 TH1F* stop_bTagDown = readWriteHisto(fST, "bTagMinus/Iso/KinFit/", histname, sf_stop, fout, "stop_bTagDown", true);
+TH1F* stop_cTagUp = readWriteHisto(fST, "cTagPlus/Iso/KinFit/", histname, sf_stop, fout, "stop_cTagUp", true);
+TH1F* stop_cTagDown = readWriteHisto(fST, "cTagMinus/Iso/KinFit/", histname, sf_stop, fout, "stop_cTagDown", true);
 
 //Dibosons
 double sf_diboson = 1;
@@ -179,6 +206,8 @@ TH1F* diboson_JESDown = readWriteHisto(fVV, "JESMinus/Iso/KinFit/", histname, sf
 TH1F* diboson_JERDown = readWriteHisto(fVV, "JERMinus/Iso/KinFit/", histname, sf_diboson, fout, "diboson_JERDown", true);
 TH1F* diboson_bTagUp = readWriteHisto(fVV, "bTagPlus/Iso/KinFit/", histname, sf_diboson, fout, "diboson_bTagUp", true);
 TH1F* diboson_bTagDown = readWriteHisto(fVV, "bTagMinus/Iso/KinFit/", histname, sf_diboson, fout, "diboson_bTagDown", true);
+TH1F* diboson_cTagUp = readWriteHisto(fVV, "cTagPlus/Iso/KinFit/", histname, sf_diboson, fout, "diboson_cTagUp", true);
+TH1F* diboson_cTagDown = readWriteHisto(fVV, "cTagMinus/Iso/KinFit/", histname, sf_diboson, fout, "diboson_cTagDown", true);
 
 //QCD MC
 double sf_qcd = 1;
@@ -189,6 +218,8 @@ TH1F* qcd_JESDown = readWriteHisto(fQCD, "JESMinus/Iso/KinFit/", histname, sf_qc
 TH1F* qcd_JERDown = readWriteHisto(fQCD, "JERMinus/Iso/KinFit/", histname, sf_qcd, fout, "qcd_JERDown", true);
 TH1F* qcd_bTagUp = readWriteHisto(fQCD, "bTagPlus/Iso/KinFit/", histname, sf_qcd, fout, "qcd_bTagUp", true);
 TH1F* qcd_bTagDown = readWriteHisto(fQCD, "bTagMinus/Iso/KinFit/", histname, sf_qcd, fout, "qcd_bTagDown", true);
+TH1F* qcd_cTagUp = readWriteHisto(fQCD, "cTagPlus/Iso/KinFit/", histname, sf_qcd, fout, "qcd_cTagUp", true);
+TH1F* qcd_cTagDown = readWriteHisto(fQCD, "cTagMinus/Iso/KinFit/", histname, sf_qcd, fout, "qcd_cTagDown", true);
 //QCD data driven
 TH1F* qcd_dd = readWriteHisto(fQCD_dd, "base/Iso/KinFit/", histname, sf_qcd, fout, "qcd", true);
 
@@ -215,6 +246,8 @@ void makeOneDataCard(TFile *fWH, int mass=80, TString label="WH80", TString labe
   TH1F* wh_topPtDown = readWriteHisto(fWH, "TopPtMinus/Iso/KinFit/", histname, sf_wh, fout, label+"_topPtDown", true);
   TH1F* wh_bTagUp = readWriteHisto(fWH, "bTagPlus/Iso/KinFit/", histname, sf_wh, fout, label+"_bTagUp", true);
   TH1F* wh_bTagDown = readWriteHisto(fWH, "bTagMinus/Iso/KinFit/", histname, sf_wh, fout, label+"_bTagDown", true);
+  TH1F* wh_cTagUp = readWriteHisto(fWH, "cTagPlus/Iso/KinFit/", histname, sf_wh, fout, label+"_cTagUp", true);
+  TH1F* wh_cTagDown = readWriteHisto(fWH, "cTagMinus/Iso/KinFit/", histname, sf_wh, fout, label+"_cTagDown", true);
   
   //hh
   double sf_hh = 0; 
@@ -227,13 +260,13 @@ void makeOneDataCard(TFile *fWH, int mass=80, TString label="WH80", TString labe
   TH1F* hh_topPtDown = readWriteHisto(fWH, "TopPtMinus/Iso/KinFit/", histname, sf_hh, fout, label2+"_topPtDown", true);
   TH1F* hh_bTagUp = readWriteHisto(fWH, "bTagPlus/Iso/KinFit/", histname, sf_hh, fout, label2+"_bTagUp", true);
   TH1F* hh_bTagDown = readWriteHisto(fWH, "bTagMinus/Iso/KinFit/", histname, sf_hh, fout, label2+"_bTagDown", true);
+  TH1F* hh_cTagUp = readWriteHisto(fWH, "cTagPlus/Iso/KinFit/", histname, sf_hh, fout, label2+"_cTagUp", true);
+  TH1F* hh_cTagDown = readWriteHisto(fWH, "cTagMinus/Iso/KinFit/", histname, sf_hh, fout, label2+"_cTagDown", true);
 
   //open input template data card of 8 TeV
   ifstream in;
   char* c = new char[1000];
-  if(isMuChannel) in.open("template_datacard_csbar_mu_8TeV.txt");
-  else in.open("template_datacard_csbar_ele_8TeV.txt");
-
+  in.open("template_datacard_csbar.txt");
   //create output data card for 13 TeV
   string outDataCard = "datacard_csbar_13TeV_mH.txt";
   string histname_str(histname);
@@ -308,6 +341,28 @@ void makeOneDataCard(TFile *fWH, int mass=80, TString label="WH80", TString labe
        
         float bTagUnc_diboson = (diboson->Integral() > 0) ? getBTagUnc(diboson, diboson_bTagUp, diboson_bTagDown) : 1.00;
         line.replace( line.find("KKKK") , 4 , string(Form("%.2f", bTagUnc_diboson)) ); 
+        out << line << endl;
+      }
+      else if(line.find("CMS_eff_c")!=string::npos){
+        float cTagUnc_wh = (wh->Integral() > 0) ? getBTagUnc(wh, wh_cTagUp, wh_cTagDown) : 1.00;
+        line.replace( line.find("YYYY") , 4 , string(Form("%.2f", cTagUnc_wh)) );
+        
+        float cTagUnc_ttbar = (ttbar->Integral() > 0) ? getBTagUnc(ttbar, ttbar_cTagUp, ttbar_cTagDown) : 1.00; 
+        line.replace( line.find("ZZZZ") , 4 , string(Form("%.2f", cTagUnc_ttbar)) ); 
+        
+        float cTagUnc_stop = (stop->Integral() > 0) ? getBTagUnc(stop, stop_cTagUp, stop_cTagDown) : 1.00; 
+        line.replace( line.find("KKKK") , 4 , string(Form("%.2f", cTagUnc_stop)) ); 
+        out << line << endl;
+      }
+      else if(line.find("CMS_mistag_c")!=string::npos){
+        float cTagUnc_wjet = (wjet->Integral() > 0) ? getBTagUnc(wjet, wjet_cTagUp, wjet_cTagDown) : 1.00;
+        line.replace( line.find("XXXX") , 4 , string(Form("%.2f", cTagUnc_wjet)) ); 
+       
+        float cTagUnc_zjet = (zjet->Integral() > 0) ? getBTagUnc(zjet, zjet_cTagUp, zjet_cTagDown) : 1.00;
+        line.replace( line.find("YYYY") , 4 , string(Form("%.2f", cTagUnc_zjet)) ); 
+       
+        float cTagUnc_diboson = (diboson->Integral() > 0) ? getBTagUnc(diboson, diboson_cTagUp, diboson_cTagDown) : 1.00;
+        line.replace( line.find("KKKK") , 4 , string(Form("%.2f", cTagUnc_diboson)) ); 
         out << line << endl;
       }
       else if(line.find("CMS_stat_wh")!=string::npos){ 

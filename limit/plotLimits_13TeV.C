@@ -96,7 +96,7 @@ void plot( TString dir  = "$PWD",
   }
   
   TMultiGraph *mg = new TMultiGraph();
-  mg->SetTitle(cutSet+"_"+histDir);
+  mg->SetTitle(cutSet+histDir);
 
   TGraphAsymmErrors* expected = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL ,expX1sL , expX1sL, expX1sL);
   TGraphAsymmErrors* oneSigma = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL, expX1sL,  expY1sL, expY1sH);
@@ -141,7 +141,7 @@ void plot( TString dir  = "$PWD",
   mg->GetXaxis()->SetTitle("m_{H} (GeV)");
   mg->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{#pm})");
 
-  leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{35.45 fb^{-1}, %s}",legend.Data()));
+  leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{35.49 fb^{-1}, %s}",legend.Data()));
 
   leg->AddEntry(expected,"Expected","L");
   if(obs) leg->AddEntry(observed,"Observed","L");
@@ -171,7 +171,7 @@ void plot( TString dir  = "$PWD",
 
   line->Draw("SAME");
   gPad->RedrawAxis();
-  TString outFile = "limit_mu_mjj_kfit";
+  TString outFile = "limit_CHANNEL_HIST";
   gPad->SaveAs(outFile+".png");
   if(rootfile){
     TFile *fout = new TFile(outFile+".root", "RECREATE");
@@ -184,8 +184,7 @@ void plot( TString dir  = "$PWD",
 
 }
 
-
-void makeLimitPlot_13TeV(){
+void plotLimits_13TeV(){
   TCanvas *c1 = new TCanvas();
   c1->SetGrid(0,0);
   c1->SetFillStyle(4000);
@@ -194,7 +193,7 @@ void makeLimitPlot_13TeV(){
   c1->SetObjectStat(0);
   //c1->Divide(2, 2);
   c1->cd(1);
-  plot("HISTDIR", "", "HISTNAME", "ChargedHiggs","electron","13TeV","mu+jets",0.03, true, true);
+  plot("HISTDIR", "", "HISTNAME", "ChargedHiggs", "CHANNELNAME", "13TeV", "CHANNELNAME", 0.03, true, true);
   /*
   c1->cd(2);
   plot("stack_20171115_Mu_sys", "", "pt_bjetH", "ChargedHiggs","electron","13TeV","mu+jets",0.1, true, true);

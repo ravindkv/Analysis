@@ -52,12 +52,12 @@ public :
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-  //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
-  //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["HplusM100"]         =  831.76*0.32;   evtDBS["HplusM100"]         =  996170; 
     xss["HplusM120"]         =  831.76*0.32;   evtDBS["HplusM120"]         =  994498; 
     xss["HplusM140"]         =  831.76*0.32;   evtDBS["HplusM140"]         =  987730; 
@@ -74,6 +74,16 @@ public :
     xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
+    
+    xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
+    xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
+    xss["QCD_Pt-30to50_EM"]  =  9928000;       evtDBS["QCD_Pt-30to50_EM"]  =  4730195;
+    xss["QCD_Pt-50to80_EM"]  =  2890800;       evtDBS["QCD_Pt-50to80_EM"]  =  22337070;
+    xss["QCD_Pt-80to120_EM"] =  350000;        evtDBS["QCD_Pt-80to120_EM"] =  35841783;
+    xss["QCD_Pt-120to170_EM"]=  62964;         evtDBS["QCD_Pt-120to170_EM"]=  35817281;
+    xss["QCD_Pt-170to300_EM"]=  18810;         evtDBS["QCD_Pt-170to300_EM"]=  11540163;
+    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
+    
     xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
     xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
@@ -88,12 +98,12 @@ public :
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
     //-------------------------
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
-  //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
+    //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
-  //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+    //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
