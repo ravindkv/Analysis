@@ -141,7 +141,7 @@ void plot( TString dir  = "$PWD",
   mg->GetXaxis()->SetTitle("m_{H} (GeV)");
   mg->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{#pm})");
 
-  leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{35.49 fb^{-1}, %s}",legend.Data()));
+  leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{ LUMI fb^{-1}, %s}",legend.Data()));
 
   leg->AddEntry(expected,"Expected","L");
   if(obs) leg->AddEntry(observed,"Observed","L");
@@ -193,7 +193,7 @@ void plotLimits_13TeV(){
   c1->SetObjectStat(0);
   //c1->Divide(2, 2);
   c1->cd(1);
-  plot("HISTDIR", "", "HISTNAME", "ChargedHiggs", "CHANNELNAME", "13TeV", "CHANNELNAME", 0.03, true, true);
+  plot("HISTDIR", "", "HISTNAME", "ChargedHiggs", "CHANNELNAME", "13TeV", "CHANNELNAME", 0.03, false, true);
   /*
   c1->cd(2);
   plot("stack_20171115_Mu_sys", "", "pt_bjetH", "ChargedHiggs","electron","13TeV","mu+jets",0.1, true, true);

@@ -194,7 +194,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   TH2D* h2_CTagEff_Num_bT 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_bT"));
   TH2D* h2_CTagEff_Num_cT		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_cT"));
   TH2D* h2_CTagEff_Num_udsgT 		= (TH2D*)(f->Get(histPath+"h2_CTagEff_Num_udsgT")); 
-  
+   
   //---------------------------------------------------//
   //loop over each event, of the ntuple
   //---------------------------------------------------//
@@ -240,7 +240,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       double sampleWeight(1.0);
       sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
       evtWeight *= sampleWeight; 
-      fillHisto(outFile_, cutflowType, "", "SampleWt", 10, 0, 1000, sampleWeight, 1 );
+      }
+      if(i < 1){
+        fillHisto(outFile_, cutflowType, "", "EleCutSet1", 10, 0, 1000, sampleWeight, 1 );
       }
       //pileup weight
       vector<double>pu = ev->sampleInfo.truepileup;
@@ -417,12 +419,16 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     //apply selection cuts on leptons
     //---------------------------------------------------//
+    double metPt = 0; 
+    metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
+    fillHisto(outFile_, cutflowType, "","pt_met", 50, 0, 500, metPt, evtWeight );
     if(e_final.size() > 0){
       int e_i = e_final[0];
       double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
-      fillHisto(outFile_, cutflowType+"/Iso", "", "RelIso", 100, 0, 1, eRelIso, evtWeight);
-      fillHisto(outFile_, cutflowType+"/NonIso", "", "RelIso", 100, 0, 1, eRelIso, evtWeight);
+      fillHisto(outFile_, cutflowType, "", "RelIso", 100, 0, 1, eRelIso, evtWeight);
+      fillHisto2D(outFile_, cutflowType, "","RelIso_MET", 100, 0, 1, eRelIso, 100, 0, 500, metPt, evtWeight );
     }
+    
     int nEle = e_final.size();
     double pri_vtxs = Vertices[0].totVtx;
     //select only one electron
@@ -460,6 +466,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     nCutPass_NonIso++;
     fillHisto(outFile_, cutflowType+"/Iso", "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     fillHisto(outFile_, cutflowType+"/NonIso", "", "cutflow", 20, 0.5, 20.5, nCutPass_NonIso, evtWeight );
+    
+    
     //---------------------------------------------------//
     // Iso(<0.08) and Non-iso(>0.08) region 
     //---------------------------------------------------//
@@ -479,9 +487,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(tmp_iso > 0.3) continue;
     nCutPass = 5;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    
     double eRelIso = pfElectrons[e_i].relCombPFIsoEA;
-    //double muonPt = pfMuons[m_i].p4.pt();
     double elePt = pfElectrons[e_i].p4.pt();
     
     //---------------------------------------------------//
@@ -495,8 +501,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     //apply MET selection   
     //---------------------------------------------------//
-    double metPt = 0; 
-    metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
     //if(metuc==0)metPt = metWithJESJER(pfJets, &j_final, met, jes, jer);
     //else metPt = metWithUncl(pfJets, &j_final, pfMuons, &m_init, pfElectrons, &e_final, met, metuc);
     
@@ -512,10 +516,11 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //leptonPt = TMath::Abs(pfMuons[m_i].p4.pt());
     deltaPhi = ROOT::Math::VectorUtil::DeltaPhi(pfElectrons[e_i].p4, met.p4);
     double mt = sqrt (  2*elePt*metPt*(1 - cos(deltaPhi) ) ) ;
+    /*
     if(mt < minMT) continue; // mt cuts
     nCutPass = 8;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    
+    */
     //---------------------------------------------------//
     //apply B-tagging, C-tagging
     //---------------------------------------------------//
@@ -526,10 +531,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     double pfCMVA = 0.0; //pfCombinedMVAV2BJetTags
     double pfCCvsL = 0.0;//pfCombinedCvsLJetTags
     double pfCCvsB = 0.0; //pfCombinedCvsBJetTags
-    double pfCCvsL_0 = 0.0;
-    double pfCCvsL_1 = 0.0;
-    double pfCCvsB_0 = 0.0;
-    double pfCCvsB_1 = 0.0;
 
     //LOOSE BTAG
     int count_CSVL_SF = 0; 
@@ -540,12 +541,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       int ind_jet = j_final[ijet];
       pfCISV = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
       pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
-      pfCCvsL= pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
-      pfCCvsB = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"];
-      fillHisto(outFile_, cutflowType_, "BTag", "pfCISV", 50, 0, 2, pfCISV, evtWeight );
+      fillHisto(outFile_, cutflowType_, "BTag", "pfCISV", 100, -2, 2, pfCISV, evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag", "pfCMVA", 100, -2, 2, pfCMVA, evtWeight );
-      fillHisto(outFile_, cutflowType_, "BTag", "pfCCvsL", 100, -2, 2, pfCCvsL, evtWeight );
-      fillHisto(outFile_, cutflowType_, "BTag", "pfCCvsB", 100, -2, 2, pfCCvsB, evtWeight );
       //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
       //b-quark
       if(abs(pfJets[ind_jet].partonFlavour) ==5)
@@ -570,12 +567,11 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //if(pfCISV >0.9535) count_CSVL ++;
     }
     if(count_CSVL >=2 ){
-    nCutPass = 9;
+    nCutPass = 8;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     }
-    fillHisto(outFile_, cutflowType_, "BTag", "CSVL_count", 20, 0.5, 20.5, count_CSVL_SF, evtWeight );
     if(count_CSVL_SF <= 1) continue; // Demanding for 2L b-tagged jets
-    nCutPass = 10;
+    nCutPass = 9;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     
     //---------------------------------------------------//
@@ -648,6 +644,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "BTag","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
     }
     fillHisto(outFile_, cutflowType_, "BTag","final_multi_jet", 15, 0.5, 15.5, count_jets, evtWeight );
+    fillHisto(outFile_, cutflowType_, "BTag", "CSVL_count", 20, 0.5, 20.5, count_CSVL_SF, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","final_pt_met", 50, 0, 500, metPt, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","wmt", 50, 0, 500, mt, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -665,7 +662,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk//
     //make sure that the fit converges 
     if(statusOfKinFit !=0) continue ; 
-    nCutPass =11;
+    nCutPass =10;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
   
     //---------------------------------------------------//
@@ -685,7 +682,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(kfJets[1].pt() < 25) 	continue;
     if(kfJets[2].pt() < 25) 	continue;
     if(kfJetsLepB[0].pt() < 25) continue;
-    nCutPass = 12;
+    nCutPass = 11;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     
     //---------------------------------------------------//
@@ -719,8 +716,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 	else pt_bjetHad = kfJets[ik].pt();
       }
     }
-    fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH", 50, 0, 500, pt_bjetHad, evtWeight );
-    fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetL", 50, 0, 500, kfJetsLepB[0].pt(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit", "probOfKinFit", 100, 0, 1, probOfKinFit, evtWeight );
     if(kfLightJets.size() < 2) continue; 
@@ -743,10 +738,35 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(!match_j1) continue;
     if(!match_j2) continue;
     kfCount++;
-    nCutPass = 13;
+    nCutPass = 12;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
     fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit", 200, 0, 1000, diJet.mass(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH", 100, 0, 500, pt_bjetHad, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetL", 100, 0, 500, kfJetsLepB[0].pt(), evtWeight );
+    ////////////////////////////////////////////////////
+    /// bin by bin Mjj vs Pt_bjetH 
+    if(pt_bjetHad >= 0 && pt_bjetHad < 35)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_00To35", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 35 && pt_bjetHad < 42)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 42 && pt_bjetHad < 50)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 50 && pt_bjetHad < 57)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 57 && pt_bjetHad < 65)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 65 && pt_bjetHad < 74)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 74 && pt_bjetHad < 84)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 84 && pt_bjetHad < 99)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 99 && pt_bjetHad < 124)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
+    if(pt_bjetHad >= 124 && pt_bjetHad < 500)
+      fillHisto(outFile_, cutflowType_, "PtbJetInc", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+    ////////////////////////////////////////////////////
     
     //---------------------------------------------------//
     //apply CTagging
@@ -755,6 +775,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     double pfCCvsL1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsLJetTags"];
     double pfCCvsB0 = pfJets[indexForCTag0].bDiscriminator["pfCombinedCvsBJetTags"]; 
     double pfCCvsB1 = pfJets[indexForCTag1].bDiscriminator["pfCombinedCvsBJetTags"];
+    fillHisto(outFile_, cutflowType_, "KinFit", "pfCCvsL", 100, -2, 2, pfCCvsL0, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "pfCCvsL", 100, -2, 2, pfCCvsL1, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "pfCCvsB", 100, -2, 2, pfCCvsB0, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "pfCCvsB", 100, -2, 2, pfCCvsB1, evtWeight );
     
     MyLorentzVector diJet_tag = kfLightJets[0]+kfLightJets[1];
     bool isCTagL = false; //loose
@@ -840,20 +864,109 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(isCTagT_SF) fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF", 200, 0, 1000, diJet_tag.mass(), evtWeight );
   
     //Categorisation 
-    if(isCTagT_SF) 
+    if(isCTagT_SF){ 
       fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else if(isCTagM_SF) 
+      if(pt_bjetHad >= 0 && pt_bjetHad < 35)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_00To35", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+      }
+    
+    else if(isCTagM_SF){ 
       fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else if(isCTagL_SF) 
+      if(pt_bjetHad >= 0 && pt_bjetHad < 35)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_00To35", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+    }
+
+    else if(isCTagL_SF){ 
       fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-    else fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagO_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 0 && pt_bjetHad < 35)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_00To35", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+    }
+    else{
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagO_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 0 && pt_bjetHad < 35)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_00To35", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+    }
     
     if(isCTagL){
-    nCutPass = 14;
+    nCutPass = 13;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     }
     if(!isCTagL_SF) continue; 
-    nCutPass = 15;
+    nCutPass = 14;
+    fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "probOfKinFit", 100, 0, 1, probOfKinFit, evtWeight );
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","pt_ele", 50, 0, 500, elePt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","eta_ele", 50, -5, 5, pfElectrons[e_i].p4.eta(), evtWeight );
@@ -869,6 +982,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "KinFit","rhoAll", 100, 0, 100, Vertices[n].rhoAll, evtWeight );
     }
     fillHisto(outFile_, cutflowType_, "KinFit","final_multi_jet", 15, 0.5, 15.5, count_jets, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "CSVL_count", 20, 0.5, 20.5, count_CSVL_SF, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","final_pt_met", 50, 0, 500, metPt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","wmt", 50, 0, 500, mt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -905,9 +1019,6 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("outFile_.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20180117/EleMC_20180117/TTJetsP_EleMC_20180117/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20180117/180117_093903/0000/TTJetsP_EleMC_20180117_Ntuple_1.root", "PF", "");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20180117/EleMC_20180117/WJetsToLNu_EleMC_20180117/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_EleMC_20180117/180117_094216/0000/WJetsToLNu_EleMC_20180117_Ntuple_52.root", "PF", "");
-
-
   //====================================
   //condor submission
   CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");

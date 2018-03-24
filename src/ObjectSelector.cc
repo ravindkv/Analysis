@@ -17,7 +17,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00749	
      && abs(e->dPhiIn) 		< 0.228	
      && e->hadOverEm 		< 0.356	
-     //&& e->relCombPFIsoEA 	< 0.175	
+     && e->relCombPFIsoEA 	< 0.175	
      && abs(e->iEminusiP) 	< 0.299	
      && e->nInnerHits       	<= 2
      && e->passConversionVeto  
@@ -29,7 +29,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e
      && abs(e->dEtaInSeed) 	< 0.00895	 
      && abs(e->dPhiIn) 		< 0.213	
      && e->hadOverEm 		< 0.211	
-     //&& e->relCombPFIsoEA 	< 0.159	
+     && e->relCombPFIsoEA 	< 0.159	
      && abs(e->iEminusiP) 	< 0.15	
      && e->nInnerHits       	<= 3
      && e->passConversionVeto  
@@ -239,7 +239,8 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
     double mRelIso  = m->pfRelIso;
     
     if(! isGlobalMuon) continue;
-    if(isMediumMuon(m, isPFlow) && mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
+    //if(isMediumMuon(m, isPFlow) && mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
+    if(mEta<LOOSE_M_ETA_MAX_  && mPt> LOOSE_M_PT_MIN_ && mRelIso < LOOSE_M_RELISO_MAX_ ){ looseVeto = true; }
   }
   return looseVeto;
     

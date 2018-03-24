@@ -11,8 +11,8 @@
 
 using namespace std;
 void example_plot(TString process, TString unctype, TString histName, TString leg_input, int bin, bool axisrange=false, double xmin=1, double xmax=100 ){
-  gROOT->ProcessLine(".L tdrstyle.C");
-  setTDRStyle();
+  //gROOT->ProcessLine(".L tdrstyle.C");
+  //setTDRStyle();
   gStyle->SetOptStat(0);
   TString inFile("$PWD/");
        
@@ -21,9 +21,10 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   
   double scale_factor = 1; 
   if(process.Contains("WH120")){
-   TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
+   //TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
+   TLegend* leg = new TLegend(0.65,0.40,0.80,0.75,NULL,"brNDC");
   }else{
-   TLegend* leg = new TLegend(0.65,0.50,0.80,0.85,NULL,"brNDC");
+   TLegend* leg = new TLegend(0.65,0.40,0.80,0.75,NULL,"brNDC");
   }
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
@@ -32,7 +33,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   //  leg->SetHeader("#splitline{CMS Preliminary}{   @ #sqrt{s} = 7 TeV}");
 
   //TFile* f = TFile::Open(inFile+"all_TTJetsP.root");
-  TFile* f = TFile::Open(inFile+"HplusShapes_mu_13TeV.root");
+  TFile* f = TFile::Open(inFile+"HplusShapes_mu_mjj_kfit_13TeV.root");
   if(f == 0) return;
   if(f->IsZombie()){f->Close(); return;}
 
@@ -53,6 +54,18 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   h2->Scale(scale_factor);
   h2->SetLineColor(kBlue);
   h2->SetLineWidth(3);
+  h2->SetTitle("");
+  h2->GetYaxis()->SetTitle("Events");
+  h2->GetYaxis()->SetRangeUser(1, 1.1* h2->GetMaximum());
+  h2->GetXaxis()->SetNdivisions(5);
+  h2->GetYaxis()->SetNdivisions(5);
+  h2->GetYaxis()->SetTitleOffset(1.35);
+  h2->GetXaxis()->SetTitleOffset(1.00);
+  h2->GetYaxis()->SetTitleSize(0.06);   h2->GetXaxis()->SetTitleSize(0.06);
+  h2->GetXaxis()->SetLabelSize(0.06);   h2->GetXaxis()->LabelsOption("u"); // extra
+  h2->GetYaxis()->SetLabelSize(0.06);   h2->GetXaxis()->LabelsOption("u"); // extra
+  h2->GetXaxis()->SetTickLength(0.03); 
+  h2->GetYaxis()->SetTickLength(0.03); 
   h2->Rebin(bin);
   if(axisrange){
     h2->GetXaxis()->SetRangeUser(xmin,xmax);
@@ -82,6 +95,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   pt->SetFillStyle(0);
   pt->SetLineColor(0);
   pt->SetBorderSize(1);
+  pt->SetTextSize(0.078);
  
   // Header
   TPaveText *header = new TPaveText(0.15,0.92,0.9,0.99, "brNDC");
@@ -91,12 +105,11 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   header->SetLineColor(0);
   header->SetTextFont(132);
   header->SetTextSize(0.058);
-  TText *text = header->AddText("CMS Simulation,    #sqrt{s} = 13 TeV");
+  TText *text = header->AddText("CMS Simulation,    #sqrt{s} = 13 TeV, 35.50 fb^{-1}");
   text->SetTextAlign(11);
 
-
   // channel specifiction
-  TPaveText *ch = new TPaveText(0.72,0.73,0.88,0.95,"brNDC");
+  TPaveText *ch = new TPaveText(0.65,0.73,0.80,0.95,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
@@ -108,7 +121,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
 
   //  h2->SetTitle(channel+"  "+category+"  "+sample);
   h2->GetXaxis()->SetTitle("M_{jj} [GeV]");
-  h2->SetAxisRange(0.0, (h2->GetMaximum())*1.3 ,"Y");
+  //h2->SetAxisRange(0.0, (h2->GetMaximum())*1.3 ,"Y");
   //  h1->GetYaxis()->SetTitle("Normalized to Unity");
   //  h1->GetYaxis()->SetRangeUser(0.00, 0.20);
   //  MuptStack->GetXaxis()->SetTitle(xaxis_title);
@@ -116,6 +129,10 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   //  h3->DrawNormalized("HIST");
   //  h2->DrawNormalized("HISTSAME");
   //  h1->DrawNormalized("HISTSAME");
+  gPad->SetLeftMargin(0.15);
+  gPad->SetRightMargin(0.15);
+  //gPad->SetTopMargin(0.15);
+  gPad->SetBottomMargin(0.13);
 
   h2->Draw("HIST");
   h1->Draw("HISTSAME");
@@ -183,3 +200,26 @@ void plotAll(){
 //  example_plot("ttbar","matching","MG5 ",1);
   
 }
+void plotSeparate( TString hist, TString hist_label, TString sys){
+  c1 = new TCanvas();
+  example_plot(hist, sys, hist_label, "", 1, true, 0, 200); // log, ratio, axisrange,xmin,xmax
+  TString outFile("MjjShape/");
+  outFile += hist_label+"_"+sys;
+  outFile += "_mu.pdf";
+  c1->SaveAs(outFile);
+  //c1->Close();
+}
+void compareMjj_13TeV(){ 
+  plotSeparate( "t#bar{t} + jets", "ttbar", "JER");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "JES");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "topPt");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "bTag");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "scale");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "matching");
+
+  plotSeparate( "WH120", "WH120", "JER");
+  plotSeparate( "WH120", "WH120", "JES");
+  plotSeparate( "WH120", "WH120", "topPt");
+  plotSeparate( "WH120", "WH120", "bTag");
+}
+

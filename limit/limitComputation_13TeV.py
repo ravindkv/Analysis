@@ -1,4 +1,3 @@
-
 #//////////////////////////////////////////////////
 #                                                 #
 # 	Limit computation at 13 TeV 		  #
@@ -7,77 +6,170 @@
 
 import os
 import sys
-import datetime
 
-#USERS INPUTS
-isMuChannel = True
-isEleChannel= False
-isLepChannel= False
-
-muon_file_dir="stack_20171115_Mu_sys"
-current_dir = os.getcwd()
-shapeVar = ["mjj_kfit", "mjj_kfit_CTagL", "mjj_kfit_CTagM", "mjj_kfit_CTagT"]
-massRange = [80, 90, 100, 120, 140, 150, 155, 160]
-#-------------------------------
-my_date = str(datetime.date.today()).replace("-","")
 def execme(command):
-    #print ""
     #print "\033[01;32m"+ "Excecuting: "+ "\033[00m",  command
     os.system(command)
+execme("mkdir -p ~/ARCHIVE/limit")
+execme("cp *.C ~/ARCHIVE/limit")
 
-isMakeDataCard= False
-isCalculateLimit= False
-isPlotLimit= True
-if isMuChannel:
-    muon_limit_dir = str("muon_limit_"+my_date)
-    execme("mkdir -p "+muon_limit_dir)
-    for shape in range(len(shapeVar)):
-	shape_dir =shapeVar[shape]
-        execme("mkdir -p "+muon_limit_dir+"/"+shape_dir)
+#---------------------------------------------
+#function to prepare data cards
+#---------------------------------------------
+def makeDataCards(CHANNEL_NAME, IN_FILE_DIR, HIST_NAME):
+    execme("cp ~/ARCHIVE/limit/*.C .")
+    execme("cp makeHPlusDataCard_13TeV.C ../")
+    execme("cp template_datacard_csbar.txt ../")
+    execme('sed -i '+'s#inFileDir_#'+IN_FILE_DIR+'# makeHPlusDataCard_13TeV.C')
+    execme('sed -i '+'s#inShapeHisto_#'+HIST_NAME+'# makeHPlusDataCard_13TeV.C')
+    if(CHANNEL_NAME=="mu"):
+        execme('sed -i '+'s#isMuonChannel_#true# makeHPlusDataCard_13TeV.C')
+        execme('sed -i '+'s#isEleChannel_#false# makeHPlusDataCard_13TeV.C')
+        execme('cp '+muon_file_dir+'/all_muData.root '+muon_file_dir+'/all_Data.root')
+        execme('sed -i '+'s#LUMI#'+str(muon_lumi)+'# makeHPlusDataCard_13TeV.C')
+    if(CHANNEL_NAME=="ele"):
+        execme('sed -i '+'s#isMuonChannel_#false# makeHPlusDataCard_13TeV.C')
+        execme('sed -i '+'s#isEleChannel_#true# makeHPlusDataCard_13TeV.C')
+        execme('cp '+ele_file_dir+'/all_EleData.root '+ele_file_dir+'/all_Data.root')
+        execme('sed -i '+'s#LUMI#'+str(ele_lumi)+'# makeHPlusDataCard_13TeV.C')
+    execme('sed -i '+'s#CHANNEL#'+CHANNEL_NAME+'# makeHPlusDataCard_13TeV.C')
+    execme('sed -i '+'s#CHANNEL#'+CHANNEL_NAME+'# template_datacard_csbar.txt')
+    execme('root -b -q makeHPlusDataCard_13TeV.C')
+    execme("mv ../makeHPlusDataCard_13TeV.C . ")
+    execme("mv ../template_datacard_csbar.txt . ")
+
+#---------------------------------------------
+#function to plot limits
+#---------------------------------------------
+def plotLimts(CHANNEL_NAME, HIST_NAME):
+    execme("cp ~/ARCHIVE/limit/*.C .")
+    execme("cp plotLimits_13TeV.C ../")
+    execme('sed -i '+'s#HISTDIR#'+CHANNEL_NAME+'# plotLimits_13TeV.C')
+    execme('sed -i '+'s#CHANNEL_HIST#'+CHANNEL_NAME+'_'+HIST_NAME+'# plotLimits_13TeV.C')
+    execme('sed -i '+'s#HISTNAME#'+HIST_NAME+'# plotLimits_13TeV.C')
+    execme('sed -i '+'s#CHANNELNAME#'+CHANNEL_NAME+'+jets# plotLimits_13TeV.C')
+    execme('sed -i '+'s#CHANNELNAME#'+CHANNEL_NAME+'+jets# plotLimits_13TeV.C')
+    if(CHANNEL_NAME=="mu"):
+        execme('sed -i '+'s#LUMI#'+str(muon_lumi)+'# plotLimits_13TeV.C')
+    if(CHANNEL_NAME=="ele"):
+        execme('sed -i '+'s#LUMI#'+str(ele_lumi)+'# plotLimits_13TeV.C')
+    execme('root -b -q plotLimits_13TeV.C')
+    execme('mv limit_* '+CHANNEL_NAME+"/"+HIST_NAME)
+    execme('cp *.C '+CHANNEL_NAME+"/"+HIST_NAME)
+    execme("mv ../plotLimits_13TeV.C .")
+
+#---------------------------------------------
+#function to calculate limits
+#---------------------------------------------
+def calcLimits(CHANNEL_NAME, HIST_NAME, MASS_ARRAY):
+    for MASS_POINT in MASS_ARRAY:
+        DATACARD = 'datacard_csbar_'+CHANNEL_NAME+'_'+HIST_NAME+'_13TeV_mH'+str(MASS_POINT)
+        execme('text2workspace.py '+DATACARD+'.txt -P HiggsAnalysis.CombinedLimit.ChargedHiggs:brChargedHiggs -o t2w_'+DATACARD+'.root')
+        execme('combine --rAbsAcc 0.000001 t2w_'+DATACARD+'.root -M Asymptotic --mass '+str(MASS_POINT)+' --name ChargedHiggs_'+CHANNEL_NAME+'_'+HIST_NAME)
+    #MOVE OUTPUT FILES TO THE LIMIT DIR
+    LIMIT_DIR = CHANNEL_NAME+"/"+HIST_NAME
+    execme('mkdir -p '+LIMIT_DIR)
+    execme('cp *.C '+LIMIT_DIR)
+    execme('mv t2w* '+LIMIT_DIR)
+    execme('mv datacard_* '+LIMIT_DIR)
+    execme('mv HplusShapes* '+LIMIT_DIR)
+    execme('mv higgsCombine* '+LIMIT_DIR)
+
+#---------------------------------------------------
+#function to get datacards to be combined
+#---------------------------------------------------
+def getCardsToBeCombined(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY, MASS_ARRAY):
+    #make separate cards first
+    for CH in range(len(CHANNEL_ARRAY)):
+        for HIST in range(len(HIST_ARRAY)):
+ 	        makeDataCards(CHANNEL_ARRAY[CH], IN_FILE_DIR_ARRAY[CH], HIST_ARRAY[HIST])
+    #store separate cards in an array
+    COMB_CARD_CHANNEL_HIST_MASS = []
+    for CH in range(len(CHANNEL_ARRAY)):
+        COMB_CARD_HIST_MASS = []
+        for HIST in range(len(HIST_ARRAY)):
+            COMB_CARD_MASS = []
+            for MASS in range(len(MASS_ARRAY)):
+                COMB_CARD_MASS.append('datacard_csbar_'+CHANNEL_ARRAY[CH]+'_'+HIST_ARRAY[HIST]+'_13TeV_mH'+str(MASS_ARRAY[MASS])+'.txt')
+            COMB_CARD_HIST_MASS.append(COMB_CARD_MASS)
+        COMB_CARD_CHANNEL_HIST_MASS.append(COMB_CARD_HIST_MASS)    
+    return COMB_CARD_CHANNEL_HIST_MASS
+
+#---------------------------------------------------
+#function to arrange datacards for combined limits
+#---------------------------------------------------
+def sortCardsForCombine(COMB_CARD_CHANNEL_HIST_MASS_ARRAY, CHANNEL_ARRAY, HIST_ARRAY, MASS):
+    SORT_CARD = ' '
+    COMB_CARD_MASS = []
+    for CH in range(len(CHANNEL_ARRAY)):
+        for HIST in range(len(HIST_ARRAY)):
+            COMB_CARD_MASS.append(COMB_CARD_CHANNEL_HIST_MASS_ARRAY[CH][HIST][MASS])
+    for STR in COMB_CARD_MASS:
+        SORT_CARD = SORT_CARD+STR+' '
+    return SORT_CARD
+
+#---------------------------------------------------
+#function to calculate combined limits
+#---------------------------------------------------
+def calcPlotCombinedLimits(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY, MASS_ARRAY):
+    COMB_CHANNEL_NAME = '_'.join(CHANNEL_ARRAY)
+    COMB_HIST_NAME = '_'.join(HIST_ARRAY)
+    getCardsToBeCombined_ = getCardsToBeCombined(CHANNEL_ARRAY, IN_FILE_DIR_ARRAY, HIST_ARRAY, MASS_ARRAY)
+    for MASS in range(len(MASS_ARRAY)):
+        sortCardsForCombine_ = sortCardsForCombine(getCardsToBeCombined_, CHANNEL_ARRAY, HIST_ARRAY, MASS)
+        print sortCardsForCombine_
+        COMB_DATACARD_NAME = 'datacard_csbar_'+COMB_CHANNEL_NAME+'_'+COMB_HIST_NAME+'_13TeV_mH'+str(MASS_ARRAY[MASS])
+        if len(CHANNEL_ARRAY)>1 or len(HIST_ARRAY)>1:
+            execme('combineCards.py '+sortCardsForCombine_+' > '+COMB_DATACARD_NAME+'.txt')
+    calcLimits(COMB_CHANNEL_NAME, COMB_HIST_NAME, MASS_ARRAY)
+    plotLimts(COMB_CHANNEL_NAME, COMB_HIST_NAME)
+
+#---------------------------------------------
+#USERS INPUTS
+#---------------------------------------------
+isSepLimit = False
+isCombLimit = True
+muon_lumi = 35.45
+ele_lumi = 35.49
+muon_file_dir="stack_20180116_Mu_sys"
+ele_file_dir="stack_20180116_Ele_sys"
+#channel_array = ["mu"]
+#file_dir_array = [muon_file_dir]
+
+channel_array = ["ele"]
+file_dir_array = [ele_file_dir]
+
+#channel_array = ["mu", "ele"]
+#file_dir_array = [muon_file_dir, ele_file_dir]
+
+hist_array = []
+#hist_array.append("mjj_kfit")
+hist_array.append("pt_bjetH")
+hist_array.append("mjj_kfit_CTagL_SF_Cat")
+hist_array.append("mjj_kfit_CTagM_SF_Cat")
+hist_array.append("mjj_kfit_CTagT_SF_Cat")
+mass_array = [80, 90, 100, 120, 140, 150, 155, 160]
+
+###########################################
+# calculate and plot separate limits
+###########################################
+if(isSepLimit):
+    for shape in hist_array:
+        #make datacards
+        #makeDataCards("mu", muon_file_dir, shape)
+        makeDataCards("ele", ele_file_dir, shape)
         
-	#---------------------------------------------
-	#Prepare data cards
-        #---------------------------------------------
-	if(isMakeDataCard):
-	    execme("cp makeHPlusDataCard_13TeV.C ../")
-            execme("cp template_datacard_csbar_mu_8TeV.txt ../")
-            execme('sed -i '+'s#inFileDir_#'+current_dir+"/"+muon_file_dir+'# makeHPlusDataCard_13TeV.C')
-            execme('sed -i '+'s#inShapeHisto_#'+shape_dir+'# makeHPlusDataCard_13TeV.C')
-            execme('sed -i '+'s#isMuonChannel_#true# makeHPlusDataCard_13TeV.C')
-            execme('sed -i '+'s#isEleChannel_#false# makeHPlusDataCard_13TeV.C')
-            execme('sed -i '+'s#CHANNEL#mu# makeHPlusDataCard_13TeV.C')
-            execme('sed -i '+'s#PATH#'+current_dir+"/"+muon_limit_dir+"/"+shape_dir+'# template_datacard_csbar_mu_8TeV.txt')
-            execme('root -l -q makeHPlusDataCard_13TeV.C')
-            execme('mv datacard_csbar_* '+muon_limit_dir+"/"+shape_dir)
-            execme('mv HplusShapes* '+muon_limit_dir+"/"+shape_dir)
-            execme("mv ../makeHPlusDataCard_13TeV.C . ")
-            execme("mv ../template_datacard_csbar_mu_8TeV.txt . ")
-	
-	#---------------------------------------------
-	#Calculate limits
-        #---------------------------------------------
-	if(isCalculateLimit):
-	    for mass in massRange:
-	        execme('text2workspace.py '+muon_limit_dir+'/'+shape_dir+'/datacard_csbar_mu_'+shape_dir+'_13TeV_mH'+
-				str(mass)+'.txt -P HiggsAnalysis.CombinedLimit.ChargedHiggs:brChargedHiggs -o comb_mu_'+shape_dir+'_mH'+str(mass)+'.root')
-	        execme('combine comb_mu_'+shape_dir+'_mH'+str(mass)+'.root -M Asymptotic --mass '+str(mass)+' --name ChargedHiggs_mu_'+shape_dir)
-            execme('mv comb* '+muon_limit_dir+"/"+shape_dir)
-            execme('mv higgsCombine* '+muon_limit_dir+"/"+shape_dir)
-	
-	#---------------------------------------------
-	#Plot limits
-        #---------------------------------------------
-	if(isPlotLimit):
-	    execme("cp makeLimitPlot_13TeV.C ../")
-            execme('sed -i '+'s#CHANNEL_HIST#mu_'+shape_dir+'# makeLimitPlot_13TeV.C')
-            execme('sed -i '+'s#HISTDIR#'+muon_limit_dir+'# makeLimitPlot_13TeV.C')
-            execme('sed -i '+'s#HISTNAME#'+shape_dir+'# makeLimitPlot_13TeV.C')
-            execme('root -b -q makeLimitPlot_13TeV.C')
-            execme('mv limit_* '+muon_limit_dir+"/"+shape_dir)
-	    execme("mv ../makeLimitPlot_13TeV.C .")
+        #calc limits
+        #calcLimits("mu",  shape, mass_array)
+        calcLimits("ele", shape, mass_array)
+        
+        #plot limits
+        plotLimts("ele", shape)
 
-if(isEleChannel):
-    for shape in range(len(shapeVar)):
-        execme("hadd -k "+str(data[samp])+"_Merged.root "+str(data[samp])+"*")
-    execme("hadd -k all_EleData.root EleRun*_Merged.root")
+###########################################
+# calculate, plot combined limits
+###########################################
+if(isCombLimit):
+    calcPlotCombinedLimits(channel_array, file_dir_array, hist_array, mass_array)
 
+execme("cp ~/ARCHIVE/limit/*.C .")
