@@ -26,6 +26,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
+  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
   //CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -47,6 +48,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
     CutFlowProcessor(url, myKey, "TopPtMinus", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -117,13 +119,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   if(bScale==-1)const std::string &bTagSys 		= "down"; 
   const std::vector<std::string> & otherSysTypes = {"up", "down"};
   //b-quark
-  BTagCalibrationReader readBTagCSV_bM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readBTagCSV_bT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
     	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_B);
   //c-quark
-  BTagCalibrationReader readBTagCSV_cM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readBTagCSV_cT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
     	      "comb", bTagSys, otherSysTypes, BTagEntry::FLAV_C);
   //other(light) quarks and gluon
-  BTagCalibrationReader readBTagCSV_lM= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_MEDIUM,
+  BTagCalibrationReader readBTagCSV_lT= readCSV(bTagCSVfile, bTagName, BTagEntry::OP_TIGHT,
     	      "incl", bTagSys, otherSysTypes, BTagEntry::FLAV_UDSG);
   
   //getBTagEffHistos(f);
@@ -131,9 +133,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   TH2D* h2_BTagEff_Denom_b 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_b"));
   TH2D* h2_BTagEff_Denom_c 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_c"));
   TH2D* h2_BTagEff_Denom_udsg 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Denom_udsg")); 
-  TH2D* h2_BTagEff_Num_bM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_bM"));
-  TH2D* h2_BTagEff_Num_cM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_cM"));
-  TH2D* h2_BTagEff_Num_udsgM 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_udsgM")); 
+  TH2D* h2_BTagEff_Num_bT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_bT"));
+  TH2D* h2_BTagEff_Num_cT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_cT"));
+  TH2D* h2_BTagEff_Num_udsgT 		= (TH2D*)(f->Get(histPath+"h2_BTagEff_Num_udsgT")); 
   
   //---------------------------------------------------//
   //CTag SF: read CSV file for SF, 2D histos for eff 
@@ -558,9 +560,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //double deepCSVb = 0.0;//pfCombinedCvsLJetTags
     //double deepCSVbb = 0.0; //pfCombinedCvsBJetTags
     
-    //LOOSE BTAG
-    int count_CSVL_SF = 0; 
-    int count_CSVL = 0;
+    //TIGHT BTAG
+    int count_CSVT_SF = 0; 
+    int count_CSVT = 0;
     ///bool isBtagL = true; bool isBtagM = true; isBtagT = true; 
     bool isBtag = false;
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
@@ -578,14 +580,14 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
       //b-quark
       if(abs(pfJets[ind_jet].partonFlavour) ==5)
-        isBtag = getBtagWithSF(readBTagCSV_bM, h2_BTagEff_Num_bM, h2_BTagEff_Denom_b, pfJets[ind_jet], ev->isData, bScale); 
+        isBtag = getBtagWithSF(readBTagCSV_bT, h2_BTagEff_Num_bT, h2_BTagEff_Denom_b, pfJets[ind_jet], ev->isData, bScale); 
       //c-quark
       else if(abs(pfJets[ind_jet].partonFlavour) ==4) 
-        isBtag = getBtagWithSF(readBTagCSV_cM, h2_BTagEff_Num_cM, h2_BTagEff_Denom_c, pfJets[ind_jet], ev->isData, bScale); 
+        isBtag = getBtagWithSF(readBTagCSV_cT, h2_BTagEff_Num_cT, h2_BTagEff_Denom_c, pfJets[ind_jet], ev->isData, bScale); 
       //other quarks and gluon
-      else isBtag = getBtagWithSF(readBTagCSV_lM, h2_BTagEff_Num_udsgM, h2_BTagEff_Denom_udsg, pfJets[ind_jet], ev->isData, bScale); 
+      else isBtag = getBtagWithSF(readBTagCSV_lT, h2_BTagEff_Num_udsgT, h2_BTagEff_Denom_udsg, pfJets[ind_jet], ev->isData, bScale); 
       if(isBtag){
-        count_CSVL_SF++; 
+        count_CSVT_SF++; 
         double jetPt = jetPtWithJESJER(pfJets[ijet], jes, jer);
         fillHisto(outFile_, cutflowType_, "BTag", "pt_bjet", 50, 0, 500, jetPt, evtWeight );
         fillHisto(outFile_, cutflowType_, "BTag", "eta_bjet", 50, -5, 5, pfJets[ijet].p4.eta(), evtWeight );
@@ -593,15 +595,15 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         bdiscr.push_back(pfCISV);
       }
       else j_final_nob.push_back(ind_jet); 
-      //if(pfCISV >0.5426) count_CSVL ++;
-      if(pfCISV >0.8484) count_CSVL ++;
-      //if(pfCISV >0.9535) count_CSVL ++;
+      //if(pfCISV >0.5426) count_CSVT ++;
+      //if(pfCISV >0.8484) count_CSVT ++;
+      if(pfCISV >0.9535) count_CSVT ++;
     }
-    if(count_CSVL >=2 ){
+    if(count_CSVT >=2 ){
     nCutPass = 8;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     }
-    if(count_CSVL_SF <= 1) continue; // Demanding for 2L b-tagged jets
+    if(count_CSVT_SF <= 1) continue; // Demanding for 2L b-tagged jets
     nCutPass = 9;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     
@@ -675,7 +677,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "BTag","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
     }
     fillHisto(outFile_, cutflowType_, "BTag","final_multi_jet", 15, 0.5, 15.5, count_jets, evtWeight );
-    fillHisto(outFile_, cutflowType_, "BTag", "CSVL_count", 20, 0.5, 20.5, count_CSVL_SF, evtWeight );
+    fillHisto(outFile_, cutflowType_, "BTag", "CSVT_count", 20, 0.5, 20.5, count_CSVT_SF, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","final_pt_met", 50, 0, 500, metPt, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","wmt", 50, 0, 500, mt, evtWeight );
     fillHisto(outFile_, cutflowType_, "BTag","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -739,12 +741,16 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //make sure that each event has 2 light jets
     //---------------------------------------------------//
     vector<MyLorentzVector> kfLightJets; kfLightJets.clear();
+    vector<MyLorentzVector> kfbHadJet; kfbHadJet.clear();
     unsigned long zero = 0; 
     double pt_bjetHad = 0;
     if(kfJets.size() >=3 && maxBtagJet >= zero){
       for(unsigned long ik = 0; ik < kfJets.size(); ik++){
         if(ik != maxBtagJet)kfLightJets.push_back(kfJets[ik]);
-	else pt_bjetHad = kfJets[ik].pt();
+	else {pt_bjetHad = kfJets[ik].pt();
+         kfbHadJet.push_back(kfJets[ik]);
+         }
+
       }
     }
     fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
@@ -772,6 +778,12 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     nCutPass = 12;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
     MyLorentzVector diJet = kfLightJets[0]+kfLightJets[1];
+    MyLorentzVector triJet_csbHad = kfLightJets[0]+kfLightJets[1]+ kfbHadJet[0];
+    MyLorentzVector triJet_csbLep = kfLightJets[0]+kfLightJets[1]+ kfJetsLepB[0];
+    fillHisto(outFile_, cutflowType_, "KinFit", "triJet_csbHad", 200, 0, 1000, triJet_csbHad.mass(), evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "triJet_csbLep", 200, 0, 1000, triJet_csbLep.mass(), evtWeight );
+    fillHisto2D(outFile_, cutflowType_, "KinFit","triJet_csbHad_csbLep", 200, 0, 1000, triJet_csbHad.mass(), 200, 0, 1000, triJet_csbLep.mass(), evtWeight );
+    
     fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit", 200, 0, 1000, diJet.mass(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH", 500, 0, 500, pt_bjetHad, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetL", 500, 0, 500, kfJetsLepB[0].pt(), evtWeight );
@@ -900,105 +912,437 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //Categorisation 
     if(isCTagT_SF){ 
       fillTProfile(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_pt_bjetH", 10, xBin_array, pt_bjetHad, diJet.mass(), evtWeight); 
+      fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+      fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH_CatT", 5000, 0, 500, pt_bjetHad, evtWeight );
-      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-      if(pt_bjetHad >= 25 && pt_bjetHad < 35)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_25To35", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 100, 0, 500, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 25 && pt_bjetHad < 35){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_25To35", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_25To35", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_25To35", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_25To35", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_25To35_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_25To35_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
       }
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_35To42", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_35To42", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_35To42", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_35To42", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_35To42_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_35To42_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_42To50", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_42To50", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_42To50", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_42To50_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_42To50_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_42To50_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_50To57", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_50To57", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_50To57", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_50To57", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_50To57_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_50To57_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_57To65", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_57To65", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_57To65", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_57To65", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_57To65_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_57To65_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_65To74", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_65To74", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_65To74", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_65To74", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_65To74_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_65To74_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_74To84", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_74To84", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_74To84", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_74To84", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_74To84_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_74To84_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_84To99", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_84To99", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_84To99", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_84To99", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_84To99_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_84To99_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_99To124", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_99To124", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_99To124", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_99To124", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_99To124_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_99To124_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_124To500", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbHad_124To500", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatT", "triJet_csbLep_124To500", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatT","triJet_csbHad_csbLep_124To500", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_124To500_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatT", "mjj_kfit_124To500_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+    }
     
     else if(isCTagM_SF){ 
       fillTProfile(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_pt_bjetH", 10, xBin_array, pt_bjetHad, diJet.mass(), evtWeight); 
+      fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+      fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH_CatM", 5000, 0, 500, pt_bjetHad, evtWeight );
-      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagM_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-      if(pt_bjetHad >= 25 && pt_bjetHad < 35)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_25To35", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 100, 0, 500, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 25 && pt_bjetHad < 35){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_25To35", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_25To35", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_25To35", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_25To35", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_25To35_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_25To35_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_35To42", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_35To42", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_35To42", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_35To42", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_35To42_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_35To42_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_42To50", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_42To50", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_42To50", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_42To50_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_42To50_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_42To50_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_50To57", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_50To57", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_50To57", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_50To57", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_50To57_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_50To57_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_57To65", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_57To65", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_57To65", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_57To65", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_57To65_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_57To65_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_65To74", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_65To74", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_65To74", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_65To74", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_65To74_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_65To74_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_74To84", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_74To84", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_74To84", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_74To84", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_74To84_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_74To84_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_84To99", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_84To99", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_84To99", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_84To99", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_84To99_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_84To99_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_99To124", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_99To124", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_99To124", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_99To124", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_99To124_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_99To124_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_124To500", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbHad_124To500", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatM", "triJet_csbLep_124To500", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatM","triJet_csbHad_csbLep_124To500", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_124To500_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatM", "mjj_kfit_124To500_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
     }
 
     else if(isCTagL_SF){ 
       fillTProfile(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_pt_bjetH", 10, xBin_array, pt_bjetHad, diJet.mass(), evtWeight); 
+      fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+      fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH_CatL", 5000, 0, 500, pt_bjetHad, evtWeight );
-      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagL_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-      if(pt_bjetHad >= 25 && pt_bjetHad < 35)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_25To35", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 100, 0, 500, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 25 && pt_bjetHad < 35){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_25To35", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_25To35", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_25To35", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_25To35", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_25To35_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_25To35_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_35To42", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_35To42", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_35To42", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_35To42", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_35To42_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_35To42_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_42To50", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_42To50", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_42To50", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_42To50_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_42To50_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_42To50_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_50To57", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_50To57", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_50To57", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_50To57", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_50To57_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_50To57_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_57To65", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_57To65", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_57To65", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_57To65", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_57To65_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_57To65_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_65To74", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_65To74", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_65To74", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_65To74", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_65To74_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_65To74_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_74To84", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_74To84", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_74To84", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_74To84", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_74To84_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_74To84_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_84To99", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_84To99", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_84To99", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_84To99", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_84To99_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_84To99_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_99To124", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_99To124", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_99To124", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_99To124", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_99To124_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_99To124_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_124To500", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbHad_124To500", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatL", "triJet_csbLep_124To500", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatL","triJet_csbHad_csbLep_124To500", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_124To500_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatL", "mjj_kfit_124To500_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
     }
     else{
       fillTProfile(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_pt_bjetH", 10, xBin_array, pt_bjetHad, diJet.mass(), evtWeight); 
+      fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+      fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_bjetH_CatO", 5000, 0, 500, pt_bjetHad, evtWeight );
-      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagO_SF_Cat", 200, 0, 1000, diJet_tag.mass(), evtWeight );
-      if(pt_bjetHad >= 25 && pt_bjetHad < 35)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_25To35", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 35 && pt_bjetHad < 42)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_35To42", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 42 && pt_bjetHad < 50)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_42To50", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 50 && pt_bjetHad < 57)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_50To57", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 57 && pt_bjetHad < 65)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_57To65", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 65 && pt_bjetHad < 74)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_65To74", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 74 && pt_bjetHad < 84)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_74To84", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 84 && pt_bjetHad < 99)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_84To99", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 99 && pt_bjetHad < 124)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_99To124", 200, 0, 1000, diJet.mass(), evtWeight );
-      if(pt_bjetHad >= 124 && pt_bjetHad < 500)
-        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_124To500", 200, 0, 1000, diJet.mass(), evtWeight );
+      fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagT_SF_Cat", 100, 0, 500, diJet_tag.mass(), evtWeight );
+      if(pt_bjetHad >= 25 && pt_bjetHad < 35){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_25To35", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_25To35", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_25To35", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_25To35", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_25To35_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_25To35_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 35 && pt_bjetHad < 42){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_35To42", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_35To42", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_35To42", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_35To42", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_35To42_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_35To42_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 42 && pt_bjetHad < 50){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_42To50", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_42To50", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_42To50", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_42To50_csbLep", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_42To50_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_42To50_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 50 && pt_bjetHad < 57){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_50To57", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_50To57", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_50To57", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_50To57", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_50To57_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_50To57_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 57 && pt_bjetHad < 65){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_57To65", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_57To65", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_57To65", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_57To65", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_57To65_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_57To65_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 65 && pt_bjetHad < 74){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_65To74", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_65To74", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_65To74", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_65To74", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_65To74_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_65To74_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 74 && pt_bjetHad < 84){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_74To84", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_74To84", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_74To84", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_74To84", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_74To84_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_74To84_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 84 && pt_bjetHad < 99){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_84To99", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_84To99", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_84To99", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_84To99", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_84To99_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_84To99_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 99 && pt_bjetHad < 124){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_99To124", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_99To124", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_99To124", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_99To124", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_99To124_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_99To124_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
+      if(pt_bjetHad >= 124 && pt_bjetHad < 500){
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_124To500", 100, 0, 500, diJet.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbHad_124To500", 100, 0, 500, triJet_csbHad.mass(), evtWeight );
+        fillHisto(outFile_, cutflowType_, "PtbJetCatO", "triJet_csbLep_124To500", 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        fillHisto2D(outFile_, cutflowType_, "PtbJetCatO","triJet_csbHad_csbLep_124To500", 100, 0, 500, triJet_csbHad.mass(), 100, 0, 500, triJet_csbLep.mass(), evtWeight );
+        if(triJet_csbLep.mass() >= 157 && triJet_csbLep.mass() < 187)
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_124To500_ClassB", 100, 0, 500, diJet.mass(), evtWeight );
+        else 
+          fillHisto(outFile_, cutflowType_, "PtbJetCatO", "mjj_kfit_124To500_ClassA", 100, 0, 500, diJet.mass(), evtWeight );
+      }
     }
     
     if(isCTagL){
@@ -1026,7 +1370,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "KinFit","rhoAll", 100, 0, 100, Vertices[n].rhoAll, evtWeight );
     }
     fillHisto(outFile_, cutflowType_, "KinFit","final_multi_jet", 15, 0.5, 15.5, count_jets, evtWeight );
-    fillHisto(outFile_, cutflowType_, "KinFit", "CSVL_count", 20, 0.5, 20.5, count_CSVL_SF, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "CSVT_count", 20, 0.5, 20.5, count_CSVT_SF, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","final_pt_met", 50, 0, 500, metPt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","wmt", 50, 0, 500, mt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","nvtx", 100, 0, 100, pri_vtxs, evtWeight );
@@ -1062,8 +1406,9 @@ void hplusAnalyzer::processEvents(){
   ///CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("outFile_muCh.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20180116/MuMC_20180116/TTJetsP_MuMC_20180116/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20180116/180116_144240/0000/TTJetsP_MuMC_20180116_Ntuple_1.root", "PF", "");
-
+  
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitT_20180414/MuMC_20180414/TTJetsP_MuMC_20180414/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20180414/180414_124320/0000/TTJetsP_MuMC_20180414_Ntuple_1.root", "PF", "");
+  
   //====================================
   //condor submission
   CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");

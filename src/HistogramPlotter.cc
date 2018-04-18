@@ -14,6 +14,34 @@ void HistogramPlotter::addHisto(TString name, TString dirname, int range, double
   histos1_[fullname]->Sumw2();
 }
 
+void HistogramPlotter::initTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[]){
+  std::string histPath;
+  histPath = std::string(dir+"/"+subdir);
+  TDirectory *d = file->GetDirectory(histPath.c_str());
+  if(!d) file->mkdir(histPath.c_str());
+  file->cd(histPath.c_str());
+  addTProfile(histName, histPath, nXBin, xBin_array);
+}
+
+void HistogramPlotter::addTProfile(TString name, TString dirname, int nXBin, Float_t xBin_array[]){
+  //TString fullname = name+"_"+dirname;
+  TString fullname = dirname+"/"+name;
+  std::string hname(fullname); 
+  tprofile_[fullname] = new TProfile(name.Data(), hname.c_str(), nXBin, xBin_array);
+  tprofile_[fullname]->Sumw2();
+  tprofile_[fullname]->SetErrorOption("s");
+}
+
+void HistogramPlotter::fillTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[], double value1, double value2, double weight)
+{
+  TString fullname = dir+"/"+subdir+"/"+histName;
+  if(!tprofile_[fullname]){
+    initTProfile(file, dir, subdir, histName, nXBin, xBin_array); 
+  }
+  //then, fill TProfile
+  tprofile_[fullname]->Fill(value1, value2, weight);
+}
+
 void HistogramPlotter::addHisto2D(TString name, TString dirname, int nBin1, double min1, double max1, int nBin2, double min2, double max2)
 {
   //TString fullname = name+"_"+dirname;

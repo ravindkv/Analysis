@@ -2364,6 +2364,69 @@ namespace ROOT {
 } // end of namespace ROOT for class map<string,double>
 
 namespace ROOT {
+   static TClass *maplETStringcOTProfilemUgR_Dictionary();
+   static void maplETStringcOTProfilemUgR_TClassManip(TClass*);
+   static void *new_maplETStringcOTProfilemUgR(void *p = 0);
+   static void *newArray_maplETStringcOTProfilemUgR(Long_t size, void *p);
+   static void delete_maplETStringcOTProfilemUgR(void *p);
+   static void deleteArray_maplETStringcOTProfilemUgR(void *p);
+   static void destruct_maplETStringcOTProfilemUgR(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const map<TString,TProfile*>*)
+   {
+      map<TString,TProfile*> *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(map<TString,TProfile*>));
+      static ::ROOT::TGenericClassInfo 
+         instance("map<TString,TProfile*>", -2, "map", 96,
+                  typeid(map<TString,TProfile*>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &maplETStringcOTProfilemUgR_Dictionary, isa_proxy, 0,
+                  sizeof(map<TString,TProfile*>) );
+      instance.SetNew(&new_maplETStringcOTProfilemUgR);
+      instance.SetNewArray(&newArray_maplETStringcOTProfilemUgR);
+      instance.SetDelete(&delete_maplETStringcOTProfilemUgR);
+      instance.SetDeleteArray(&deleteArray_maplETStringcOTProfilemUgR);
+      instance.SetDestructor(&destruct_maplETStringcOTProfilemUgR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::MapInsert< map<TString,TProfile*> >()));
+      return &instance;
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const map<TString,TProfile*>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *maplETStringcOTProfilemUgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const map<TString,TProfile*>*)0x0)->GetClass();
+      maplETStringcOTProfilemUgR_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void maplETStringcOTProfilemUgR_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_maplETStringcOTProfilemUgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) map<TString,TProfile*> : new map<TString,TProfile*>;
+   }
+   static void *newArray_maplETStringcOTProfilemUgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) map<TString,TProfile*>[nElements] : new map<TString,TProfile*>[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_maplETStringcOTProfilemUgR(void *p) {
+      delete ((map<TString,TProfile*>*)p);
+   }
+   static void deleteArray_maplETStringcOTProfilemUgR(void *p) {
+      delete [] ((map<TString,TProfile*>*)p);
+   }
+   static void destruct_maplETStringcOTProfilemUgR(void *p) {
+      typedef map<TString,TProfile*> current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class map<TString,TProfile*>
+
+namespace ROOT {
    static TClass *maplETStringcOTH2mUgR_Dictionary();
    static void maplETStringcOTH2mUgR_TClassManip(TClass*);
    static void *new_maplETStringcOTH2mUgR(void *p = 0);

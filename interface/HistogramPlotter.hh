@@ -38,9 +38,15 @@ public :
   TH1* getHisto(TString name, TString dirname);
   TH2* getHisto2d(TString name, TString dirname);
 
+  // TProfile
+  void initTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[]);
+  void addTProfile(TString name, TString dirname, int nXBin, Float_t xBin_array[]);
+  void fillTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[], double value1, double value2, double weight);
+
 private :
   std::map<TString, TH1*> histos1_;
   std::map<TString, TH2*> histos2_;
+  std::map<TString, TProfile*> tprofile_;
   //static std::map<TString, histos1_> histDir1_;
   //static std::map<TString, histos2_> histDir2_;
   //std::map<TString, TDirectory*> hDir_;

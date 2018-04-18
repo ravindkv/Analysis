@@ -9,9 +9,9 @@ Bool_t BtagSF::isbtagged(BTagCalibrationReader &reader, TH2D *h2_BTagEff_Num, TH
   //----------------------------------------------
   //cout<<"isbtagged called "<<endl;
   //double csvL = 0.5426;
-  double csvM = 0.8484;
-  //double csvT = 0.9535;
-  double csvOP = csvM;
+  //double csvM = 0.8484;
+  double csvT = 0.9535;
+  double csvOP = csvT;
   Bool_t btagged = kFALSE; 
   if(isdata){ 
     if(csv>csvOP) btagged = kTRUE; 
