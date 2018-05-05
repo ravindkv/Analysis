@@ -18,8 +18,10 @@
 void getProcessedEvent_13TeV(){
   
   bool isMC = true;
-  bool isMuData = false;
-  bool isEleData = true;
+  bool isMuData = true;
+  bool isMuMC = false;
+  bool isEleData = false;
+  bool isEleMC = false;
 
   std::map<std::string, double> mcEvtDBS;
   mcEvtDBS["DY1JetsToLL_Merged.root"]       =  62079400;
@@ -35,14 +37,26 @@ void getProcessedEvent_13TeV(){
   mcEvtDBS["HplusM160_Merged.root"]         =  992264;
   mcEvtDBS["HplusM80_Merged.root"]          =  976710;
   mcEvtDBS["HplusM90_Merged.root"]          =  988480;
-  mcEvtDBS["QCD_Pt-15to20_Merged.root"]  =  4141251;
-  mcEvtDBS["QCD_Pt-20to30_Merged.root"]  =  31475157;
-  mcEvtDBS["QCD_Pt-30to50_Merged.root"]  =  29954815;
-  mcEvtDBS["QCD_Pt-50to80_Merged.root"]  =  19806915;
-  mcEvtDBS["QCD_Pt-80to120_Merged.root"] =  13786971;
-  mcEvtDBS["QCD_Pt-120to170_Merged.root"]=  8042721;
-  mcEvtDBS["QCD_Pt-170to300_Merged.root"]=  7947159;
-  mcEvtDBS["QCD_Pt-300to470_Merged.root"]=  7937590;
+  if(isMuMC){
+    mcEvtDBS["QCD_Pt-15to20_Mu_Merged.root"]  =  4141251;
+    mcEvtDBS["QCD_Pt-20to30_Mu_Merged.root"]  =  31475157;
+    mcEvtDBS["QCD_Pt-30to50_Mu_Merged.root"]  =  29954815;
+    mcEvtDBS["QCD_Pt-50to80_Mu_Merged.root"]  =  19806915;
+    mcEvtDBS["QCD_Pt-80to120_Mu_Merged.root"] =  13786971;
+    mcEvtDBS["QCD_Pt-120to170_Mu_Merged.root"]=  8042721;
+    mcEvtDBS["QCD_Pt-170to300_Mu_Merged.root"]=  7947159;
+    mcEvtDBS["QCD_Pt-300to470_Mu_Merged.root"]=  7937590;
+  }
+  if(isEleMC){
+    mcEvtDBS["QCD_Pt-15to20_EM_Merged.root"]  =  5652601;
+    mcEvtDBS["QCD_Pt-20to30_EM_Merged.root"]  =  9218954;
+    mcEvtDBS["QCD_Pt-30to50_EM_Merged.root"]  =  4730195;
+    mcEvtDBS["QCD_Pt-50to80_EM_Merged.root"]  =  22337070;
+    mcEvtDBS["QCD_Pt-80to120_EM_Merged.root"] =  35841783;
+    mcEvtDBS["QCD_Pt-120to170_EM_Merged.root"]=  35817281;
+    mcEvtDBS["QCD_Pt-170to300_EM_Merged.root"]=  11540163;
+    mcEvtDBS["QCD_Pt-300toInf_EM_Merged.root"]=  7373633;
+  }
   mcEvtDBS["ST_s_Merged.root"]              =  2989199;
   mcEvtDBS["ST_t_Merged.root"]              =  38811017;
   mcEvtDBS["ST_tW_Merged.root"]             =  6933094;
@@ -109,15 +123,21 @@ void getProcessedEvent_13TeV(){
       cout<<setw(30)<<inFile<<setw(15)<<event_dbs<<setw(15)<<event_cond<<setw(15)<<ratio<<endl;
     }
   }
-
+    
+    
+    
+    
+    
+    
+    
   std::map<std::string, double> eleDataEvtDBS;
-  eleDataEvtDBS["EleRunBver2v2_Merged.root"]  =235362706  ;  
-  eleDataEvtDBS["EleRunCv1_Merged.root"    ]  =91537460   ;
-  eleDataEvtDBS["EleRunDv1_Merged.root"    ]  =141901645  ;
-  eleDataEvtDBS["EleRunEv1_Merged.root"    ]  =111732063  ;
-  eleDataEvtDBS["EleRunFv1_Merged.root"    ]  =68855145   ;
-  eleDataEvtDBS["EleRunGv1_Merged.root"    ]  =151022050  ;
-  eleDataEvtDBS["EleRunHver2v1_Merged.root"]  =121561193  ; 
+  eleDataEvtDBS["EleRunBver2v2_Merged.root"]  =235362706 +2466515 ;  
+  eleDataEvtDBS["EleRunCv1_Merged.root"    ]  =91537460  +1789192 ;
+  eleDataEvtDBS["EleRunDv1_Merged.root"    ]  =141901645 +4316488 ;
+  eleDataEvtDBS["EleRunEv1_Merged.root"    ]  =111732063 +1437789 ;
+  eleDataEvtDBS["EleRunFv1_Merged.root"    ]  =68855145  +1288176 ;
+  eleDataEvtDBS["EleRunGv1_Merged.root"    ]  =151022050 +1076567 ;
+  eleDataEvtDBS["EleRunHver2v1_Merged.root"]  =121561193 +2338994 ; 
   eleDataEvtDBS["EleRunHver3v1_Merged.root"]  =3189661  ;
 
   std::map<std::string, double>::iterator itr_eledata;

@@ -40,7 +40,15 @@ public :
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData
     //PU info for MC:
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Pileup_MC_Information
-    LumiWeights_ = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY.root","stack/lumiRewgt/trueMinBiasPU_dataMu.root", "pileup", "pileup");
+    //data-pileup with min bias xss = 69200 mb
+    LumiWeights_ = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY_6000bins.root",
+            "stack/lumiRewgt/trueMinBiasPU_data_JSON_23Sep2016ReReco_69200_1000_6000.root", "pileup", "pileup");
+    //data-pileup with min bias xss = 72383 mb (4.7% more w.r.t. 69200)
+    LumiWeights_Up = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY_6000bins.root",
+            "stack/lumiRewgt/trueMinBiasPU_data_JSON_23Sep2016ReReco_72383_1000_6000.root", "pileup", "pileup");
+    //data-pileup with min bias xss = 66016 mb (4.7% less w.r.t. 69200)
+    LumiWeights_Down = reweight::LumiReWeighting("stack/lumiRewgt/trueInTimePU_mcDY_6000bins.root",
+            "stack/lumiRewgt/trueMinBiasPU_data_JSON_23Sep2016ReReco_66016_1000_6000.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
     
@@ -58,14 +66,16 @@ public :
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
     xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
     //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
-    xss["HplusM100"]         =  831.76*0.32;   evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  831.76*0.32;   evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  831.76*0.32;   evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  831.76*0.32;   evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  831.76*0.32;   evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  831.76*0.32;   evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  831.76*0.32;   evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  831.76*0.32;   evtDBS["HplusM90"]          =  988480;
+    //BR(W->ev) = 10.75± 0.3, BR(W->mv) = 10.57± 0.5
+    //http://pdg.lbl.gov/2012/listings/rpp2012-list-w-boson.pdf
+    xss["HplusM100"]         =  831.76*0.2132;   evtDBS["HplusM100"]         =  996170; 
+    xss["HplusM120"]         =  831.76*0.2132;   evtDBS["HplusM120"]         =  994498; 
+    xss["HplusM140"]         =  831.76*0.2132;   evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM150"]         =  831.76*0.2132;   evtDBS["HplusM150"]         =  990645;
+    xss["HplusM155"]         =  831.76*0.2132;   evtDBS["HplusM155"]         =  952984;
+    xss["HplusM160"]         =  831.76*0.2132;   evtDBS["HplusM160"]         =  992264;
+    xss["HplusM80"]          =  831.76*0.2132;   evtDBS["HplusM80"]          =  976710;
+    xss["HplusM90"]          =  831.76*0.2132;   evtDBS["HplusM90"]          =  988480;
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
     xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
@@ -100,6 +110,10 @@ public :
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
     //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
+    
+    // mu channel 
+    //xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
+    // ele channel 
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
@@ -107,7 +121,7 @@ public :
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
-    xss["sampCode_"]         =  1;             evtDBS["sampCode_"]         =  1; 
+    xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498; 
     
     //Lumis(inverse pb) of single muon DATA at 13TeV
   };
@@ -126,6 +140,8 @@ private :
   Reader *evR;
   
   reweight::LumiReWeighting LumiWeights_;
+  reweight::LumiReWeighting LumiWeights_Up;
+  reweight::LumiReWeighting LumiWeights_Down;
   reweight::PoissonMeanShifter PShiftUp_;   //pileup syst up
   reweight::PoissonMeanShifter PShiftDown_; //pileup syst down 
   std::map<string, double> xss;

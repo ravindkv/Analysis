@@ -1,8 +1,17 @@
 
+bool isMuChannel = true;
+bool isEleChannel = false;
 //TFile *fData     = TFile::Open("all_EleData.root");
 TFile *fData     = TFile::Open("all_muData.root");
-//TFile *fSig     = TFile::Open("all_Hplus150.root");
-TFile* fSig	= TFile::Open("all_TTJetsP.root");
+TFile *fSig     = TFile::Open("all_Hplus90.root");
+
+TFile *fSig90     = TFile::Open("all_Hplus90.root");
+TFile *fSig100     = TFile::Open("all_Hplus100.root");
+TFile *fSig120     = TFile::Open("all_Hplus120.root");
+TFile *fSig140     = TFile::Open("all_Hplus140.root");
+TFile *fSig150     = TFile::Open("all_Hplus150.root");
+TFile *fSig155     = TFile::Open("all_Hplus155.root");
+TFile *fSig160     = TFile::Open("all_Hplus160.root");
 TFile* fTT	= TFile::Open("all_TTJetsP.root");
 
 //--------------------------------------------
@@ -48,69 +57,6 @@ void getAll2dHisto(){
   //c1->SaveAs("RelIso_MET_mu.pdf");
   c1->SaveAs("RelIso_MET_ele.pdf");
 }
-void getAndDeco2dHisto(TFile *histFile, TString dir, TString histName, TString xaxis_title){
-  TH2F* hist = (TH2F*)(histFile->Get("base/Iso/"+dir+"/"+histName))->Clone(histName);
-  TCanvas *c1 = new TCanvas();
-  //gStyle->SetPalette(55);
-  gStyle->SetOptStat(111);
-  gStyle->SetFrameLineWidth(4);
-  gPad->SetBottomMargin(0.20);
-  gPad->SetLeftMargin(0.15);
-  //gPad->SetRightMargin(0.15);
-  hist->GetXaxis()->SetTitle(xaxis_title);
-  hist->SetTitle("Binning: 10%, 10%, 10% : "+dir+": #mu+jets: t#bar{t}");
-  //hist->SetFillColor(color);
-  //hist->GetXaxis()->SetTitle(xTit);
-  //hist->GetYaxis()->SetTitle(yTit);
-  //hist->GetZaxis()->SetTitle(zTit);
-  //hist->GetYaxis()->SetRangeUser(1, 3000);
-  hist->GetYaxis()->SetTitle("M_{csb_{Lep}} [GeV]");
-  //hist->GetYaxis()->SetRangeUser(1, 1.4* hist->GetMaximum());
-  hist->GetYaxis()->SetTitleOffset(1.00);
-  hist->GetXaxis()->SetRangeUser(0, 300);
-  hist->GetXaxis()->SetTitleOffset(1.20);
-  hist->GetYaxis()->SetTitleSize(0.07);   hist->GetXaxis()->SetTitleSize(0.07);
-  hist->GetXaxis()->SetLabelSize(0.07);   hist->GetXaxis()->LabelsOption("u"); // extra
-  hist->GetYaxis()->SetLabelSize(0.07);   hist->GetXaxis()->LabelsOption("u"); // extra
-  hist->GetXaxis()->SetTickLength(0.05); 
-  hist->GetXaxis()->SetNdivisions(5); 
-  hist->GetYaxis()->SetNdivisions(5); 
-  hist->GetYaxis()->SetTickLength(0.04); 
-  hist->Draw("colz");
-  c1->SaveAs(dir+"_"+histName+".pdf");
-}
-void getTProfile(TFile *histFile, TString dir, TString histName, TString xaxis_title){
-  TProfile* hist = (TProfile*)(histFile->Get("base/Iso/"+dir+"/"+histName))->Clone(histName);
-  TCanvas *c1 = new TCanvas();
-  //gStyle->SetPalette(55);
-  gStyle->SetOptStat(111);
-  gStyle->SetFrameLineWidth(4);
-  gPad->SetBottomMargin(0.20);
-  gPad->SetLeftMargin(0.15);
-  //gPad->SetRightMargin(0.15);
-  hist->GetXaxis()->SetTitle(xaxis_title);
-  hist->SetTitle("Binning: 10%, 10%, 10% : "+dir+": #mu+jets: t#bar{t}");
-  //hist->GetYaxis()->SetRangeUser(1, 3000);
-  hist->GetYaxis()->SetTitle("M_{jj} [GeV]");
-  //hist->GetYaxis()->SetRangeUser(1, 1.4* hist->GetMaximum());
-  hist->GetYaxis()->SetTitleOffset(1.00);
-  //hist->GetXaxis()->SetRangeUser(0, 300);
-  hist->GetXaxis()->SetTitleOffset(1.20);
-  hist->GetYaxis()->SetTitleSize(0.07);   hist->GetXaxis()->SetTitleSize(0.07);
-  hist->GetXaxis()->SetLabelSize(0.07);   hist->GetXaxis()->LabelsOption("u"); // extra
-  hist->GetYaxis()->SetLabelSize(0.07);   hist->GetXaxis()->LabelsOption("u"); // extra
-  hist->GetXaxis()->SetTickLength(0.05); 
-  //hist->GetXaxis()->SetNdivisions(5); 
-  hist->SetLineColor(3);
-  hist->SetLineWidth(3);
-  hist->SetMarkerSize(1);
-  hist->SetMarkerStyle(20);
-  hist->SetMarkerColor(4); 
-  hist->GetYaxis()->SetNdivisions(5); 
-  hist->GetYaxis()->SetTickLength(0.04); 
-  hist->Draw();
-  c1->SaveAs(dir+"_"+histName+".pdf");
-}
 
 void getHisto(TFile *histFile, TString dir, TString histName, TString xaxis_title){
   TH1F* hist; 
@@ -118,10 +64,9 @@ void getHisto(TFile *histFile, TString dir, TString histName, TString xaxis_titl
     hist = (TH1F*)(fTT->Get("base/Iso/"+dir+"/"+histName))->Clone(histName);
     hist->Add(hist, -1);
   }else hist = (TH1F*)(histFile->Get("base/Iso/"+dir+"/"+histName))->Clone(histName);
-  
+  gStyle->SetOptStat(1111111111);
+  gStyle->SetFrameLineWidth(3);
   TCanvas *c1 = new TCanvas();
-  gStyle->SetOptStat(11111111);
-  gStyle->SetFrameLineWidth(4);
   gPad->SetBottomMargin(0.15);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
@@ -133,7 +78,7 @@ void getHisto(TFile *histFile, TString dir, TString histName, TString xaxis_titl
   //hist->SetTitle("Binning: 10g, 10g, 10g : "+dir+": #mu+jets: t#bar{t}");
   //hist->SetTitle("Binning: 5%, 5%, 10% : "+dir+": #mu+jets: t#bar{t}");
   //hist->SetTitle("Binning: 5%, 5%, 20% : "+dir+": #mu+jets: t#bar{t}");
-  hist->SetTitle("Binning: 10%, 10%, 10% : "+dir+": #mu+jets: t#bar{t}");
+  //hist->SetTitle("Binning: 10%, 10%, 10% : "+dir+": #mu+jets: t#bar{t}");
   hist->GetYaxis()->SetRangeUser(1, 1.2* hist->GetMaximum());
   hist->GetXaxis()->SetRangeUser(0, 200);
   hist->GetXaxis()->SetTitle(xaxis_title);
@@ -150,6 +95,7 @@ void getHisto(TFile *histFile, TString dir, TString histName, TString xaxis_titl
   c1->SaveAs(dir+"_"+histName+".pdf");
   //c1->Close();
 }
+
 
 
 void getAllHistoBin10p10p10p(){
@@ -305,7 +251,6 @@ void getAllHistoBin5p5p10p(){
  }
 
 void getAllHistoBin10g10g10g(){
-
   getHisto(fSig, "PtbJetCatL", "mjj_kfit_25To35" , "M_{jj}^{CatL}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
   getHisto(fSig, "PtbJetCatL", "mjj_kfit_35To45" , "M_{jj}^{CatL}(35 < Pt_{bjet}^{Had} #leq 45)[GeV$]");
   getHisto(fSig, "PtbJetCatL", "mjj_kfit_45To55" , "M_{jj}^{CatL}(45 < Pt_{bjet}^{Had} #leq 55)[GeV]");
@@ -339,277 +284,81 @@ void getAllHistoBin10g10g10g(){
   getHisto(fSig, "PtbJetCatT", "mjj_kfit_105To150", "M_{jj}^{CatT}(105 < Pt_{bjet}^{Had} #leq 150)[GeV]");
   getHisto(fSig, "PtbJetCatT", "mjj_kfit_150To500","M_{jj}^{CatT}(150 < Pt_{bjet}^{Had}#leq 500)[GeV]");
  }
-void getAllHistoBin10p10p10p_triJetcsbHad(){
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_25To35" , "M_{csb_{Had}}^{CatL}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_35To42" , "M_{csb_{Had}}^{CatL}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_42To50" , "M_{csb_{Had}}^{CatL}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_50To57" , "M_{csb_{Had}}^{CatL}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_57To65" , "M_{csb_{Had}}^{CatL}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_65To74" , "M_{csb_{Had}}^{CatL}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_74To84" , "M_{csb_{Had}}^{CatL}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_84To99" , "M_{csb_{Had}}^{CatL}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_99To124", "M_{csb_{Had}}^{CatL}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbHad_124To500","M_{csb_{Had}}^{CatL}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
 
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_25To35" , "M_{csb_{Had}}^{CatM}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_35To42" , "M_{csb_{Had}}^{CatM}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_42To50" , "M_{csb_{Had}}^{CatM}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_50To57" , "M_{csb_{Had}}^{CatM}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_57To65" , "M_{csb_{Had}}^{CatM}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_65To74" , "M_{csb_{Had}}^{CatM}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_74To84" , "M_{csb_{Had}}^{CatM}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_84To99" , "M_{csb_{Had}}^{CatM}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_99To124", "M_{csb_{Had}}^{CatM}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbHad_124To500","M_{csb_{Had}}^{CatM}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_25To35" , "M_{csb_{Had}}^{CatT}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_35To42" , "M_{csb_{Had}}^{CatT}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_42To50" , "M_{csb_{Had}}^{CatT}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_50To57" , "M_{csb_{Had}}^{CatT}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_57To65" , "M_{csb_{Had}}^{CatT}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_65To74" , "M_{csb_{Had}}^{CatT}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_74To84" , "M_{csb_{Had}}^{CatT}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_84To99" , "M_{csb_{Had}}^{CatT}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_99To124", "M_{csb_{Had}}^{CatT}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbHad_124To500","M_{csb_{Had}}^{CatT}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
- }
-void getAllHistoBin10p10p10p_triJetcsbLep(){
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_25To35" , "M_{csb_{Lep}}^{CatL}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_35To42" , "M_{csb_{Lep}}^{CatL}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_42To50" , "M_{csb_{Lep}}^{CatL}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_50To57" , "M_{csb_{Lep}}^{CatL}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_57To65" , "M_{csb_{Lep}}^{CatL}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_65To74" , "M_{csb_{Lep}}^{CatL}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_74To84" , "M_{csb_{Lep}}^{CatL}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_84To99" , "M_{csb_{Lep}}^{CatL}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_99To124", "M_{csb_{Lep}}^{CatL}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "triJet_csbLep_124To500","M_{csb_{Lep}}^{CatL}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_25To35" , "M_{csb_{Lep}}^{CatM}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_35To42" , "M_{csb_{Lep}}^{CatM}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_42To50" , "M_{csb_{Lep}}^{CatM}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_50To57" , "M_{csb_{Lep}}^{CatM}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_57To65" , "M_{csb_{Lep}}^{CatM}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_65To74" , "M_{csb_{Lep}}^{CatM}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_74To84" , "M_{csb_{Lep}}^{CatM}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_84To99" , "M_{csb_{Lep}}^{CatM}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_99To124", "M_{csb_{Lep}}^{CatM}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "triJet_csbLep_124To500","M_{csb_{Lep}}^{CatM}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_25To35" , "M_{csb_{Lep}}^{CatT}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_35To42" , "M_{csb_{Lep}}^{CatT}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_42To50" , "M_{csb_{Lep}}^{CatT}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_50To57" , "M_{csb_{Lep}}^{CatT}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_57To65" , "M_{csb_{Lep}}^{CatT}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_65To74" , "M_{csb_{Lep}}^{CatT}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_74To84" , "M_{csb_{Lep}}^{CatT}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_84To99" , "M_{csb_{Lep}}^{CatT}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_99To124", "M_{csb_{Lep}}^{CatT}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "triJet_csbLep_124To500","M_{csb_{Lep}}^{CatT}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
- }
-//TH2F* getAndDeco2dHisto(TFile *histFile, TString histName, TString xaxis_title){
-void getAllHistoBin10p10p10p_triJet_csbHad_csbLep_50To57(){
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_25To35" , "M_{csb_{Had}}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_35To42" , "M_{csb_{Had}}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_42To50_csbLep" , "M_{csb_{Had}}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_50To57" , "M_{csb_{Had}}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_57To65" , "M_{csb_{Had}}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_65To74" , "M_{csb_{Had}}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_74To84" , "M_{csb_{Had}}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_84To99" , "M_{csb_{Had}}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_99To124", "M_{csb_{Had}}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatL", "triJet_csbHad_csbLep_124To500","M_{csb_{Had}}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_25To35" , "M_{csb_{Had}}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_35To42" , "M_{csb_{Had}}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_42To50_csbLep" , "M_{csb_{Had}}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_50To57" , "M_{csb_{Had}}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_57To65" , "M_{csb_{Had}}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_65To74" , "M_{csb_{Had}}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_74To84" , "M_{csb_{Had}}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_84To99" , "M_{csb_{Had}}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_99To124", "M_{csb_{Had}}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatM", "triJet_csbHad_csbLep_124To500","M_{csb_{Had}}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_25To35" , "M_{csb_{Had}}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_35To42" , "M_{csb_{Had}}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_42To50_csbLep" , "M_{csb_{Had}}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_50To57" , "M_{csb_{Had}}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_57To65" , "M_{csb_{Had}}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_65To74" , "M_{csb_{Had}}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_74To84" , "M_{csb_{Had}}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_84To99" , "M_{csb_{Had}}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_99To124", "M_{csb_{Had}}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getAndDeco2dHisto(fSig, "PtbJetCatT", "triJet_csbHad_csbLep_124To500","M_{csb_{Had}}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
- }
-void getAllHistoBin10p10p10p_ClassA(){
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_25To35_ClassA" , "M_{jj}^{ClassA}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_35To42_ClassA" , "M_{jj}^{ClassA}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_42To50_ClassA" , "M_{jj}^{ClassA}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_50To57_ClassA" , "M_{jj}^{ClassA}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_57To65_ClassA" , "M_{jj}^{ClassA}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_65To74_ClassA" , "M_{jj}^{ClassA}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_74To84_ClassA" , "M_{jj}^{ClassA}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_84To99_ClassA" , "M_{jj}^{ClassA}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_99To124_ClassA", "M_{jj}^{ClassA}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_124To500_ClassA","M_{jj}^{ClassA}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_25To35_ClassA" , "M_{jj}^{ClassA}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_35To42_ClassA" , "M_{jj}^{ClassA}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_42To50_ClassA" , "M_{jj}^{ClassA}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_50To57_ClassA" , "M_{jj}^{ClassA}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_57To65_ClassA" , "M_{jj}^{ClassA}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_65To74_ClassA" , "M_{jj}^{ClassA}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_74To84_ClassA" , "M_{jj}^{ClassA}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_84To99_ClassA" , "M_{jj}^{ClassA}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_99To124_ClassA", "M_{jj}^{ClassA}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_124To500_ClassA","M_{jj}^{ClassA}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_25To35_ClassA" , "M_{jj}^{ClassA}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_35To42_ClassA" , "M_{jj}^{ClassA}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_42To50_ClassA" , "M_{jj}^{ClassA}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_50To57_ClassA" , "M_{jj}^{ClassA}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_57To65_ClassA" , "M_{jj}^{ClassA}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_65To74_ClassA" , "M_{jj}^{ClassA}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_74To84_ClassA" , "M_{jj}^{ClassA}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_84To99_ClassA" , "M_{jj}^{ClassA}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_99To124_ClassA", "M_{jj}^{ClassA}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_124To500_ClassA","M_{jj}^{ClassA}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
- }
-void getAllHistoBin10p10p10p_ClassB(){
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_25To35_ClassB" , "M_{jj}^{ClassB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_35To42_ClassB" , "M_{jj}^{ClassB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_42To50_ClassB" , "M_{jj}^{ClassB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_50To57_ClassB" , "M_{jj}^{ClassB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_57To65_ClassB" , "M_{jj}^{ClassB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_65To74_ClassB" , "M_{jj}^{ClassB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_74To84_ClassB" , "M_{jj}^{ClassB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_84To99_ClassB" , "M_{jj}^{ClassB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_99To124_ClassB", "M_{jj}^{ClassB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_124To500_ClassB","M_{jj}^{ClassB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_25To35_ClassB" , "M_{jj}^{ClassB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_35To42_ClassB" , "M_{jj}^{ClassB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_42To50_ClassB" , "M_{jj}^{ClassB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_50To57_ClassB" , "M_{jj}^{ClassB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_57To65_ClassB" , "M_{jj}^{ClassB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_65To74_ClassB" , "M_{jj}^{ClassB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_74To84_ClassB" , "M_{jj}^{ClassB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_84To99_ClassB" , "M_{jj}^{ClassB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_99To124_ClassB", "M_{jj}^{ClassB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_124To500_ClassB","M_{jj}^{ClassB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
-
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_25To35_ClassB" , "M_{jj}^{ClassB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_35To42_ClassB" , "M_{jj}^{ClassB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_42To50_ClassB" , "M_{jj}^{ClassB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_50To57_ClassB" , "M_{jj}^{ClassB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_57To65_ClassB" , "M_{jj}^{ClassB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_65To74_ClassB" , "M_{jj}^{ClassB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_74To84_ClassB" , "M_{jj}^{ClassB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_84To99_ClassB" , "M_{jj}^{ClassB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_99To124_ClassB", "M_{jj}^{ClassB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_124To500_ClassB","M_{jj}^{ClassB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
+TH1F* getHisto_method2(TFile *histFile, TString dir, TString histName, TString xaxis_title){
+  TH1F* hist; 
+  if(!(histFile->Get("base/"+histName))){
+    hist = (TH1F*)(fTT->Get("base/"+histName))->Clone(histName);
+    hist->Add(hist, -1);
+  }else hist = (TH1F*)(histFile->Get("base/"+histName))->Clone(histName);
+  hist->GetYaxis()->SetTitle("Events");
+  hist->SetTitle("");
+  hist->SetLineWidth(10);
+  hist->GetYaxis()->SetRangeUser(1, 1.2* hist->GetMaximum());
+  hist->GetXaxis()->SetRangeUser(0.5, 1.5);
+  hist->GetXaxis()->SetTitle(xaxis_title);
+  hist->GetYaxis()->SetTitleSize(0.05);   hist->GetXaxis()->SetTitleSize(0.05);
+  hist->GetXaxis()->SetLabelSize(0.05);   hist->GetXaxis()->LabelsOption("u"); // extra
+  hist->GetYaxis()->SetLabelSize(0.05);   hist->GetXaxis()->LabelsOption("u"); // extra
+  hist->GetXaxis()->SetTickLength(0.05); 
+  hist->GetYaxis()->SetTickLength(0.04); 
+  hist->GetYaxis()->SetTitleSize(0.07);   
+  hist->GetXaxis()->SetTitleSize(0.07);   
+  hist->GetYaxis()->SetTitleOffset(1.05);
+  hist->GetXaxis()->SetTitleOffset(1.00);
+  return hist;
+}
+void getTopPtHisto(TFile * fSig, TString proc){
+  gStyle->SetOptStat(0);
+  gStyle->SetFrameLineWidth(3);
+  TCanvas *c1 = new TCanvas();
+  gPad->SetBottomMargin(0.15);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetRightMargin(0.05);
+  TH1F* h_Sig = getHisto_method2(fSig, "", "SF_topPtWeights" , "top quark pT weights");
+  
+  TLegend* leg = new TLegend(0.7018792,0.6261504,0.9012081,0.9198861,NULL,"brNDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetFillColor(10);
+  leg->SetTextSize(0.07);
+  leg->AddEntry(h_Sig, proc);
+  //pave text CMS box
+  TPaveText *pt = new TPaveText(0.25,0.9354,0.90,0.9362, "brNDC"); // good_v1
+  pt->SetBorderSize(1);
+  pt->SetFillColor(19);
+  pt->SetFillStyle(0);
+  pt->SetTextSize(0.08);
+  pt->SetLineColor(0);
+  pt->SetTextFont(132);
+  TText *text = pt->AddText("#sqrt{s}=13 TeV, 35.9 fb^{-1}; ");
+  text->SetTextAlign(11);
+  
+  //pave text channel box
+  TPaveText *ch = new TPaveText(1.00,0.9154898,0.7510067,0.9762187,"brNDC");
+  ch->SetFillColor(19);
+  ch->SetFillStyle(0);
+  ch->SetLineColor(0);
+  ch->SetTextSize(0.08);
+  ch->SetBorderSize(1);
+  if(isMuChannel) ch->AddText("#mu + jets");
+  if(isEleChannel) ch->AddText("e + jets");
+  h_Sig->Draw();
+  pt->Draw();
+  ch->Draw();
+  leg->Draw();
+  c1->SaveAs(proc+"_topPtWt.pdf");
  }
 
-void getAllHistoBin10p10p10p_ClassAB(){
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_25To35" , "M_{jj}^{ClassAB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_35To42" , "M_{jj}^{ClassAB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_42To50" , "M_{jj}^{ClassAB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_50To57" , "M_{jj}^{ClassAB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_57To65" , "M_{jj}^{ClassAB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_65To74" , "M_{jj}^{ClassAB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_74To84" , "M_{jj}^{ClassAB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_84To99" , "M_{jj}^{ClassAB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_99To124", "M_{jj}^{ClassAB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatL", "mjj_kfit_124To500","M_{jj}^{ClassAB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
+void getTopPtHistoAll(){
+  getTopPtHisto(fTT, "t#bar{t} + jets");
+  //getTopPtHisto(fSig90, "WH90");
+  //getTopPtHisto(fSig100, "WH100");
+  //getTopPtHisto(fSig120, "WH120");
+  //getTopPtHisto(fSig140, "WH140");
+  //getTopPtHisto(fSig150, "WH150");
+  //getTopPtHisto(fSig155, "WH155");
+  getTopPtHisto(fSig160, "WH160");
+}
 
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_25To35" , "M_{jj}^{ClassAB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_35To42" , "M_{jj}^{ClassAB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_42To50" , "M_{jj}^{ClassAB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_50To57" , "M_{jj}^{ClassAB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_57To65" , "M_{jj}^{ClassAB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_65To74" , "M_{jj}^{ClassAB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_74To84" , "M_{jj}^{ClassAB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_84To99" , "M_{jj}^{ClassAB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_99To124", "M_{jj}^{ClassAB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatM", "mjj_kfit_124To500","M_{jj}^{ClassAB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
 
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_25To35" , "M_{jj}^{ClassAB}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_35To42" , "M_{jj}^{ClassAB}(35 < Pt_{bjet}^{Had} #leq 42)[GeV$]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_42To50" , "M_{jj}^{ClassAB}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_50To57" , "M_{jj}^{ClassAB}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_57To65" , "M_{jj}^{ClassAB}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_65To74" , "M_{jj}^{ClassAB}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_74To84" , "M_{jj}^{ClassAB}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_84To99" , "M_{jj}^{ClassAB}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_99To124", "M_{jj}^{ClassAB}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]");
-  getHisto(fSig, "PtbJetCatT", "mjj_kfit_124To500","M_{jj}^{ClassAB}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]");
- }
-void getAllTProfileBin10p10p10p_mjj_kfit_eta_bjetH(){
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_25To35" , "#eta_{bjet}^{Had}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_35To42" , "#eta_{bjet}^{Had}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_42To50" , "#eta_{bjet}^{Had}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_50To57" , "#eta_{bjet}^{Had}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_57To65" , "#eta_{bjet}^{Had}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_65To74" , "#eta_{bjet}^{Had}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_74To84" , "#eta_{bjet}^{Had}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_84To99" , "#eta_{bjet}^{Had}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_99To124", "#eta_{bjet}^{Had}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_bjetH_124To500","#eta_{bjet}^{Had}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
-
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_25To35" , "#eta_{bjet}^{Had}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_35To42" , "#eta_{bjet}^{Had}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_42To50" , "#eta_{bjet}^{Had}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_50To57" , "#eta_{bjet}^{Had}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_57To65" , "#eta_{bjet}^{Had}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_65To74" , "#eta_{bjet}^{Had}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_74To84" , "#eta_{bjet}^{Had}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_84To99" , "#eta_{bjet}^{Had}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_99To124", "#eta_{bjet}^{Had}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_bjetH_124To500","#eta_{bjet}^{Had}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
-
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_25To35" , "#eta_{bjet}^{Had}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_35To42" , "#eta_{bjet}^{Had}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_42To50" , "#eta_{bjet}^{Had}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_50To57" , "#eta_{bjet}^{Had}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_57To65" , "#eta_{bjet}^{Had}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_65To74" , "#eta_{bjet}^{Had}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_74To84" , "#eta_{bjet}^{Had}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_84To99" , "#eta_{bjet}^{Had}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_99To124", "#eta_{bjet}^{Had}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_bjetH_124To500","#eta_{bjet}^{Had}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
- }
-void getAllTProfileBin10p10p10p_mjj_kfit_eta_diJet(){
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_25To35" , "#eta_{jj}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_35To42" , "#eta_{jj}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_42To50" , "#eta_{jj}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_50To57" , "#eta_{jj}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_57To65" , "#eta_{jj}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_65To74" , "#eta_{jj}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_74To84" , "#eta_{jj}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_84To99" , "#eta_{jj}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_99To124", "#eta_{jj}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatL", "mjj_kfit_eta_diJet_124To500","#eta_{jj}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
-
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_25To35" , "#eta_{jj}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_35To42" , "#eta_{jj}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_42To50" , "#eta_{jj}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_50To57" , "#eta_{jj}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_57To65" , "#eta_{jj}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_65To74" , "#eta_{jj}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_74To84" , "#eta_{jj}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_84To99" , "#eta_{jj}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_99To124", "#eta_{jj}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatM", "mjj_kfit_eta_diJet_124To500","#eta_{jj}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
-
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_25To35" , "#eta_{jj}(25 < Pt_{bjet}^{Had} #leq 35 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_35To42" , "#eta_{jj}(35 < Pt_{bjet}^{Had} #leq 42 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_42To50" , "#eta_{jj}(42 < Pt_{bjet}^{Had} #leq 50 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_50To57" , "#eta_{jj}(50 < Pt_{bjet}^{Had} #leq 57 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_57To65" , "#eta_{jj}(57 < Pt_{bjet}^{Had} #leq 65 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_65To74" , "#eta_{jj}(65 < Pt_{bjet}^{Had} #leq 74 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_74To84" , "#eta_{jj}(74 < Pt_{bjet}^{Had} #leq 84 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_84To99" , "#eta_{jj}(84 < Pt_{bjet}^{Had} #leq 99 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_99To124", "#eta_{jj}(99 < Pt_{bjet}^{Had} #leq 124 GeV)");
-  getTProfile(fSig, "PtbJetCatT", "mjj_kfit_eta_diJet_124To500","#eta_{jj}(124 < Pt_{bjet}^{Had}#leq 500 GeV)");
- }

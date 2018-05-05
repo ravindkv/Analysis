@@ -23,7 +23,7 @@ cp /tmp/x509up_u56537 ~/
 
 log="log_20170620_"
 logDir=$log${ntupleT2Paths/.txt/""}
-baseDir="/home/rverma/condor_log/"
+baseDir="/home/rverma/t3store2/condor_log/"
 mkdir -p $baseDir$logDir
 outcond="$baseDir$logDir"
 

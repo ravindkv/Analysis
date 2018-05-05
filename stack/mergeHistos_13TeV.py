@@ -15,48 +15,59 @@ isMuMC = False
 isEleData = True
 isEleMC = True
 
-mc = [
-    "TTJetsM",
-    "TTJetsP",
-    "TTJetsP_up",
-    "TTJetsP_down",
-    "TTJetsP_mtop1735",
-    "TTJetsP_mtop1715",
-    "TTJetsP_hdampUP",
-    "TTJetsP_hdampDOWN",
-    "HplusM120",
-    "ST_tW",
-    "ST_t",
-    "ST_s",
-    "WJetsToLNu",
-    "W1JetsToLNu",
-    "W2JetsToLNu",
-    "W3JetsToLNu",
-    "W4JetsToLNu",
-    "DYJetsToLL",
-    "DY1JetsToLL",
-    "DY2JetsToLL",
-    "DY3JetsToLL",
-    "DY4JetsToLL",
-    "WW",
-    "WZ",
-    "ZZ",
-    "QCD_Pt-15to20",
-    "QCD_Pt-20to30",
-    "QCD_Pt-30to50",
-    "QCD_Pt-50to80",
-    "QCD_Pt-80to120",
-    "QCD_Pt-120to170",
-    "QCD_Pt-170to300",
-    "QCD_Pt-300to470",
-    "HplusM80",
-    "HplusM90",
-    "HplusM100",
-    "HplusM120",
-    "HplusM140",
-    "HplusM150",
-    "HplusM155",
-    "HplusM160"]
+mc = []
+mc.append("TTJetsM")
+mc.append("TTJetsP")
+mc.append("TTJetsP_up")
+mc.append("TTJetsP_down")
+mc.append("TTJetsP_mtop1735")
+mc.append("TTJetsP_mtop1715")
+mc.append("TTJetsP_hdampUP")
+mc.append("TTJetsP_hdampDOWN")
+mc.append("HplusM120")
+mc.append("ST_tW")
+mc.append("ST_t")
+mc.append("ST_s")
+mc.append("WJetsToLNu")
+mc.append("W1JetsToLNu")
+mc.append("W2JetsToLNu")
+mc.append("W3JetsToLNu")
+mc.append("W4JetsToLNu")
+mc.append("DYJetsToLL")
+mc.append("DY1JetsToLL")
+mc.append("DY2JetsToLL")
+mc.append("DY3JetsToLL")
+mc.append("DY4JetsToLL")
+mc.append("WW")
+mc.append("WZ")
+mc.append("ZZ")
+mc.append("HplusM80")
+mc.append("HplusM90")
+mc.append("HplusM100")
+mc.append("HplusM120")
+mc.append("HplusM140")
+mc.append("HplusM150")
+mc.append("HplusM155")
+mc.append("HplusM160")
+
+if(isMuMC):
+    mc.append("QCD_Pt-15to20_Mu")
+    mc.append("QCD_Pt-20to30_Mu")
+    mc.append("QCD_Pt-30to50_Mu")
+    mc.append("QCD_Pt-50to80_Mu")
+    mc.append("QCD_Pt-80to120_Mu")
+    mc.append("QCD_Pt-120to170_Mu")
+    mc.append("QCD_Pt-170to300_Mu")
+    mc.append("QCD_Pt-300to470_Mu")
+else:
+    mc.append("QCD_Pt-15to20_EM")
+    mc.append("QCD_Pt-20to30_EM")
+    mc.append("QCD_Pt-30to50_EM")
+    mc.append("QCD_Pt-50to80_EM")
+    mc.append("QCD_Pt-80to120_EM")
+    mc.append("QCD_Pt-120to170_EM")
+    mc.append("QCD_Pt-170to300_EM")
+    mc.append("QCD_Pt-300toInf_EM")
 
 if(isMuData):
 	data = ["MuRunB2v2", "MuRunCv1", "MuRunDv1", "MuRunEv1", "MuRunFv1", "MuRunGv1", "MuRunH2v1", "MuRunH3v1"]
@@ -74,17 +85,11 @@ def execme(command):
 
 if isMuMC:
     for samp in range(len(mc)):
-        if "QCD" in str(mc[samp]):
-            execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_Mu_MuMC*")
-        else:
-            execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_MuMC*")
+        execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_MuMC*")
 
 if isEleMC:
     for samp in range(len(mc)):
-        if "QCD" in str(mc[samp]):
-            execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_EM_EleMC*")
-        else:
-            execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_EleMC*")
+        execme("hadd -k "+str(mc[samp])+"_Merged.root "+str(mc[samp])+"_EleMC*")
 
 if(isMuData):
     for samp in range(len(data)):

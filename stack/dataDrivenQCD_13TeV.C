@@ -13,12 +13,14 @@ using namespace std;
  
 ///////////////////////////////////////////  
 //CHANNEL
-bool isMuChannel = true;
-bool isEleChannel = false;
+bool isMuChannel = false;
+bool isEleChannel = true;
+TString baseIsoDir = "baseLowMET";
+//TString baseIsoDir = "baseIso20LowMET";
 
 //INPUT FILES
-//TFile* fData = TFile::Open("all_EleData.root");
-TFile *fData  = TFile::Open("all_muData.root");
+TFile* fData = TFile::Open("all_EleData.root");
+//TFile *fData  = TFile::Open("all_muData.root");
 
 TFile* fVV	= TFile::Open("all_VV.root");
 TFile* fDY	= TFile::Open("all_DY.root");
@@ -29,7 +31,7 @@ TFile *fSig     = TFile::Open("all_Hplus120.root");
 double sf_ttbar = 1.0; 
   
 //SAVE HISTOS ON DISK
-bool isSaveHisto = false;
+bool isSaveHisto = true;
 ///////////////////////////////////////////  
 
 //*-------------------------------
@@ -46,6 +48,7 @@ TH1F* getHisto(TFile *histFile, TString dirBase, TString dirIso, TString dirBTag
     hist->Add(hist, -1);
   }else hist = (TH1F*)(histFile->Get(histPath))->Clone(histName);
   hist->Scale(sf);
+  cout<<dirBTag<<", "<<dirIso<<", "<<dirBTag<<", "<<histName<<", "<<hist->Integral()<<endl;
   return hist;
 }
 
@@ -54,14 +57,15 @@ TH1F* getHisto(TFile *histFile, TString dirBase, TString dirIso, TString dirBTag
 //*-------------------------------
 TH1F * dataMCdiff(TString dirIso, TString dirBTag, TString histname, TString xaxis_title, int bin, bool log=false, bool axisrange=false, double xmin=0, double xmax=10){
   //hMC = all Bkg MC samples
-  TH1F* hMC =  (TH1F*) getHisto(fVV, "baseLowMET", dirIso, dirBTag, histname, 1)->Clone("hMC");
-  hMC->Add(getHisto(fDY, "baseLowMET", dirIso, dirBTag, histname, 1));
-  hMC->Add(getHisto(fST, "baseLowMET", dirIso, dirBTag, histname, 1));
-  hMC->Add(getHisto(fWJ, "baseLowMET", dirIso, dirBTag, histname, 1));
-  hMC->Add(getHisto(fTT, "baseLowMET", dirIso, dirBTag, histname, sf_ttbar));
+  cout<<"VV"<<endl;
+  TH1F* hMC =  (TH1F*) getHisto(fVV, baseIsoDir, dirIso, dirBTag, histname, 1)->Clone("hMC");
+  hMC->Add(getHisto(fDY, baseIsoDir, dirIso, dirBTag, histname, 1));
+  hMC->Add(getHisto(fST, baseIsoDir, dirIso, dirBTag, histname, 1));
+  hMC->Add(getHisto(fWJ, baseIsoDir, dirIso, dirBTag, histname, 1));
+  hMC->Add(getHisto(fTT, baseIsoDir, dirIso, dirBTag, histname, sf_ttbar));
   
   //DATA
-  TH1F* hData = (TH1F*)getHisto(fData, "baseLowMET", dirIso, dirBTag, histname, 1)->Clone("data");
+  TH1F* hData = (TH1F*)getHisto(fData, baseIsoDir, dirIso, dirBTag, histname, 1)->Clone("data");
   //Data - non QCD Bkg
   TH1F *hDiff = (TH1F*)hData->Clone("hDiff");
   hDiff->Add(hMC, -1);
@@ -70,12 +74,12 @@ TH1F * dataMCdiff(TString dirIso, TString dirBTag, TString histname, TString xax
   //hDiff->GetYaxis()->SetRangeUser(0, 2);
   hDiff->GetXaxis()->SetRangeUser(xmin, xmax);
   hDiff->SetTitle("");
-  //hDiff->GetXaxis()->SetTitle(xaxis_title); 
-  hDiff->GetYaxis()->SetTitleOffset(0.65);
-  hDiff->GetYaxis()->SetTitle("Data - nonQCDBkg"); hDiff->GetYaxis()->CenterTitle();
-  hDiff->GetYaxis()->SetTitleSize(0.08); hDiff->GetXaxis()->SetTitleSize(0.08);
-  hDiff->GetXaxis()->SetLabelSize(0.06); hDiff->GetXaxis()->LabelsOption("u"); // extra
-  hDiff->GetYaxis()->SetLabelSize(0.06); hDiff->GetYaxis()->LabelsOption("u"); // extra
+  hDiff->GetXaxis()->SetTitle(xaxis_title); 
+  hDiff->GetYaxis()->SetTitleOffset(1.20);
+  hDiff->GetYaxis()->SetTitle("QCD events "); hDiff->GetYaxis()->CenterTitle();
+  hDiff->GetYaxis()->SetTitleSize(0.07); hDiff->GetXaxis()->SetTitleSize(0.07);
+  hDiff->GetXaxis()->SetLabelSize(0.05); hDiff->GetXaxis()->LabelsOption("u"); // extra
+  hDiff->GetYaxis()->SetLabelSize(0.05); hDiff->GetYaxis()->LabelsOption("u"); // extra
   ///hDiff->Draw("e1"); // use "P" or "AP"
   //hDiff->Draw("E same");
   return hDiff;
@@ -87,18 +91,24 @@ TH1F * dataMCdiff(TString dirIso, TString dirBTag, TString histname, TString xax
 
 void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TString histname, TString xaxis_title, double xmin=0, double xmax = 100){
   gStyle->SetOptStat(0);
-  //TCanvas *c1 = new TCanvas("ddd", "aaa");
-  //c1->Divide(2, 2);
-  //c1->cd(postion);
+  gStyle->SetFrameLineWidth(3);
   const float xpad[2] = {0.,1};
-  const float ypad[4] = {0.,0.2351916,0.2351916,0.98};
+  const float ypad[4] = {0.,0.2351916,0.0351916,0.98};
+  TCanvas *c1 = new TCanvas("ddd", "aaa");
+  c1->Divide(1, 2);
+  //c1->cd(postion);
+  c1->cd(1);
+  gPad->SetPad(xpad[0],ypad[2],xpad[1],ypad[3]);
+  gPad->SetTopMargin(1.15); 
+  gPad->SetBottomMargin(0.5); 
+  gPad->SetLeftMargin(0.15);
+  gPad->SetRightMargin(0.05);
   //legend box
-  TLegend* leg = new TLegend(0.6318792,0.6261504,0.8012081,0.9198861,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.7518792,0.6261504,0.9512081,0.9198861,NULL,"brNDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetFillColor(10);
-  leg->SetTextSize(0.1);
-  
+  leg->SetTextSize(0.07);
   //pave text CMS box
   TPaveText *pt = new TPaveText(0.11,0.9354,0.90,0.9362, "brNDC"); // good_v1
   pt->SetBorderSize(1);
@@ -107,12 +117,12 @@ void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TStri
   pt->SetTextSize(0.08);
   pt->SetLineColor(0);
   pt->SetTextFont(132);
-  TText *text = pt->AddText(dirBTag+": #sqrt{s} = 13 TeV,    34.94 fb^{-1}; ");
+  TText *text = pt->AddText(dirBTag+": #sqrt{s}=13 TeV, 35.9 fb^{-1}; ");
   //TText *text = pt->AddText(dir+":  CMS Preliminary,    #sqrt{s} = 13 TeV,    35.45 fb^{-1}; ");
   text->SetTextAlign(11);
   
   //pave text channel box
-  TPaveText *ch = new TPaveText(0.953,0.9154898,0.6210067,0.9762187,"brNDC");
+  TPaveText *ch = new TPaveText(1.00,0.9154898,0.7510067,0.9762187,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
@@ -129,29 +139,76 @@ void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TStri
   hLable->SetTextSize(0.08);
   hLable->SetBorderSize(1);
   hLable->AddText(xaxis_title);
-
+  
   //data-MC from isolated region
   TH1F *hDiff = dataMCdiff(dirIso, dirBTag, histname, xaxis_title, 1, true, true, xmin, xmax);
-  leg->AddEntry(hDiff,"qcd iso","P");
+  leg->AddEntry(hDiff,"Iso","P");
   hDiff->SetMarkerColor(kRed);
   hDiff->SetLineColor(kRed);
-  hDiff->Scale(1/hDiff->Integral());
+  //hDiff->Scale(1/hDiff->Integral());
+  cout<<hDiff->GetMaximum()<<endl;
+  //hDiff->GetYaxis()->SetRangeUser(1,  hDiff->GetMaximum());
+  hDiff->GetYaxis()->SetRangeUser(-200,  1.5*hDiff->GetMaximum());
+  hDiff->GetXaxis()->SetTitle(xaxis_title);
+  hDiff->GetYaxis()->SetTitleOffset(1.20);
+  hDiff->GetXaxis()->SetTitleOffset(1.10);
+  hDiff->GetYaxis()->SetTitleSize(0.06);   hDiff->GetXaxis()->SetTitleSize(0.06);
+  hDiff->GetXaxis()->SetLabelSize(0.06);   hDiff->GetXaxis()->LabelsOption("u"); // extra
+  hDiff->GetYaxis()->SetLabelSize(0.06);   hDiff->GetXaxis()->LabelsOption("u"); // extra
+  hDiff->GetXaxis()->SetTickLength(0.05); 
+  hDiff->GetYaxis()->SetTickLength(0.04); 
+  //hDiff->GetXaxis()->SetNdivisions(5);
+  hDiff->GetYaxis()->SetNdivisions(5);
   hDiff->Draw("e1"); 
+  
   //data-MC from non-isolated region
   TH1F *hDiff_NonIso = dataMCdiff(dirNoniso, dirBTag, histname, xaxis_title, 1, true, true, xmin, xmax);
-  leg->AddEntry(hDiff_NonIso,"qcd non-iso","P");
+  leg->AddEntry(hDiff_NonIso,"NonIso","P");
   hDiff_NonIso->SetMarkerColor(kGreen);
   hDiff_NonIso->SetLineColor(kGreen);
-  hDiff_NonIso->Scale(1/hDiff_NonIso->Integral());
+  //hDiff_NonIso->Scale(1/hDiff_NonIso->Integral());
   hDiff_NonIso->Draw("SAME");  
   pt->Draw();
   leg->Draw();
   ch->Draw();
-  hLable->Draw();
-  TF1 *baseLine = new TF1("baseLine","0", -100, 2000); 
+  //hLable->Draw();
+  c1->cd(2);
+  const float ypad_r[4] = {0.,0.2351916,0.3351916,0.98};
+  gPad->SetPad(xpad[0],ypad_r[0],xpad[1],ypad_r[2]);
+  gPad->SetTopMargin(0); gPad->SetBottomMargin(0.5); gPad->SetGridy();
+  gPad->SetLeftMargin(0.15);
+  gPad->SetRightMargin(0.05);
+  TH1F *hRatio = (TH1F*)hDiff->Clone("hRatio");
+  hRatio->Reset();
+  hRatio->Add(hDiff);
+  //hRatio->GetYaxis()->SetNdivisions(3);
+  //hRatio->Add(hMC, -1);
+  hRatio->Divide(hDiff_NonIso); hRatio->SetMarkerStyle(20); hRatio->SetMarkerSize(0.8);
+  hRatio->SetMarkerColor(kBlack); hRatio->SetLineColor(kBlack); hRatio->GetYaxis()->SetRangeUser(-10, 10);
+  //hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
+  hRatio->GetXaxis()->SetTickLength(0.13); 
+  hRatio->GetYaxis()->SetTickLength(0.04); 
+  hRatio->GetXaxis()->SetTitle(xaxis_title); 
+  hRatio->GetYaxis()->SetTitleOffset(0.40);
+  hRatio->GetXaxis()->SetTitleOffset(1.10);
+  hRatio->GetYaxis()->SetTitle("#frac{Iso}{NonIso}"); hRatio->GetYaxis()->CenterTitle();
+  hRatio->GetYaxis()->SetTitleSize(0.15); hRatio->GetXaxis()->SetTitleSize(0.20);
+  hRatio->GetXaxis()->SetLabelSize(0.20); hRatio->GetXaxis()->LabelsOption("u"); // extra
+  hRatio->GetYaxis()->SetLabelSize(0.15); hRatio->GetXaxis()->LabelsOption("u"); // extra
+  hRatio->Draw("E"); // use "P" or "AP"
+  TF1 *baseLine = new TF1("baseLine","1", -100, 2000); 
   baseLine->SetLineColor(kBlue);
   baseLine->Draw("SAME");
+ 
   //c1->Update();
+  if(isSaveHisto){
+    TString outFile("$PWD/QCD/");
+    //outFile += histname;
+    if(isMuChannel)outFile += "mu_"+dirBTag+"_"+histname+".pdf";
+    if(isEleChannel)outFile += "ele_"+dirBTag+"_"+histname+".pdf";
+    c1->SaveAs(outFile);
+    //c1->Close();
+  }
   
 }
 
@@ -162,7 +219,7 @@ void qcd_sf(){
   TString steps[15] = {"muon trig","= 1 muon","0 electron","muon SF","RelIso", "#geq 4 jets","#slash{E}_{T} #geq 20GeV", "MT >20", "#geq 2 b-jets","BTag SF", "fit converg","kfJetPt >25","dRJets <0.2",""};
   hDiff->Divide(hDiff_NonIso);
   std::cout << std::setprecision(4);
-  for(int i=1; i<17; i++){
+  for(int i=1; i<14; i++){
     double sf = hDiff->GetBinContent(i); 
     double sf_err = hDiff->GetBinError(i);
     cout<<sf<<" +- "<<sf_err<<"\t"<<steps[i-1]<<endl;
@@ -172,8 +229,8 @@ void qcd_sf(){
   hDiff->GetYaxis()->SetTitle("QCD scale factors");
 }
 
-//void qcd_shape_kfit(TString dir="KinFit"){
-void qcd_shape_btag(TString dir="BTag"){
+void qcd_shape_kfit(TString dir="KinFit"){
+//void qcd_shape_btag(TString dir="BTag"){
   TCanvas *c1 = new TCanvas(dir, dir);
   c1->Divide(2, 3);
   if(isMuChannel){
@@ -217,3 +274,24 @@ void qcd_shape_btag(TString dir="BTag"){
   //dataMCdiffOverlap("/wmt", "MT","Iso/"+dir, "NonIso/"+dir, dir);
 }
 
+void qcd_shape(TString dir, TString hist, TString hist_label, int xMin, int xMax){
+  dataMCdiffOverlap("Iso", "NonIso", dir, hist, hist_label, xMin, xMax);
+  //dataMCdiffOverlap("/wmt", "MT","Iso/"+dir, "NonIso/"+dir, dir);
+}
+
+void qcd_shape_all(){
+  TString dir = "KinFit";
+  //TString dir = "BTag";
+  if(isMuChannel){
+    qcd_shape(dir, "pt_mu", "Pt^{#mu} [GeV]", 0, 300);
+    qcd_shape(dir, "eta_mu", "#eta^{#mu}", -10, 10);
+  }
+  if(isEleChannel){
+    qcd_shape(dir, "pt_ele", "Pt^{e} [GeV]", 0, 300);
+    qcd_shape(dir, "eta_ele", "#eta^{e}", -10, 10);
+  }
+  qcd_shape(dir, "pt_jet", "Pt^{jets} [GeV]", 0, 300);
+  qcd_shape(dir, "eta_jet", "#eta^{jets}", -10, 10);
+  qcd_shape(dir, "final_pt_met", "E_{T}^{miss}[GeV]", 0, 30);
+  qcd_shape(dir, "wmt", "MT[GeV]", 0, 200);
+}
