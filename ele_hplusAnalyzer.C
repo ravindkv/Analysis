@@ -671,6 +671,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     // 		add set of plots after KinFit: 		    //
     //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk//
     //make sure that the fit converges 
+    fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
+    fillHisto(outFile_, cutflowType_, "KinFit", "probOfKinFit", 100, 0, 1, probOfKinFit, evtWeight );
     if(statusOfKinFit !=0) continue ; 
     nCutPass =10;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
@@ -726,8 +728,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 	else pt_bjetHad = kfJets[ik].pt();
       }
     }
-    fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
-    fillHisto(outFile_, cutflowType_, "KinFit", "probOfKinFit", 100, 0, 1, probOfKinFit, evtWeight );
     if(kfLightJets.size() < 2) continue; 
     bool match_j1 = false, match_j2 = false;
     int indexForCTag0 = 0, indexForCTag1 = 0;
@@ -987,8 +987,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(!isCTagL_SF) continue; 
     nCutPass = 14;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 20, 0.5, 20.5, nCutPass, evtWeight );
-    fillHisto(outFile_, cutflowType_, "KinFit", "chi2OfKinFit", 100, 0, 100, chi2OfKinFit, evtWeight );
-    fillHisto(outFile_, cutflowType_, "KinFit", "probOfKinFit", 100, 0, 1, probOfKinFit, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","pt_ele", 50, 0, 500, elePt, evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","eta_ele", 50, -5, 5, pfElectrons[e_i].p4.eta(), evtWeight );
     fillHisto(outFile_, cutflowType_, "KinFit","phi_ele", 50, -5, 5, pfElectrons[e_i].p4.phi(), evtWeight );

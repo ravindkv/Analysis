@@ -61,7 +61,7 @@ do
   #submit the condor jobs, for each ntuple
   #----------------------------------------------
   
-  mkdir $iFile
+  mkdir -p $iFile
   cp hplusCond.sub $iFile
   cp hplusAnalyzer_TIFR.sh $iFile
   cd $iFile 
