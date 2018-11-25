@@ -156,7 +156,7 @@ string getLimitNumbers(TString massFiles){
     TFile f("limit_root_file/"+massFiles,"READ"); // higgsCombineChargedHiggs_mu.Asymptotic.mH140.root
     if(f.IsZombie()){
       cout << "Cannot open file for " << massFiles << endl;
-      continue;
+      ///continue;
     }
     float obsY     = 0.0;
     float expY     = 0.0;
@@ -205,7 +205,7 @@ void makeLimitTable_13TeV(){
   ofstream outFile; 
   outFile.open("limitTable.tex"); 
   //outFile<<"\\documentclass[landscape,letterpaper]{article}"<<endl;  
-  outFile<<"\\documentclass[landscape]{article}"<<endl;  
+  outFile<<"\\documentclass[]{article}"<<endl;  
   outFile<<"\\pagestyle{empty}"<<endl;  
   outFile<<"\\usepackage{epsfig}"<<endl;  
   outFile<<"\\usepackage{amsmath}"<<endl;  
@@ -227,35 +227,34 @@ void makeLimitTable_13TeV(){
   outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  & "<< "Ex. Limit using & "<<"Ex. Limit using"<<" \\\\ "<<endl;
   outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(pt_{bjet}^{Had} ~bins)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} &  \\multicolumn{1}{|c|}{$M_{jj}(Ex ~CTag (pt_{bjet}^{Had} ~bins))$} \\\\"<<endl; 
   outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)  & "<< "(\\%) & "<<"(\\%)"<<" \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
+  outFile<<"[0.1cm] \\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[0])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[0])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[0])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[0])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[0])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[1])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[1])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[1])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[1])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[1])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[2])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[2])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[2])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[2])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[2])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[3])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[3])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[3])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[3])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[3])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[4])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[4])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[4])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[4])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[4])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[5])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[5])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[5])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[5])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[5])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getLimitNumbers(massFiles_mu_mjj_kfit[6])<<" & "<<getLimitNumbers(massFiles_mu_mjj_bJetPtCat[6])<<" & "<<getLimitNumbers(massFiles_mu_mjj_kfit_CTagL_SF[6])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat[6])<<" & "<<getLimitNumbers(massFiles_mu_mjj_CTagCat_bJetPtCat[6])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
   outFile<<"\\caption{muon + jets channel}"<<endl; 
@@ -272,41 +271,39 @@ void makeLimitTable_13TeV(){
   outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  & "<< "Ex. Limit using & "<<"Ex. Limit using"<<" \\\\ "<<endl;
   outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(pt_{bjet}^{Had} ~bins)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} &  \\multicolumn{1}{|c|}{$M_{jj}(Ex ~CTag (pt_{bjet}^{Had} ~bins))$} \\\\"<<endl; 
   outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)  & "<< "(\\%) & "<<"(\\%)"<<" \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
+  outFile<<"[0.1cm] \\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[0])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[0])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[0])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[0])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[0])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[1])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[1])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[1])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[1])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[1])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[2])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[2])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[2])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[2])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[2])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[3])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[3])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[3])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[3])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[3])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[4])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[4])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[4])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[4])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[4])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[5])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[5])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[5])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[5])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[5])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getLimitNumbers(massFiles_ele_mjj_kfit[6])<<" & "<<getLimitNumbers(massFiles_ele_mjj_bJetPtCat[6])<<" & "<<getLimitNumbers(massFiles_ele_mjj_kfit_CTagL_SF[6])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat[6])<<" & "<<getLimitNumbers(massFiles_ele_mjj_CTagCat_bJetPtCat[6])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
   outFile<<"\\caption{electron + jets channel}"<<endl; 
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
-
   cout<<"=============================="<<endl;
   cout<<"        LEPTON CHANNEL        "<<endl;
   cout<<"=============================="<<endl;
@@ -317,35 +314,34 @@ void makeLimitTable_13TeV(){
   outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  & "<< "Ex. Limit using & "<<"Ex. Limit using"<<" \\\\ "<<endl;
   outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(pt_{bjet}^{Had} ~bins)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} &  \\multicolumn{1}{|c|}{$M_{jj}(Ex ~CTag (pt_{bjet}^{Had} ~bins))$} \\\\"<<endl; 
   outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)  & "<< "(\\%) & "<<"(\\%)"<<" \\\\ "<<endl;
-  outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
+  outFile<<"[0.1cm]\\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[0])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[1])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[1])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[1])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[1])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[1])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[2])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[2])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[2])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[2])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[2])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[3])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[3])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[3])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[3])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[3])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[4])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[4])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[4])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[4])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[4])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[5])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[5])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[5])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[5])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[5])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit[6])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_bJetPtCat[6])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_kfit_CTagL_SF[6])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat[6])<<" & "<<getLimitNumbers(massFiles_mu_ele_mjj_CTagCat_bJetPtCat[6])<< "\\\\"<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
   outFile<<"\\caption{lepton + jets channel}"<<endl; 

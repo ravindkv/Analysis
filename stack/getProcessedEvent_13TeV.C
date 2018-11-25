@@ -22,6 +22,7 @@ void getProcessedEvent_13TeV(){
   bool isMuMC = false;
   bool isEleData = false;
   bool isEleMC = false;
+  bool isHiggsBkg = true;
 
   std::map<std::string, double> mcEvtDBS;
   mcEvtDBS["DY1JetsToLL_Merged.root"]       =  62079400;
@@ -76,6 +77,21 @@ void getProcessedEvent_13TeV(){
   mcEvtDBS["WW_Merged.root"]                =  994012;
   mcEvtDBS["WZ_Merged.root"]                =  1000000;
   mcEvtDBS["ZZ_Merged.root"]                =  990064; 
+
+  //Bkg from SM Higgs prodcution
+  if(isHiggsBkg){
+    mcEvtDBS["GluGluHToCC_Merged.root"]          = 9782840 ;
+    mcEvtDBS["VBFHToCC_Merged.root"]             = 4980094 ;
+    mcEvtDBS["WminusH_HToCC_WToLNu_Merged.root"] = 1477656 ;
+    mcEvtDBS["WminusH_HToCC_WToQQ_Merged.root"]  = 457517  ;
+    mcEvtDBS["WplusH_HToCC_WToLNu_Merged.root"]  = 1482024 ;
+    mcEvtDBS["WplusH_HToCC_WToQQ_Merged.root"]   = 459565  ;
+    mcEvtDBS["ZH_HToCC_ZToLL_Merged.root"]       = 4885552 ;
+    mcEvtDBS["ZH_HToCC_ZToNuNu_Merged.root"]     = 1183744 ;
+    mcEvtDBS["ZH_HToCC_ZToQQ_Merged.root"]       = 499384  ;
+    mcEvtDBS["ttHToCC_Merged.root"]              = 4784344 ;
+  }
+
   std::map<std::string, double>::iterator itr_mc;
   if(isMC){ 
     cout<<"=============================="<<endl;
@@ -123,12 +139,6 @@ void getProcessedEvent_13TeV(){
       cout<<setw(30)<<inFile<<setw(15)<<event_dbs<<setw(15)<<event_cond<<setw(15)<<ratio<<endl;
     }
   }
-    
-    
-    
-    
-    
-    
     
   std::map<std::string, double> eleDataEvtDBS;
   eleDataEvtDBS["EleRunBver2v2_Merged.root"]  =235362706 +2466515 ;  

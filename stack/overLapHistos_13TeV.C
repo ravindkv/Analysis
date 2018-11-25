@@ -69,8 +69,8 @@ TH1F* getHisto(TFile *file, TString histName, int histColor, Float_t xMin_ = 0.0
     cout << "Cannot open file "<< endl;
   }
   TH1F* h;
-  h = (TH1F*)file->Get("base/Iso/BTag/"+histName);
-  //h = (TH1F*)file->Get("base/Iso/KinFit/"+histName);
+  //h = (TH1F*)file->Get("base/Iso/BTag/"+histName);
+  h = (TH1F*)file->Get("base/Iso/KinFit/"+histName);
   //h->SetMarkerColor(kRed);
   cout<<h->GetNbinsX()<<endl;
   //h->Rebin();
@@ -111,7 +111,7 @@ TH1F* getRatio(TH1F* h1, TH1F* h2, TString histName, int my_color){
   hRatio->GetYaxis()->SetTitleOffset(1.30);
   hRatio->GetXaxis()->SetTitleOffset(1.20);
   hRatio->GetYaxis()->SetTitle("#frac{Signal}{t#bar{t} + jets}"); 
-  hRatio->GetXaxis()->SetRangeUser(0, 300);
+  hRatio->GetXaxis()->SetRangeUser(0, 500);
   //hRatio->Scale(1/hRatio->Integral());
   //cout<<hRatio->Integral()<<endl;
   //hRatio->GetYaxis()->CenterTitle();
@@ -284,7 +284,8 @@ void overLapRatios(){
   if(isEleChannel) ch->AddText("e + jets");
 
   TCanvas *c1 = new TCanvas();
-  TLegend* leg = new TLegend(0.59,0.55,0.46,0.87,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.19,0.65,0.62,0.87,NULL,"brNDC");
+  leg->SetNColumns(2);
   leg->SetBorderSize(0);
   leg->SetTextSize(0.035);
   leg->SetFillColor(0);
@@ -345,7 +346,7 @@ void overLapRatios(){
     if(isMuChannel) outFile += histName+"_ratio_mu.pdf";
     if(isEleChannel) outFile += histName+"_ratio_ele.pdf";
     c1->SaveAs(outFile);
-    c1->Close();
+    ///c1->Close();
   }
 }
 
@@ -361,11 +362,14 @@ void overLapHistos(){
   overLap2Histos(fWH160, fWH160, "pt_bjet", "pt_bjetL", "WH160:Had bjet", "WH160:Lep bjet");
 }
 
-void overLapAllHistos(){
+void overLapHistos_13TeV(){
+
+  //TString histName = "mjj_kfit";
+  TString histName = "mjj";
 
   gStyle->SetFrameLineWidth(3);
   // Header
-  TPaveText *header = new TPaveText(0.15,0.92,0.9,0.97, "brNDC");
+  TPaveText *header = new TPaveText(0.15,0.90,0.9,0.90, "brNDC");
   header->SetBorderSize(1);
   header->SetFillColor(19);
   header->SetFillStyle(0);
@@ -376,19 +380,20 @@ void overLapAllHistos(){
   text->SetTextAlign(11);
 
   // channel specifiction
-  TPaveText *ch = new TPaveText(0.70,0.70,0.85,0.80,"brNDC");
+  TPaveText *ch = new TPaveText(0.75,0.80,0.80,0.85,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
   ch->SetBorderSize(1);
+  ch->SetTextSize(0.060);
   if(isMuChannel) ch->AddText("#mu + jets");
   if(isEleChannel) ch->AddText("e + jets");
      
   gStyle->SetOptStat(0);
   TCanvas *c1 = new TCanvas();
-  TLegend* leg = new TLegend(0.89,0.35,0.76,0.70,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.75,0.35,0.80,0.70,NULL,"brNDC");
   leg->SetBorderSize(0);
-  leg->SetTextSize(0.03);
+  leg->SetTextSize(0.05);
   leg->SetFillColor(0);
   
   //overlay
@@ -397,8 +402,6 @@ void overLapAllHistos(){
   gPad->SetBottomMargin(0.16); 
   gPad->SetTopMargin(0.11);
  
-  //TString histName = "mjj_kfit";
-  TString histName = "mjj";
   cout<<"ttbar"<<endl;
   TH1F* hTT = getHisto(fTT,       histName, 1, xMin_, xMax_);
   cout<<"WH80"<<endl;
@@ -445,6 +448,6 @@ void overLapAllHistos(){
     if(isMuChannel) outFile += histName+"_mu.pdf";
     if(isEleChannel) outFile += histName+"_ele.pdf";
     c1->SaveAs(outFile);
-    c1->Close();
+    //c1->Close();
   }
 }

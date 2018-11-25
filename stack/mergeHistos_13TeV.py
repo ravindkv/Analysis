@@ -10,10 +10,11 @@ import sys
 import datetime
 
 #USERS INPUTS
-isMuData = False
-isMuMC = False
-isEleData = True
-isEleMC = True
+isMuData = True
+isMuMC = True
+isEleData = False
+isEleMC = False
+isHiggsBkg = True
 
 mc = []
 mc.append("TTJetsM")
@@ -69,6 +70,18 @@ else:
     mc.append("QCD_Pt-170to300_EM")
     mc.append("QCD_Pt-300toInf_EM")
 
+if(isHiggsBkg):
+    mc.append("GluGluHToCC")          
+    mc.append("VBFHToCC")             
+    mc.append("WminusH_HToCC_WToLNu") 
+    mc.append("WminusH_HToCC_WToQQ")  
+    mc.append("WplusH_HToCC_WToLNu")  
+    mc.append("WplusH_HToCC_WToQQ")   
+    mc.append("ZH_HToCC_ZToLL")       
+    mc.append("ZH_HToCC_ZToNuNu")     
+    mc.append("ZH_HToCC_ZToQQ")       
+    mc.append("ttHToCC")              
+
 if(isMuData):
 	data = ["MuRunB2v2", "MuRunCv1", "MuRunDv1", "MuRunEv1", "MuRunFv1", "MuRunGv1", "MuRunH2v1", "MuRunH3v1"]
 
@@ -122,11 +135,25 @@ execme("hadd -k all_QCD.root QCD*_Merged.root")
 execme("hadd -k all_VV.root WW_Merged.root WZ_Merged.root ZZ_Merged.root")
 execme("hadd -k all_WJets.root W1*_Merged.root W2*_Merged.root W3*_Merged.root W4*_Merged.root WJ*_Merged.root")
 execme("hadd -k all_DY.root DY1*_Merged.root DY2*_Merged.root DY3*_Merged.root DY4*_Merged.root DYJ*_Merged.root")
-'''
-execme("mkdir merged_histos")
-execme("cp *_Merged.root merged_histos")
-execme("cp all* merged_histos")
-execme("tar -czvf merged_histos.tar.gz merged_histos")
-'''
 
-
+if(isHiggsBkg):
+    execme("hadd -k all_GluGluHToCC.root            GluGluHToCC*_Merged.root")          
+    execme("hadd -k all_VBFHToCC.root               VBFHToCC*_Merged.root")             
+    execme("hadd -k all_WminusH_HToCC_WToLNu.root   WminusH_HToCC_WToLNu*_Merged.root") 
+    execme("hadd -k all_WminusH_HToCC_WToQQ.root    WminusH_HToCC_WToQQ*_Merged.root")  
+    execme("hadd -k all_WplusH_HToCC_WToLNu.root    WplusH_HToCC_WToLNu*_Merged.root")  
+    execme("hadd -k all_WplusH_HToCC_WToQQ.root     WplusH_HToCC_WToQQ*_Merged.root")   
+    execme("hadd -k all_ZH_HToCC_ZToLL.root         ZH_HToCC_ZToLL*_Merged.root")       
+    execme("hadd -k all_ZH_HToCC_ZToNuNu.root       ZH_HToCC_ZToNuNu*_Merged.root")     
+    execme("hadd -k all_ZH_HToCC_ZToQQ.root         ZH_HToCC_ZToQQ*_Merged.root")       
+    execme("hadd -k all_ttHToCC.root                ttHToCC*_Merged.root")              
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   

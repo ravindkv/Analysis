@@ -24,13 +24,19 @@ public:
   };
   ///~CTagSF() {delete randm;};
   
-  Bool_t isCtagged( BTagCalibrationReader &reader, TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t csv_OP, Float_t csv, Float_t eta, Float_t pt, Int_t jetflavor, Bool_t isdata, UInt_t CTagSys); 
-  Double_t getCTagSFb(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t CTagSys);
-  Double_t getCTagSFc(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t CTagSys);
-  Double_t getCTagSFl(BTagCalibrationReader &reader, Float_t eta, Float_t pt, Float_t csv, UInt_t CTagSys);
-Double_t getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t pt, Float_t eta);
-
-  enum { kNo, kDown, kUp};                     // systematic variations 
+  //For inclusive scale factors
+  double getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, bool isCTag);
+  double getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTag, int jetFlavor, int cTagSys);
+  //For exclusive scale factors
+  double getExCTagPmc(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTagLMT, bool isCTagMT, bool isCTagT);
+  double getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int btagsys, bool isCTagLMT, bool isCTagMT, bool isCTagT);
+  
+  // For both
+  double getCTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetflavor, int CTagSys);
+  double getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, double eta, double pt);
+  
+  // For systematics
+  enum { kNo, kDown, kUp};  
 
 private:
  

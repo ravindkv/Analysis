@@ -39,33 +39,33 @@ public :
     defaultSelection_=true;
 
     //Vertex //////
-    ZMAX_    = 0.5; // initally was using 0.2
+    ZMAX_    = 0.500000; // initally was using 0.2
     ///////////////
 
     // Jets ///////////////////////////////////////////
-    JET_PT_MIN_        = 25;  
-    JET_ETA_MAX_       = 2.4; 
-    JET_EMF_MIN_       = 0.01;
-    JET_LEPTON_DRMIN_  = 0.5;
+    JET_PT_MIN_        = 25.000000;  
+    JET_ETA_MAX_       = 2.4000000; 
+    JET_EMF_MIN_       = 0.0100000;
+    JET_LEPTON_DRMIN_  = 0.5000000;
     //////////////////////////////////////////////////
 
     // electron //////////////////////////////////////
-    E_ETA_MAX_          = 2.1;
-    E_PT_MIN_           = 25;
-    E_D0_MAX_           = 0.05;
+    E_ETA_MAX_          = 2.100000;
+    E_PT_MIN_           = 25.00000;
+    E_D0_MAX_           = 0.050000;
     //////////////////////////////////////////////////
 
 
     // muon //////////////////////////////////////////
-    M_RELISO_MAX_  = 0.15; //sync with muon POG
+    M_RELISO_MAX_  = 0.15000; //sync with muon POG
     //https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2  
-    M_PT_MIN_      = 25;  
-    M_ETA_MAX_     = 2.1; 
-    M_D0_MAX_      = 0.2; 
+    M_PT_MIN_      = 26.0000;  
+    M_ETA_MAX_     = 2.10000; 
+    M_D0_MAX_      = 0.20000; 
     
-    LOOSE_M_RELISO_MAX_ = 0.25;
-    LOOSE_M_ETA_MAX_    = 2.4;
-    LOOSE_M_PT_MIN_     = 15;
+    LOOSE_M_RELISO_MAX_ = 0.25000;
+    LOOSE_M_ETA_MAX_    = 2.40000;
+    LOOSE_M_PT_MIN_     = 15.00000;
     ///////////////////////////////////////////////////
   }
 

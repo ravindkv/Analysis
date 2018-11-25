@@ -8,8 +8,8 @@ ntupleT2Paths=$1
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
-voms-proxy-init --voms cms
-cp /tmp/x509up_u56537 ~/
+#voms-proxy-init --voms cms
+#cp /tmp/x509up_u56537 ~/
 
 #------------------------------------------------
 #read the file, where paths of ntuples are stored

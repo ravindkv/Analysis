@@ -3,8 +3,9 @@
 #include <iomanip>
 
 //hadd all_MC.root all_DY.root all_ST.root all_TTJetsP.root all_VV.root all_WJets.root
+double ttbar_sf = 1.0;
 
-TH1F* getHisto(TFile *histFile, TString histPath){
+TH1F* getHisto(TFile *histFile, TString histPath, double sf){
   TH1F* hist; 
   TString inFile("$PWD/");
   TFile *fTT= new TFile(inFile+"all_TTJetsP.root"); 
@@ -12,15 +13,16 @@ TH1F* getHisto(TFile *histFile, TString histPath){
     hist = (TH1F*)(fTT->Get(histPath));
     hist->Add(hist, -1);
   }else hist = (TH1F*)(histFile->Get(histPath));
+  hist->Scale(sf);
   return hist;
 }
 
-void getABCDNumbers(ofstream &outFile, TFile *f, string proc, TString A, TString B, TString C, TString D){
-  TH1F * hA = getHisto(f, A);
-  TH1F * hB = getHisto(f, B);
-  TH1F * hC = getHisto(f, C);
-  TH1F * hD = getHisto(f, D);
-  outFile<< proc<<" & "<< hA->Integral()<<" & "<< hB->Integral()<<" & "<< hC->Integral()<<" & "<< hD->Integral()<<" \\\\ "<<endl;
+void getABCDNumbers(ofstream &outFile, TFile *f, string proc, TString A, TString B, TString C, TString D, double sf = 1){
+  TH1F * hA = getHisto(f, A, sf);
+  TH1F * hB = getHisto(f, B, sf);
+  TH1F * hC = getHisto(f, C, sf);
+  TH1F * hD = getHisto(f, D, sf);
+  outFile<< proc<<" & "<<hA->Integral()<<" & "<< hB->Integral()<<" & "<< hC->Integral()<<" & "<< hD->Integral()<<" \\\\ "<<endl;
 }
 
 void makeABCDTable_13TeV(){  
@@ -30,10 +32,12 @@ void makeABCDTable_13TeV(){
   TFile *zjet  			= new TFile(inFile+"all_DY.root");
   TFile *stop  			= new TFile(inFile+"all_ST.root");
   TFile *diboson 		= new TFile(inFile+"all_VV.root");
+  TFile *qcd  			= new TFile(inFile+"all_QCD.root");
   TFile *allMC 			= new TFile(inFile+"all_MC.root");
-  
-  //TFile *data = new TFile(inFile+"all_muData.root");
-  TFile *data = new TFile(inFile+"all_EleData.root");
+ 
+  TString dir = "baseLowMET"; 
+  TFile *data = new TFile(inFile+"all_muData.root");
+  //TFile *data = new TFile(inFile+"all_EleData.root");
   ofstream outFile; 
   outFile.open("qcdABCDTable.tex"); 
   //outFile<<"\\documentclass[landscape,letterpaper]{article}"<<endl;  
@@ -58,25 +62,28 @@ void makeABCDTable_13TeV(){
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   //Add another table with JESUP
-   getABCDNumbers(outFile, ttbar, "$t\\bar{t}$ + jets", "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+   getABCDNumbers(outFile, qcd, "MC QCD", "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
+  outFile<<"\\hline "<<endl;
+
+   getABCDNumbers(outFile, ttbar, "$t\\bar{t}$ + jets", "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit", ttbar_sf);
   outFile<<"\\hline "<<endl;
   
-  getABCDNumbers(outFile, stop, "Single ~t",            "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+  getABCDNumbers(outFile, stop, "Single ~t",            "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
 
-   getABCDNumbers(outFile, wjet, " W + jets",           "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+   getABCDNumbers(outFile, wjet, " W + jets",           "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
 
-   getABCDNumbers(outFile, zjet, "$Z/\\gamma$ + jets",  "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+   getABCDNumbers(outFile, zjet, "$Z/\\gamma$ + jets",  "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
  
-  getABCDNumbers(outFile, diboson, "VV",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+  getABCDNumbers(outFile, diboson, "VV",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
-  getABCDNumbers(outFile, allMC, "Bkg",                 "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+  getABCDNumbers(outFile, allMC, "nonQCDBkg",                 "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
 
-   getABCDNumbers(outFile, data, "Data",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", "baseLowMET/NonIso/KinFit/mjj_kfit", "baseLowMET/Iso/KinFit/mjj_kfit");
+   getABCDNumbers(outFile, data, "Data",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 

@@ -51,7 +51,7 @@ namespace std {} using namespace std;
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
-#include "interface/BtagSF.hh"
+#include "interface/BTagSF.hh"
 #include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
@@ -605,35 +605,35 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static void *new_BtagSF(void *p = 0);
-   static void *newArray_BtagSF(Long_t size, void *p);
-   static void delete_BtagSF(void *p);
-   static void deleteArray_BtagSF(void *p);
-   static void destruct_BtagSF(void *p);
+   static void *new_BTagSF(void *p = 0);
+   static void *newArray_BTagSF(Long_t size, void *p);
+   static void delete_BTagSF(void *p);
+   static void deleteArray_BTagSF(void *p);
+   static void destruct_BTagSF(void *p);
 
    // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::BtagSF*)
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::BTagSF*)
    {
-      ::BtagSF *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::BtagSF >(0);
+      ::BTagSF *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::BTagSF >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("BtagSF", ::BtagSF::Class_Version(), "interface/BtagSF.hh", 15,
-                  typeid(::BtagSF), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::BtagSF::Dictionary, isa_proxy, 4,
-                  sizeof(::BtagSF) );
-      instance.SetNew(&new_BtagSF);
-      instance.SetNewArray(&newArray_BtagSF);
-      instance.SetDelete(&delete_BtagSF);
-      instance.SetDeleteArray(&deleteArray_BtagSF);
-      instance.SetDestructor(&destruct_BtagSF);
+         instance("BTagSF", ::BTagSF::Class_Version(), "interface/BTagSF.hh", 15,
+                  typeid(::BTagSF), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::BTagSF::Dictionary, isa_proxy, 4,
+                  sizeof(::BTagSF) );
+      instance.SetNew(&new_BTagSF);
+      instance.SetNewArray(&newArray_BTagSF);
+      instance.SetDelete(&delete_BTagSF);
+      instance.SetDeleteArray(&deleteArray_BTagSF);
+      instance.SetDestructor(&destruct_BTagSF);
       return &instance;
    }
-   TGenericClassInfo *GenerateInitInstance(const ::BtagSF*)
+   TGenericClassInfo *GenerateInitInstance(const ::BTagSF*)
    {
-      return GenerateInitInstanceLocal((::BtagSF*)0);
+      return GenerateInitInstanceLocal((::BTagSF*)0);
    }
    // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::BtagSF*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::BTagSF*)0x0); R__UseDummy(_R__UNIQUE_(Init));
 } // end of namespace ROOT
 
 namespace ROOT {
@@ -838,37 +838,37 @@ TClass *HistogramPlotter::Class()
 }
 
 //______________________________________________________________________________
-atomic_TClass_ptr BtagSF::fgIsA(0);  // static to hold class pointer
+atomic_TClass_ptr BTagSF::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
-const char *BtagSF::Class_Name()
+const char *BTagSF::Class_Name()
 {
-   return "BtagSF";
+   return "BTagSF";
 }
 
 //______________________________________________________________________________
-const char *BtagSF::ImplFileName()
+const char *BTagSF::ImplFileName()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::BtagSF*)0x0)->GetImplFileName();
+   return ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetImplFileName();
 }
 
 //______________________________________________________________________________
-int BtagSF::ImplFileLine()
+int BTagSF::ImplFileLine()
 {
-   return ::ROOT::GenerateInitInstanceLocal((const ::BtagSF*)0x0)->GetImplFileLine();
+   return ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetImplFileLine();
 }
 
 //______________________________________________________________________________
-TClass *BtagSF::Dictionary()
+TClass *BTagSF::Dictionary()
 {
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BtagSF*)0x0)->GetClass();
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetClass();
    return fgIsA;
 }
 
 //______________________________________________________________________________
-TClass *BtagSF::Class()
+TClass *BTagSF::Class()
 {
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BtagSF*)0x0)->GetClass(); }
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::BTagSF*)0x0)->GetClass(); }
    return fgIsA;
 }
 
@@ -1287,37 +1287,37 @@ namespace ROOT {
 } // end of namespace ROOT for class ::HistogramPlotter
 
 //______________________________________________________________________________
-void BtagSF::Streamer(TBuffer &R__b)
+void BTagSF::Streamer(TBuffer &R__b)
 {
-   // Stream an object of class BtagSF.
+   // Stream an object of class BTagSF.
 
    if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(BtagSF::Class(),this);
+      R__b.ReadClassBuffer(BTagSF::Class(),this);
    } else {
-      R__b.WriteClassBuffer(BtagSF::Class(),this);
+      R__b.WriteClassBuffer(BTagSF::Class(),this);
    }
 }
 
 namespace ROOT {
    // Wrappers around operator new
-   static void *new_BtagSF(void *p) {
-      return  p ? new(p) ::BtagSF : new ::BtagSF;
+   static void *new_BTagSF(void *p) {
+      return  p ? new(p) ::BTagSF : new ::BTagSF;
    }
-   static void *newArray_BtagSF(Long_t nElements, void *p) {
-      return p ? new(p) ::BtagSF[nElements] : new ::BtagSF[nElements];
+   static void *newArray_BTagSF(Long_t nElements, void *p) {
+      return p ? new(p) ::BTagSF[nElements] : new ::BTagSF[nElements];
    }
    // Wrapper around operator delete
-   static void delete_BtagSF(void *p) {
-      delete ((::BtagSF*)p);
+   static void delete_BTagSF(void *p) {
+      delete ((::BTagSF*)p);
    }
-   static void deleteArray_BtagSF(void *p) {
-      delete [] ((::BtagSF*)p);
+   static void deleteArray_BTagSF(void *p) {
+      delete [] ((::BTagSF*)p);
    }
-   static void destruct_BtagSF(void *p) {
-      typedef ::BtagSF current_t;
+   static void destruct_BTagSF(void *p) {
+      typedef ::BTagSF current_t;
       ((current_t*)p)->~current_t();
    }
-} // end of namespace ROOT for class ::BtagSF
+} // end of namespace ROOT for class ::BTagSF
 
 //______________________________________________________________________________
 void CTagSF::Streamer(TBuffer &R__b)
@@ -2568,7 +2568,7 @@ namespace {
 "interface/Reader.h",
 "interface/ObjectSelector.hh",
 "interface/HistogramPlotter.hh",
-"interface/BtagSF.hh",
+"interface/BTagSF.hh",
 "interface/CTagSF.hh",
 "interface/SVEffUnc.hh",
 "interface/UncertaintyComputer.hh",
@@ -2601,7 +2601,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  MyEvent;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  Reader;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  ObjectSelector;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  HistogramPlotter;
-class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  BtagSF;
+class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  BTagSF;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  CTagSF;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  SVEffUnc;
 class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComputer;
@@ -2627,7 +2627,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
-#include "interface/BtagSF.hh"
+#include "interface/BTagSF.hh"
 #include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
@@ -2635,7 +2635,7 @@ class __attribute__((annotate("$clingAutoload$src/LinkDef.h")))  UncertaintyComp
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
     static const char* classesHeaders[]={
-"BtagSF", payloadCode, "@",
+"BTagSF", payloadCode, "@",
 "CTagSF", payloadCode, "@",
 "HistogramPlotter", payloadCode, "@",
 "MyElectron", payloadCode, "@",

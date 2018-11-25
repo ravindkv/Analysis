@@ -59,13 +59,8 @@ public :
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
-    xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
-    xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
-    xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
-    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    
+    //signal samples
     //BR(W->ev) = 10.75± 0.3, BR(W->mv) = 10.57± 0.5
     //http://pdg.lbl.gov/2012/listings/rpp2012-list-w-boson.pdf
     xss["HplusM100"]         =  831.76*0.2132;   evtDBS["HplusM100"]         =  996170; 
@@ -76,6 +71,8 @@ public :
     xss["HplusM160"]         =  831.76*0.2132;   evtDBS["HplusM160"]         =  992264;
     xss["HplusM80"]          =  831.76*0.2132;   evtDBS["HplusM80"]          =  976710;
     xss["HplusM90"]          =  831.76*0.2132;   evtDBS["HplusM90"]          =  988480;
+
+    //qcd muon enriched
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
     xss["QCD_Pt-20to30_Mu"]  =  2960198;       evtDBS["QCD_Pt-20to30_Mu"]  =  31475157;
     xss["QCD_Pt-30to50_Mu"]  =  1652471;       evtDBS["QCD_Pt-30to50_Mu"]  =  29954815;
@@ -85,6 +82,7 @@ public :
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
     
+    //qcd EM enriched
     xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
     xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
     xss["QCD_Pt-30to50_EM"]  =  9928000;       evtDBS["QCD_Pt-30to50_EM"]  =  4730195;
@@ -92,38 +90,107 @@ public :
     xss["QCD_Pt-80to120_EM"] =  350000;        evtDBS["QCD_Pt-80to120_EM"] =  35841783;
     xss["QCD_Pt-120to170_EM"]=  62964;         evtDBS["QCD_Pt-120to170_EM"]=  35817281;
     xss["QCD_Pt-170to300_EM"]=  18810;         evtDBS["QCD_Pt-170to300_EM"]=  11540163;
-    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
-    
+    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;    
+
+    //single top and ttbar
     xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
     xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
     xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
-    //-------------------------
+
+    //for ttbar systematics
     xss["TTJetsP_up"]        =  831.76;        evtDBS["TTJetsP_up"]        =  29310620;   
     xss["TTJetsP_down"]      =  831.76;        evtDBS["TTJetsP_down"]      =  28354188;   
     xss["TTJetsP_mtop1735"]  =  831.76;        evtDBS["TTJetsP_mtop1735"]  =  19419050;   
     xss["TTJetsP_mtop1715"]  =  831.76;        evtDBS["TTJetsP_mtop1715"]  =  19578812;   
     xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;   
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
-    //-------------------------
+
+    //DY + jets and W + jets 
+    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
+    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
+    xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
+    xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
+    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
+    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
     //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
-    
     // mu channel 
-    //xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
+    ///xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
     // ele channel 
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
     //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+
+    //VV fusion
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
+
+    //Bkg from Higgs production
+    //Gluon gluon fusion
+    xss["GluGluHToBB"]            =   28.293   ; evtDBS["GluGluHToBB"]            = 4856192 ;
+    xss["GluGluHToTauTau"]        =   3.046    ; evtDBS["GluGluHToTauTau"]        = 1471061 ;
+    xss["GluGluHToCC"]            =   1.404    ; evtDBS["GluGluHToCC"]            = 9782840 ;
+    xss["GluGluHToGG"]            =   3.979    ; evtDBS["GluGluHToGG"]            = 998200  ;
+    xss["GluGluHToWWTo2L2Nu"]     =   1.090    ; evtDBS["GluGluHToWWTo2L2Nu"]     = 499473  ;
+    xss["GluGluHToWWToLNuQQ"]     =   4.548    ; evtDBS["GluGluHToWWToLNuQQ"]     = 198585  ;
+    xss["GluGluHToZZTo2L2Q"]      =   0.195    ; evtDBS["GluGluHToZZTo2L2Q"]      = 1000000 ;
+    xss["GluGluHToZZTo4L"]        =   0.015    ; evtDBS["GluGluHToZZTo4L"]        = 992224  ;
+    //W+H production
+    xss["WplusH_HToBB_WToLNu"]    =   0.158    ; evtDBS["WplusH_HToBB_WToLNu"]    = 999800  ;
+    xss["WplusH_HToBB_WToQQ"]     =   0.331    ; evtDBS["WplusH_HToBB_WToQQ"]     = 499093  ;
+    xss["WplusHToTauTau"]         =   0.053    ; evtDBS["WplusHToTauTau"]         = 428036  ;
+    xss["WplusH_HToCC_WToLNu"]    =   0.008    ; evtDBS["WplusH_HToCC_WToLNu"]    = 1482024 ;
+    xss["WplusH_HToCC_WToQQ"]     =   0.016    ; evtDBS["WplusH_HToCC_WToQQ"]     = 459565  ;
+    xss["WplusH_HToGG_WToAll"]    =   0.069    ; evtDBS["WplusH_HToGG_WToAll"]    = 300000  ;
+    //W-H production
+    xss["WminusH_HToBB_WToQQ"]    =   0.210    ; evtDBS["WminusH_HToBB_WToQQ"]    = 499994  ;
+    xss["WminusHToTauTau"]        =   0.033    ; evtDBS["WminusHToTauTau"]        = 445200  ;
+    xss["WminusH_HToCC_WToLNu"]   =   0.005    ; evtDBS["WminusH_HToCC_WToLNu"]   = 1477656 ;
+    xss["WminusH_HToCC_WToQQ"]    =   0.010    ; evtDBS["WminusH_HToCC_WToQQ"]    = 457517  ;
+    xss["WminusH_HToGG_WToAll"]   =   0.044    ; evtDBS["WminusH_HToGG_WToAll"]   = 300000  ;
+    xss["WminusH_HToZZTo2L2X"]    =   0.014    ; evtDBS["WminusH_HToZZTo2L2X"]    = 978136  ;
+    //ZH production
+    xss["ZH_HToBB_ZToNuNu"]       =   0.103    ; evtDBS["ZH_HToBB_ZToNuNu"]       = 2924580 ;
+    xss["ZH_HToBB_ZToLL"]         =   0.052    ; evtDBS["ZH_HToBB_ZToLL"]         = 1979860 ;
+    xss["ZH_HToBB_ZToQQ"]         =   0.360    ; evtDBS["ZH_HToBB_ZToQQ"]         = 499200  ;
+    xss["ZHToTauTau"]             =   0.055    ; evtDBS["ZHToTauTau"]             = 571597  ;
+    xss["ZH_HToCC_ZToNuNu"]       =   0.005    ; evtDBS["ZH_HToCC_ZToNuNu"]       = 1183744 ;
+    xss["ZH_HToCC_ZToLL"]         =   0.003    ; evtDBS["ZH_HToCC_ZToLL"]         = 4885552 ;
+    xss["ZH_HToCC_ZToQQ"]         =   0.018    ; evtDBS["ZH_HToCC_ZToQQ"]         = 499384  ;
+    xss["ZH_HToGG_ZToAll"]        =   0.072    ; evtDBS["ZH_HToGG_ZToAll"]        = 299739  ;
+    xss["ZH_HToZZ_2L"]            =   0.002    ; evtDBS["ZH_HToZZ_2L"]            = 942259  ;
+    //gg fusion to ZH
+    xss["ggZH_HToBB_ZToNuNu"]     =   0.014    ; evtDBS["ggZH_HToBB_ZToNuNu"]     = 250000  ;
+    xss["ggZH_HToBB_ZToLL"]       =   0.007    ; evtDBS["ggZH_HToBB_ZToLL"]       = 250000  ;
+    xss["ggZH_HToBB_ZToQQ"]       =   0.050    ; evtDBS["ggZH_HToBB_ZToQQ"]       = 499130  ;
+    xss["ggZH_HToCC_ZToNuNu"]     =   0.001    ; evtDBS["ggZH_HToCC_ZToNuNu"]     = 2457116 ;
+    xss["ggZH_HToCC_ZToLL"]       =   0.000    ; evtDBS["ggZH_HToCC_ZToLL"]       = 2921029 ;
+    xss["ggZH_HToCC_ZToQQ"]       =   0.002    ; evtDBS["ggZH_HToCC_ZToQQ"]       = 478600  ;
+    xss["GluGluZH_HToWW"]         =   0.026    ; evtDBS["GluGluZH_HToWW"]         = 148525  ;
+    //tt fusion
+    xss["ttHToCC"]                =   0.015    ; evtDBS["ttHToCC"]                = 4784344 ;
+    xss["ttHToGG"]                =   0.042    ; evtDBS["ttHToGG"]                = 768410  ;
+    //bb fusion
+    xss["bbHToBB"]                =   0.284    ; evtDBS["bbHToBB"]                = 749600  ;
+    xss["bbHToGG"]                =   0.040    ; evtDBS["bbHToGG"]                = 746400  ;
+    xss["bbHToWWTo2L2Nu"]         =   0.011    ; evtDBS["bbHToWWTo2L2Nu"]         = 749998  ;
+    xss["bbH_HToZZTo4L"]          =   0.000    ; evtDBS["bbH_HToZZTo4L"]          = 1000000 ;
+    //vector boson fustion
+    xss["VBFHToBB"]               =   2.203    ; evtDBS["VBFHToBB"]               = 1000000 ;
+    xss["VBFHToTauTau"]           =   0.237    ; evtDBS["VBFHToTauTau"]           = 1499400 ;
+    xss["VBFHToCC"]               =   0.109    ; evtDBS["VBFHToCC"]               = 4980094 ;
+    xss["VBFHToGG"]               =   0.310    ; evtDBS["VBFHToGG"]               = 1000000 ;
+    xss["VBFHToWWTo2L2Nu"]        =   0.085    ; evtDBS["VBFHToWWTo2L2Nu"]        = 486510  ;
+    xss["VBFHToWWToLNuQQ"]        =   0.354    ; evtDBS["VBFHToWWToLNuQQ"]        = 198937  ;
+                                   
+    //for default sample code
     xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498; 
-    
-    //Lumis(inverse pb) of single muon DATA at 13TeV
   };
   ~hplusAnalyzer() {
     delete evR;

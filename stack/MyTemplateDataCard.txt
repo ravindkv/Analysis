@@ -1,0 +1,43 @@
+Date: XXX
+Description: H+, CCC +jets, mass YYY GeV, lumi=ZZZ fb-1
+---------------------------------------------------------------------------------------------------------
+imax   1  number of channels
+jmax   *  number of backgrounds
+kmax   *  number of nuisance parameters
+---------------------------------------------------------------------------------------------------------
+shapes * * XXX.root $PROCESS $PROCESS_$SYSTEMATIC
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+Observation    XXX
+---------------------------------------------------------------------------------------------------------
+bin                            hcs_13TeV   hcs_13TeV   hcs_13TeV   hcs_13TeV   hcs_13TeV  hcs_13TeV hcs_13TeV
+process                        WHYYY       ttbar       wjet        zjet        stop        vv       qcd
+process                          0          1           2           3           4           5        6
+---------------------------------------------------------------------------------------------------------
+rate                    
+---------------------------------------------------------------------------------------------------------
+lumi_13TeV           lnN      1.025      1.025      1.025        1.025      1.025     1.025   1.00      Luminosity unc.
+CMS_eff_lep          lnN      1.03       1.03       1.03         1.03       1.03      1.03    1.00      Lepton selection unc.
+CMS_eff_b            lnN      HHHH       TTTT       WWWW         DDDD       SSSS      VVVV    1.00      b-tag unc.
+CMS_eff_c            lnN      HHHH       TTTT       WWWW         DDDD       SSSS      VVVV    1.00      c-tag unc.
+CMS_pileup           lnN      HHHH       TTTT       WWWW         DDDD       SSSS      VVVV    1.00      Pileup unc.
+CMS_scale_j          lnN      HHHH       TTTT       WWWW         DDDD       SSSS      VVVV    1.00      JES unc.
+CMS_res_j            lnN      HHHH       TTTT       WWWW         DDDD       SSSS      VVVV    1.00      JER unc.
+CMS_hcs_stat_wh      lnN      XXXX       1.00       1.00         1.00       1.00      1.00    1.00      WH(signal) stat unc.
+CMS_hcs_stat_tt      lnN      1.00       XXXX       1.00         1.00       1.00      1.00    1.00      TTbar stat unc.
+CMS_hcs_stat_wjet    lnN      1.00       1.00       XXXX         1.00       1.00      1.00    1.00      W+jets stat unc.
+CMS_hcs_stat_zjet    lnN      1.00       1.00       1.00         XXXX       1.00      1.00    1.00      Z+jet stat unc.
+CMS_hcs_stat_stop    lnN      1.00       1.00       1.00         1.00       XXXX      1.00    1.00      Single top stat unc.
+CMS_hcs_stat_vv      lnN      1.00       1.00       1.00         1.00       1.00      XXXX    1.00      Diboson stat unc.
+CMS_hcs_stat_qcd     lnN      1.00       1.00       1.00         1.00       1.00      1.00    XXXX      QCD data-driven stat unc.
+CMS_norm_tt          lnN      1.061      1.061      1.00         1.00       1.00      1.00    1.00      TTbar xss unc.
+CMS_norm_stop        lnN      1.00       1.00       1.00         1.00       1.07      1.00    1.00      Single top xss unc.
+CMS_norm_wjet        lnN      1.00       1.00       1.045        1.00       1.00      1.00    1.00      W+jets xss unc.
+CMS_norm_zjet        lnN      1.00       1.00       1.00         1.05       1.00      1.00    1.00      Z+jets xss unc.
+CMS_norm_qcd         lnN      1.00       1.00       1.00         1.00       1.00      1.00    QQQQ      QCD data-driven unc.
+CMS_norm_vv          lnN      1.00       1.00       1.00         1.00       1.00      1.04    1.00      Diboson xss unc.
+CMS_topPtReweight    lnN      HHHH       TTTT         -           -          -         -       -        Top Pt reweighting unc.
+scaleRF_tt           shape     -         1.00         -           -          -         -       -        Renorm, factor scale Up/Down
+hDamp_tt             shape     -         1.00         -           -          -         -       -        Parton shower matching Up/Down 
+topMass_tt           shape     -         1.00         -           -          -         -       -        Top mass Up/Down 
+* autoMCStats 9 1

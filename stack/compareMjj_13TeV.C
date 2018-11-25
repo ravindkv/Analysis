@@ -18,31 +18,31 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   gStyle->SetOptStat(0);
   gStyle->SetFrameLineWidth(3);
   const float xpad[2] = {0.,1};
-  const float ypad[4] = {0.,0.2351916,0.0351916,0.98};
-  TCanvas *c1 = new TCanvas("ddd", "aaa");
+  const float ypad[4] = {0.,0.30,0.30,0.98};
+  TCanvas *c1 = new TCanvas();
   c1->Divide(1, 2);
   //c1->cd(postion);
   c1->cd(1);
   gPad->SetPad(xpad[0],ypad[2],xpad[1],ypad[3]);
   gPad->SetTopMargin(1.15); 
-  gPad->SetBottomMargin(0.5); 
+  gPad->SetBottomMargin(0); 
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   double scale_factor = 1; 
   if(process.Contains("WH120")){
    //TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
-   TLegend* leg = new TLegend(0.70,0.70,0.80,0.85,NULL,"brNDC");
+   TLegend* leg = new TLegend(0.70,0.60,0.80,0.85,NULL,"brNDC");
   }else{
-   TLegend* leg = new TLegend(0.70,0.70,0.80,0.85,NULL,"brNDC");
+   TLegend* leg = new TLegend(0.70,0.60,0.80,0.85,NULL,"brNDC");
   }
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetFillColor(10);
-  leg->SetTextSize(0.05);
+  leg->SetTextSize(0.07);
   //  leg->SetHeader("#splitline{CMS Preliminary}{   @ #sqrt{s} = 7 TeV}");
 
-  //TFile* f = TFile::Open(inFile+"all_TTJetsP.root");
   TFile* f = TFile::Open(inFile+"HplusShapes_mu_mjj_kfit_13TeV.root");
+  //TFile* f = TFile::Open(inFile+"HplusShapes_ele_mjj_kfit_13TeV.root");
   if(f == 0) return;
   if(f->IsZombie()){f->Close(); return;}
 
@@ -68,11 +68,12 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   h2->GetYaxis()->SetRangeUser(1, 1.1* h2->GetMaximum());
   h2->GetXaxis()->SetNdivisions(5);
   h2->GetYaxis()->SetNdivisions(5);
-  h2->GetYaxis()->SetTitleOffset(1.35);
+  h2->GetYaxis()->SetTitleOffset(0.90);
   h2->GetXaxis()->SetTitleOffset(1.00);
-  h2->GetYaxis()->SetTitleSize(0.06);   h2->GetXaxis()->SetTitleSize(0.06);
-  h2->GetXaxis()->SetLabelSize(0.06);   h2->GetXaxis()->LabelsOption("u"); // extra
-  h2->GetYaxis()->SetLabelSize(0.06);   h2->GetXaxis()->LabelsOption("u"); // extra
+  h2->GetYaxis()->SetTitleSize(0.08);   
+  h2->GetXaxis()->SetTitleSize(0.06);
+  h2->GetXaxis()->SetLabelSize(0.06);   
+  h2->GetYaxis()->SetLabelSize(0.06);   
   h2->GetXaxis()->SetTickLength(0.03); 
   h2->GetYaxis()->SetTickLength(0.03); 
   h2->Rebin(bin);
@@ -107,22 +108,22 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   pt->SetTextSize(0.078);
  
   // Header
-  TPaveText *header = new TPaveText(0.15,0.92,0.9,0.99, "brNDC");
+  TPaveText *header = new TPaveText(0.15,0.91,0.9,0.95, "brNDC");
   header->SetBorderSize(1);
   header->SetFillColor(19);
   header->SetFillStyle(0);
   header->SetLineColor(0);
   header->SetTextFont(132);
-  header->SetTextSize(0.058);
+  header->SetTextSize(0.08);
   TText *text = header->AddText("CMS Simulation,    #sqrt{s} = 13 TeV, 35.9 fb^{-1}");
   text->SetTextAlign(11);
 
   // channel specifiction
-  TPaveText *ch = new TPaveText(1.00,0.9154898,0.7510067,0.9762187,"brNDC");
+  TPaveText *ch = new TPaveText(0.82,0.9154898,0.9210067,0.9762187,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
-  ch->SetTextSize(0.08);
+  ch->SetTextSize(0.10);
   ch->SetBorderSize(1);
   if(isMuChannel) ch->AddText("#mu + jets");
   if(isEleChannel) ch->AddText("e + jets");
@@ -147,24 +148,24 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   
   TText TMean1;
   TMean1.SetTextColor(kGreen);
-  TMean1.SetTextSize(.04);
+  TMean1.SetTextSize(.06);
   char mean1[100];
   sprintf(mean1,"Mean = %.2f",h1->GetMean());
   TMean1.DrawTextNDC(.18,.750,mean1);
 
   TText TMean2;
   TMean2.SetTextColor(kBlue);
-  TMean2.SetTextSize(.04);
+  TMean2.SetTextSize(.06);
   char mean2[100];
   sprintf(mean2,"Mean = %.2f",h2->GetMean());
-  TMean2.DrawTextNDC(.18,.700,mean2);
+  TMean2.DrawTextNDC(.18,.650,mean2);
 
   TText TMean3;
   TMean3.SetTextColor(kRed);
-  TMean3.SetTextSize(.04);
+  TMean3.SetTextSize(.06);
   char mean3[100];
   sprintf(mean3,"Mean = %.2f",h3->GetMean());
-  TMean3.DrawTextNDC(.18,.650,mean3);
+  TMean3.DrawTextNDC(.18,.550,mean3);
 
   leg->Draw();
   pt->Draw();
@@ -174,8 +175,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
 
   ////////////////////////////// Ratio //////////////////////////// 
   c1->cd(2);
-  const float ypad_r[4] = {0.,0.2351916,0.3351916,0.98};
-  gPad->SetPad(xpad[0],ypad_r[0],xpad[1],ypad_r[2]);
+  gPad->SetPad(xpad[0],ypad[0],xpad[1],ypad[1]);
   gPad->SetTopMargin(0); gPad->SetBottomMargin(0.5); gPad->SetGridy();
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
@@ -210,9 +210,9 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   TString outFile("MjjShape/");
   outFile += histName+"_"+unctype;
   if(isMuChannel) outFile += "_mu.pdf";
-  if(isEleChannel) outFile += "_mu.pdf";
+  if(isEleChannel) outFile += "_ele.pdf";
   c1->SaveAs(outFile);
-  c1->Close();
+  //c1->Close();
 }
 
 

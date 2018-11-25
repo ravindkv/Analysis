@@ -20,6 +20,7 @@ double UncertaintyComputer::muPtWithRochCorr(const MyMuon *mu, bool isData, doub
   double SF = 1.0; 
   if(isData)SF = dataSF;
   else SF = mcSF;
+  ///cout<<pt<<"\t"<<SF<<"\t"<<SF*pt<<"\t"<<charge<<"\t"<<eta<<"\t"<<phi<<"\t"<<nl<<"\t"<<u1<<"\t"<<u2<<"\t"<<s<<"\t"<<m<<endl;
   return SF*pt;
 }
 
@@ -157,7 +158,6 @@ double UncertaintyComputer::metWithUncl(const vector<MyJet> & vJ, vector<int> *j
 }
 
 double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
-
   double gen_pt = jet.Genp4.pt();  
   double jet_pt = jet.p4.pt();
   double sigmaJER = jet.resolution ;
@@ -174,44 +174,67 @@ double UncertaintyComputer::jetPtWithJESJER(MyJet jet, int jes, int jer){
   }
   return jet_pt;
 }
-//bottom mistagging
-bool UncertaintyComputer::getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, MyJet jet, bool isData, int scale){
-  bool isBtagged = false;
-  
-  if(scale == 0){
-  isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kNo);
-  }
-  else if(scale == 1){
-    isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kUp);
-  }
-  else if(scale == -1){
-    isBtagged = btsf->isbtagged(reader, h2_BTagEff_Num, h2_BTagEff_Denom, jet.p4.eta(), jet.p4.pt(), jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"], jet.partonFlavour, isData ,kDown);
-  }
-  return isBtagged;
+
+//bottom mistagging, by event re-weighting 
+double UncertaintyComputer::getBTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet){
+  double csv =jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
+  double pMC = 1.0; 
+  pMC = btsf->getBTagPmc(h2_qTagEff_Num, h2_qTagEff_Denom, jet.p4.eta(), jet.p4.pt(), csv);
+  return pMC;
+}
+double UncertaintyComputer::getBTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, int scale){
+  double pData = 1.0;
+  double csv =jet.bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
+  double eta = jet.p4.eta();
+  double pt = jet.p4.pt();
+  int flavor = abs(jet.partonFlavour);
+  if(scale == 0) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kNo);
+  else if(scale == 1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kUp);
+  else if(scale == -1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kDown);
+  return pData;
 }
 
-//Charm mistagging 
-Bool_t UncertaintyComputer::getCTagWithSF(BTagCalibrationReader &reader, TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t dCvsL, Float_t dCvsB, MyJet jet, bool isData, int scale){
-  Bool_t isCTagCvsB = false;
-  Bool_t isCTagCvsL = false;
-  if(scale == 0){
-  isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,    dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kNo);
-  isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,    dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kNo);
-  }                                                                                                                                                       
-  else if(scale == 1){                                                                                                                                    
-    isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kUp);
-    isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kUp);
-  }                                                                                                                                                       
-  else if(scale == -1){                                                                                                                                   
-    isCTagCvsL = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsL, jet.bDiscriminator["pfCombinedCvsLJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kDown);
-    isCTagCvsB = ctsf->isCtagged(reader, h2_CTagEff_Num, h2_CTagEff_Denom,  dCvsB, jet.bDiscriminator["pfCombinedCvsBJetTags"], jet.p4.eta(), jet.p4.pt(),jet.partonFlavour, isData ,kDown);
-  }
-  return isCTagCvsB && isCTagCvsL;
+//charm mistagging, for inclusive categories, by event re-weighting 
+double UncertaintyComputer::getIncCTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag){
+  double pMC = 1.0; 
+  pMC = ctsf->getIncCTagPmc(h2_qTagEff_Num, h2_qTagEff_Denom, jet.p4.eta(), jet.p4.pt(), isCTag);
+  return pMC;
+}
+double UncertaintyComputer::getIncCTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag, int scale){
+  double pData = 1.0;
+  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
+  double eta = jet.p4.eta();
+  double pt = jet.p4.pt();
+  int flavor = abs(jet.partonFlavour);
+  if(scale == 0) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kNo);
+  else if(scale == 1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kUp);
+  else if(scale == -1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kDown);
+  return pData;
+}
+
+//charm mistagging, for exclusive categories, by event re-weighting 
+double UncertaintyComputer::getExCTagPmcSys(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTagL, bool isCTagM, bool isCTagT){
+  double pMC = 1.0; 
+  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
+  double eta = jet.p4.eta();
+  double pt = jet.p4.pt();
+  pMC = ctsf->getExCTagPmc(h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT,  h2_qTagEff_Denom, eta, pt, csv, isCTagL, isCTagM, isCTagT);
+  return pMC;
+}
+double UncertaintyComputer::getExCTagPdataSys(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTagL, bool isCTagM, bool isCTagT, int scale){
+  double pData = 1.0;
+  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
+  double eta = jet.p4.eta();
+  double pt = jet.p4.pt();
+  int flavor = abs(jet.partonFlavour);
+  if(scale == 0) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kNo);
+  else if(scale == 1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kUp);
+  else if(scale == -1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kDown);
+  return pData;
 }
 
 double UncertaintyComputer::EffUncOnSV(MyJet jet)
 {
-  
   double Uncert = 0.0;
   if(abs(jet.partonFlavour) >= 3 && abs(jet.partonFlavour) <= 5)
     {
@@ -221,11 +244,9 @@ double UncertaintyComputer::EffUncOnSV(MyJet jet)
     {
       Uncert = sveffunc->getUncL(jet.p4.pt(), jet.p4.eta());
     }
-
   return Uncert;
 }
 double UncertaintyComputer::DeltaR(MyLorentzVector aV, MyLorentzVector bV){
-  
   double deta = TMath::Abs(aV.eta() - bV.eta());
   double dphi = TMath::Abs(aV.phi() - bV.phi());
   if(dphi > M_PI) dphi = 2*M_PI - dphi;

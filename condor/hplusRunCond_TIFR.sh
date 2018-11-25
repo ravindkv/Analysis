@@ -18,12 +18,12 @@ ntupleT2Paths=$1
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
-voms-proxy-init --voms cms
+voms-proxy-init --voms cms --valid 100:10
 cp /tmp/x509up_u56537 ~/
 
-log="log_20170620_"
+log="CondorLog_"
 logDir=$log${ntupleT2Paths/.txt/""}
-baseDir="/home/rverma/t3store2/condor_log/"
+baseDir="/home/rverma/t3store/AN-18-061/CondorLog/AnalysisCondorLog/"
 mkdir -p $baseDir$logDir
 outcond="$baseDir$logDir"
 

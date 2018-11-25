@@ -2,7 +2,7 @@
 #include "interface/Reader.h"
 #include "interface/ObjectSelector.hh"
 #include "interface/HistogramPlotter.hh"
-#include "interface/BtagSF.hh"
+#include "interface/BTagSF.hh"
 #include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
@@ -35,7 +35,7 @@
 #pragma link C++ class Reader+;
 #pragma link C++ class ObjectSelector+;
 #pragma link C++ class HistogramPlotter+;
-#pragma link C++ class BtagSF+;
+#pragma link C++ class BTagSF+;
 #pragma link C++ class CTagSF+;
 #pragma link C++ class SVEffUnc+;
 #pragma link C++ class UncertaintyComputer+;

@@ -22,7 +22,7 @@
 #else
 #include "interface/Reader.h"
 #endif
-#include "interface/BtagSF.hh"
+#include "interface/BTagSF.hh"
 #include "interface/CTagSF.hh"
 #include "interface/SVEffUnc.hh"
 #include "BTagCalibrationStandalone.h"
@@ -41,7 +41,7 @@ class UncertaintyComputer{
 public :
   UncertaintyComputer()
   {
-    btsf = new BtagSF(12345);
+    btsf = new BTagSF(12345);
     ctsf = new CTagSF(12345);
     sveffunc = new SVEffUnc();
   }
@@ -59,14 +59,20 @@ public :
   double metWithUncl(const vector<MyJet> & vJ, vector<int> *j, const vector<MyMuon> &vMu, vector<int> *m, const vector<MyElectron> &vEle, vector<int> *el, MyMET MET, int unc=0);
   double getJERSF(double eta, int jer=0);
   double jetPtWithJESJER(MyJet jet, int jes=0, int jer=0); 
-  bool getBtagWithSF(BTagCalibrationReader &reader, TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, MyJet jet, bool isData, int scale);
-  Bool_t getCTagWithSF(BTagCalibrationReader &reader, TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, Float_t dCvsL, Float_t dCvsB, MyJet jet, bool isData, int scale);
   void  openCSVfile(const std::string &filename); 
   double EffUncOnSV(MyJet jet);
   double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
   
+  // bTag SF, by event reweighting
+  double getBTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet);
+  double getBTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, int scale);
+  double getIncCTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag);
+  double getIncCTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag, int scale);
+  double getExCTagPmcSys(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTagL, bool isCTagM, bool isCTagT);
+  double getExCTagPdataSys(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTagL, bool isCTagM, bool isCTagT, int scale);
+  
 private :
-  BtagSF* btsf;
+  BTagSF* btsf;
   CTagSF* ctsf;
   enum BVariation{kNo = 0, kDown = 1, kUp = 2};
   SVEffUnc* sveffunc;
