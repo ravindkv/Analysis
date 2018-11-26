@@ -960,10 +960,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             pData_ExL = pData_ExL*pdata;
           }
           cTagWt_ExL  = pData_ExL/pMC_ExL; 
-          cout<<"-------------------------"<<endl;
-          cout<<"pData_ExL = "<<pData_ExL<<endl;
-          cout<<"pMC_ExL = "<<pMC_ExL<<endl;
-          cout<<"cTagWt_ExL = "<<cTagWt_ExL<<endl;
         }//Ex loose scale factor
         if(count_cJetsIncM > 0){
           isCTagL = false; 

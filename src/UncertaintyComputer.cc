@@ -230,6 +230,7 @@ double UncertaintyComputer::getExCTagPdataSys(BTagCalibrationReader &readerL, BT
   if(scale == 0) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kNo);
   else if(scale == 1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kUp);
   else if(scale == -1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, isCTagL, isCTagM, isCTagT, kDown);
+  cout<<"pData = "<<pData<<endl;
   return pData;
 }
 

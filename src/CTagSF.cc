@@ -46,7 +46,7 @@ double CTagSF::getExCTagPmc(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *
   return pMC;
 }
 
-double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int btagsys, bool isCTagLMT, bool isCTagMT, bool isCTagT){
+double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, bool isCTagLMT, bool isCTagMT, bool isCTagT, int cTagSys){
   double pData = 1.0;
   double sfL = 1.0;
   double sfM = 1.0;
@@ -55,24 +55,24 @@ double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationRea
   double effM = 1.0;
   double effT = 1.0;
   if(isCTagT){//tagged 
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, btagsys);
+    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys);
     effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
     pData = sfT*effT;
   }
   else if(isCTagMT){
     effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
     effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, btagsys); //csv value of the jet will be same for MT ?
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, btagsys); 
+    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); //csv value of the jet will be same for MT ?
+    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
     pData  = (sfM*effM - sfT*effT);
   }
   else if(isCTagLMT){
     effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
     effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
     effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    sfL  = getCTagSF(readerL, eta, pt, csv, jetFlavor, btagsys); 
-    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, btagsys); 
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, btagsys); 
+    sfL  = getCTagSF(readerL, eta, pt, csv, jetFlavor, cTagSys); 
+    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); 
+    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
     pData = (sfL*effL - sfM*effM)*(sfM*effM - sfT*effT);
   }
   return pData;
