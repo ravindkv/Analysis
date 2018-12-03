@@ -793,14 +793,16 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       double cTagWt_IncM  = 1.0;
       double cTagWt_IncT  = 1.0;
       if(!ev->isData){
-        bool isCTagIncL = false;
         if(count_cJetsIncL > 0){
-          isCTagIncL = true; 
           double pMC_IncL     = 1.0;
           double pData_IncL   = 1.0;
+          bool isCTagIncL = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > -0.48  && pfCCvsB > -0.17) isCTagIncL = true; 
             double pmc   = 1.0;
             double pdata = 1.0;
             //b-quark
@@ -825,17 +827,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             pData_IncL = pData_IncL*pdata;
           }
           cTagWt_IncL  = pData_IncL/pMC_IncL; 
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_incL", 100, 0, 2, cTagWt_IncL, 1);
         }//Inc loose scale factor
-        bool isCTagIncM = false;
         if(count_cJetsIncM > 0){
-          isCTagIncM = true;
           double pMC_IncM     = 1.0;
           double pData_IncM   = 1.0;
+          bool isCTagIncM = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
             double pmc   = 1.0;
             double pdata = 1.0;
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > -0.1   && pfCCvsB > 0.08)   isCTagIncM = true;
             //b-quark
             if(abs(pfJets[ijet].partonFlavour) ==5){
               pmc = getIncCTagPmcSys(h2_CTagEff_Num_bM, h2_CTagEff_Denom_b, pfJets[ijet], isCTagIncM);   
@@ -858,17 +863,20 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             pData_IncM = pData_IncM*pdata;
           }
           cTagWt_IncM  = pData_IncM/pMC_IncM; 
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_incM", 100, 0, 2, cTagWt_IncM, 1);
         }//Inc medium scale factor
-        bool isCTagT = false;
         if(count_cJetsIncT > 0){
-          isCTagT = true;
           double pMC_IncT     = 1.0;
           double pData_IncT   = 1.0;
+          bool isCTagT = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
             double pmc   = 1.0;
             double pdata = 1.0;
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > 0.69   && pfCCvsB > -0.45) isCTagT = true;
             //b-quark
             if(abs(pfJets[ijet].partonFlavour) ==5){
               pmc = getIncCTagPmcSys(h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, pfJets[ijet], isCTagT);   
@@ -891,163 +899,182 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             pData_IncT = pData_IncT*pdata;
           }
           cTagWt_IncT  = pData_IncT/pMC_IncT; 
-        }
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_incT", 100, 0, 2, cTagWt_IncT, 1);
+        }//Inc tight scale factor
       }
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_incL", 100, 0, 2, cTagWt_IncL, 1);
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_incM", 100, 0, 2, cTagWt_IncM, 1);
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_incT", 100, 0, 2, cTagWt_IncT, 1);
-      double evtWtIncL = evtWeight*cTagWt_IncL;
-      double evtWtIncM = evtWeight*cTagWt_IncM;
-      double evtWtIncT = evtWeight*cTagWt_IncT;
+      double evtWtIncL = 1.0;
+      double evtWtIncM = 1.0;
+      double evtWtIncT = 1.0;
       if(count_cJetsIncL > 0) 
-          fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncL", 100, 0, 500, diJet.mass(), evtWtIncL);
+        evtWtIncL = evtWeight*cTagWt_IncL;
+        fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncL", 100, 0, 500, diJet.mass(), evtWtIncL);
+        nCutPass++;
+        fillHisto(outFile_, cutflowType_, "", "cutflow", 10, 0.5, 10.5, nCutPass, evtWtIncL);
       if(count_cJetsIncM > 0) 
-          fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncM", 100, 0, 500, diJet.mass(), evtWtIncM);
+        evtWtIncM = evtWeight*cTagWt_IncM;
+        fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncM", 100, 0, 500, diJet.mass(), evtWtIncM);
       if(count_cJetsIncT > 0) 
-          fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncT", 100, 0, 500, diJet.mass(), evtWtIncT);
-      if(count_cJetsIncL > 0){
-      nCutPass++;
-      fillHisto(outFile_, cutflowType_, "", "cutflow", 10, 0.5, 10.5, nCutPass, evtWtIncL);
-      }
+        evtWtIncT = evtWeight*cTagWt_IncT;
+        fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncT", 100, 0, 500, diJet.mass(), evtWtIncT);
+
       //---------------------------------------------------//
       //ctag - categorisation 
       //Charm mistag scale factors : Exclusive 
       //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
       //---------------------------------------------------//
-      bool isCTagL = false;
-      bool isCTagM = false;
-      bool isCTagT = false;
       double cTagWt_ExL  = 1.0;
       double cTagWt_ExM  = 1.0;
       double cTagWt_ExT  = 1.0;
+      string exCat = "ExclusiveCategoryLoose";
       if(!ev->isData){
         if(count_cJetsIncL > 0){
-          isCTagL = true; 
-          isCTagM = false; 
-          isCTagT = false; 
+          exCat = "forExCatL";
           double pMC_ExL     = 1.0;
           double pData_ExL   = 1.0;
+          bool isCTagL = false;
+          bool isCTagM = false;
+          bool isCTagT = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > -0.48  && pfCCvsB > -0.17)  isCTagL = true;
+            if(pfCCvsL > -0.1   && pfCCvsB > 0.08)   isCTagM = true;
+            if(pfCCvsL > 0.69   && pfCCvsB > -0.45)  isCTagT = true;
             double pmc   = 1.0;
             double pdata = 1.0;
             //b-quark
             if(abs(pfJets[ijet].partonFlavour) ==5){
               pmc = getExCTagPmcSys(h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, 
-                      h2_CTagEff_Denom_b, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_b, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_bL, readCTagCSV_bM, readCTagCSV_bT, 
                       h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //c-quark
             else if(abs(pfJets[ijet].partonFlavour) ==4){ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, 
-                      h2_CTagEff_Denom_c, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_c, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_cL, readCTagCSV_cM, readCTagCSV_cT, 
                       h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, h2_CTagEff_Denom_c, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //other quarks and gluon
             else{ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, 
-                      h2_CTagEff_Denom_udsg, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_udsg, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_lL, readCTagCSV_lM, readCTagCSV_lT, 
                       h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, h2_CTagEff_Denom_udsg, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             pMC_ExL = pMC_ExL*pmc;
             pData_ExL = pData_ExL*pdata;
           }
           cTagWt_ExL  = pData_ExL/pMC_ExL; 
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_ExL", 100, 0, 2, cTagWt_ExL, 1);
         }//Ex loose scale factor
         if(count_cJetsIncM > 0){
-          isCTagL = false; 
-          isCTagM = true; 
-          isCTagT = false; 
+          exCat = "forExCatM";
           double pMC_ExM     = 1.0;
           double pData_ExM   = 1.0;
+          bool isCTagL = false;
+          bool isCTagM = false;
+          bool isCTagT = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
-            //b-quark
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > -0.48  && pfCCvsB > -0.17)  isCTagL = true;
+            if(pfCCvsL > -0.1   && pfCCvsB > 0.08)   isCTagM = true;
+            if(pfCCvsL > 0.69   && pfCCvsB > -0.45)  isCTagT = true;
             double pmc   = 1.0;
             double pdata = 1.0;
+            //b-quark
             if(abs(pfJets[ijet].partonFlavour) ==5){
               pmc = getExCTagPmcSys(h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, 
-                      h2_CTagEff_Denom_b, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_b, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_bL, readCTagCSV_bM, readCTagCSV_bT, 
                       h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //c-quark
             else if(abs(pfJets[ijet].partonFlavour) ==4){ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, 
-                      h2_CTagEff_Denom_c, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_c, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_cL, readCTagCSV_cM, readCTagCSV_cT, 
                       h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, h2_CTagEff_Denom_c, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //other quarks and gluon
             else{ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, 
-                      h2_CTagEff_Denom_udsg, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_udsg, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_lL, readCTagCSV_lM, readCTagCSV_lT, 
                       h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, h2_CTagEff_Denom_udsg, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             pMC_ExM = pMC_ExM*pmc;
             pData_ExM = pData_ExM*pdata;
           }
           cTagWt_ExM  = pData_ExM/pMC_ExM; 
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_ExM", 100, 0, 2, cTagWt_ExM, 1);
         }//Ex medium scale factor
         if(count_cJetsIncT > 0){
-          isCTagL = false; 
-          isCTagM = false; 
-          isCTagT = true; 
+          exCat = "forExCatT";
           double pMC_ExT     = 1.0;
           double pData_ExT   = 1.0;
+          bool isCTagL = false;
+          bool isCTagM = false;
+          bool isCTagT = false;
           for(size_t ijet = 0; ijet < kfLightJets.size(); ijet++){
             if(ijet ==0) ijet = indexForCTag0;
             if(ijet ==1) ijet = indexForCTag1;
+            double pfCCvsL = pfJets[ijet].bDiscriminator["pfCombinedCvsLJetTags"];
+            double pfCCvsB = pfJets[ijet].bDiscriminator["pfCombinedCvsBJetTags"]; 
+            if(pfCCvsL > -0.48  && pfCCvsB > -0.17)  isCTagL = true;
+            if(pfCCvsL > -0.1   && pfCCvsB > 0.08)   isCTagM = true;
+            if(pfCCvsL > 0.69   && pfCCvsB > -0.45)  isCTagT = true;
             double pmc   = 1.0;
             double pdata = 1.0;
             //b-quark
             if(abs(pfJets[ijet].partonFlavour) ==5){
               pmc = getExCTagPmcSys(h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, 
-                      h2_CTagEff_Denom_b, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_b, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_bL, readCTagCSV_bM, readCTagCSV_bT, 
                       h2_CTagEff_Num_bL, h2_CTagEff_Num_bM, h2_CTagEff_Num_bT, h2_CTagEff_Denom_b, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //c-quark
             else if(abs(pfJets[ijet].partonFlavour) ==4){ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, 
-                      h2_CTagEff_Denom_c, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_c, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_cL, readCTagCSV_cM, readCTagCSV_cT, 
                       h2_CTagEff_Num_cL, h2_CTagEff_Num_cM, h2_CTagEff_Num_cT, h2_CTagEff_Denom_c, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             //other quarks and gluon
             else{ 
               pmc = getExCTagPmcSys(h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, 
-                      h2_CTagEff_Denom_udsg, pfJets[ijet], isCTagL, isCTagM, isCTagT);   
+                      h2_CTagEff_Denom_udsg, pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT);   
               pdata = getExCTagPdataSys(readCTagCSV_lL, readCTagCSV_lM, readCTagCSV_lT, 
                       h2_CTagEff_Num_udsgL, h2_CTagEff_Num_udsgM, h2_CTagEff_Num_udsgT, h2_CTagEff_Denom_udsg, 
-                      pfJets[ijet], isCTagL, isCTagM, isCTagT, cScale);
+                      pfJets[ijet], exCat, isCTagL, isCTagM, isCTagT, cScale);
             }
             pMC_ExT = pMC_ExT*pmc;
             pData_ExT = pData_ExT*pdata;
           }
-        cTagWt_ExT  = pData_ExT/pMC_ExT; 
-        }
+          cTagWt_ExT  = pData_ExT/pMC_ExT; 
+          fillHisto(outFile_, cutflowType, "", "cTagWeight_ExT", 100, 0, 2, cTagWt_ExT, 1);
+        }//Ex tight scale factor
       }
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_ExL", 100, 0, 2, cTagWt_ExL, 1);
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_ExM", 100, 0, 2, cTagWt_ExM, 1);
-      fillHisto(outFile_, cutflowType, "", "cTagWeight_ExT", 100, 0, 2, cTagWt_ExT, 1);
-      double evtWtExL = evtWeight*cTagWt_ExL;
-      double evtWtExM = evtWeight*cTagWt_ExM;
-      double evtWtExT = evtWeight*cTagWt_ExT;
+      double evtWtExL = 1.0;
+      double evtWtExM = 1.0;
+      double evtWtExT = 1.0;
+      if(count_cJetsIncL > 0) evtWtExL = evtWeight*cTagWt_ExL;
+      if(count_cJetsIncM > 0) evtWtExM = evtWeight*cTagWt_ExM;
+      if(count_cJetsIncT > 0) evtWtExT = evtWeight*cTagWt_ExT;
 
       //---------------------------------------------------//
       // b-jet pT categorization from exclusive events

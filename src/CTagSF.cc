@@ -27,26 +27,30 @@ double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_N
 }
 
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
-double CTagSF::getExCTagPmc(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTagLMT, bool isCTagMT, bool isCTagT){
+double CTagSF::getExCTagPmc(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, string exCat, bool isCTagL, bool isCTagM, bool isCTagT){
   double pMC = 1.0;
-  if(isCTagT){
-    pMC = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
+  double effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
+  double effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
+  double effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
+  if(exCat=="forExCatL"){
+    if(isCTagL && !isCTagM) pMC = effL -effM;
+    else if(isCTagM && !isCTagT) pMC = effM -effT; 
+    else if(isCTagT) pMC = effT;
+    else pMC = 1-effL;
   }
-  else if(isCTagMT){
-    double effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-    double effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    pMC = effM - effT; 
+  if(exCat=="forExCatM"){
+    if(isCTagM && !isCTagT) pMC = effM -effT; 
+    else if(isCTagT) pMC = effT;
+    else pMC = 1-effM;
   }
-  else if(isCTagLMT){
-    double effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
-    double effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-    double effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    pMC = (effL - effM)* (effM - effT);
+  if(exCat=="forExCatT"){
+    if(isCTagT) pMC = effT;
+    else pMC = 1-effT;
   }
   return pMC;
 }
 
-double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, bool isCTagLMT, bool isCTagMT, bool isCTagT, int cTagSys){
+double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, string exCat, bool isCTagL, bool isCTagM, bool isCTagT, int cTagSys){
   double pData = 1.0;
   double sfL = 1.0;
   double sfM = 1.0;
@@ -54,26 +58,26 @@ double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationRea
   double effL = 1.0;
   double effM = 1.0;
   double effT = 1.0;
-  if(isCTagT){//tagged 
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys);
-    effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    pData = sfT*effT;
+  effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
+  effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
+  effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
+  sfL  = getCTagSF(readerL, eta, pt, csv, jetFlavor, cTagSys); 
+  sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); //csv value of the jet will be same for M ?
+  sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
+  if(exCat=="forExCatL"){
+    if(isCTagL && !isCTagM) pData = sfL*effL -sfM*effM;
+    else if(isCTagM && !isCTagT) pData = sfM*effM -sfT*effT; 
+    else if(isCTagT) pData = sfT*effT;
+    else pData = 1- sfL*effL;
   }
-  else if(isCTagMT){
-    effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-    effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); //csv value of the jet will be same for MT ?
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
-    pData  = (sfM*effM - sfT*effT);
+  if(exCat=="forExCatM"){
+    if(isCTagM && !isCTagT) pData = sfM*effM -sfT*effT; 
+    else if(isCTagT) pData = sfT*effT;
+    else pData = 1-sfM*effM;
   }
-  else if(isCTagLMT){
-    effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
-    effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-    effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-    sfL  = getCTagSF(readerL, eta, pt, csv, jetFlavor, cTagSys); 
-    sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); 
-    sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
-    pData = (sfL*effL - sfM*effM)*(sfM*effM - sfT*effT);
+  if(exCat=="forExCatT"){
+    if(isCTagT) pData = sfT*effT;
+    else pData = 1-sfT*effT;
   }
   return pData;
 }
