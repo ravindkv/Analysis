@@ -119,9 +119,9 @@ public :
     //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     // mu channel 
-    ///xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
+    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
     // ele channel 
-    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
+    ///xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
     xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
     //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
@@ -215,10 +215,10 @@ private :
   std::map<string, double> evtDBS;
   std::map<string, double> muSF;
   /*
-  BTagCalibrationReader readCSV(const std::string &tagger, const std::string &filename);
+  BTagCalibrationReader myReadCSV(const std::string &tagger, const std::string &filename);
   */
   ofstream outfile_;
-  BTagCalibrationReader readCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
+  BTagCalibrationReader myReadCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
   Double_t getMuonSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
@@ -250,7 +250,7 @@ float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
   else return 1 ;
 }
 
-BTagCalibrationReader hplusAnalyzer::readCSV(const std::string &filename, const std::string &tagger,  
+BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, const std::string &tagger,  
 		BTagEntry::OperatingPoint op, 
 		const std::string & measurementType,
 		const std::string & sysType, 

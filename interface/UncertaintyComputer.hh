@@ -68,13 +68,10 @@ public :
   double getBTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, int scale);
   double getIncCTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag);
   double getIncCTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag, int scale);
-  double getExCTagPmcSys(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, string exCat, bool isCTagL, bool isCTagM, bool isCTagT);
-  double getExCTagPdataSys(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, string exCat, bool isCTagL, bool isCTagM, bool isCTagT, int scale);
   
 private :
   BTagSF* btsf;
   CTagSF* ctsf;
-  enum BVariation{kNo = 0, kDown = 1, kUp = 2};
   SVEffUnc* sveffunc;
   ClassDef(UncertaintyComputer, 1)
 };

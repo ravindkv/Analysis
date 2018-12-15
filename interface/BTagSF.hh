@@ -30,7 +30,6 @@ public:
 
   double getBTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int bTagSys);
   double getBTagEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, double eta, double pt);
-  enum { kNo, kDown, kUp };                     // systematic variations 
 
 private:
   TRandom3* randm;

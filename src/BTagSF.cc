@@ -7,7 +7,7 @@ double BTagSF::getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double e
   double pMC = 1.0; 
   if(csv> csvM) pMC = getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
   else pMC = 1 - getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
-  return pMC;
+  return (pMC>0)?pMC:1.0;
 }
 
 double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int bTagSys){
@@ -26,35 +26,29 @@ double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num,
     eff = getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
     pData = 1.0 - sf*eff;
   }
-  return pData;
+  return (pData>0)?pData:1.0;
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
 //https://twiki.cern.ch/twiki/pub/CMS/BTagRecommendation80XReReco/CSVv2_Moriond17_B_H.csv
 double BTagSF::getBTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int bTagSys){
-  double sf     =1.0;
-  double sfUp   =1.0;
-  double sfDown =1.0;
+  double sf=1.0;
   if(abs(jetFlavor) ==5){
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_B, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_B, eta, pt, csv);
+    if(bTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
+    if(bTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_B, eta, pt, csv);
+    if(bTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_B, eta, pt, csv);
   }
   else if(abs(jetFlavor)==4){
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_C, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_C, eta, pt, csv);
+    if(bTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, eta, pt,csv);
+    if(bTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_C, eta, pt, csv);
+    if(bTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_C, eta, pt, csv);
   }
   else{
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_UDSG, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_UDSG, eta, pt, csv);
+    if(bTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, eta, pt,csv);
+    if(bTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_UDSG, eta, pt, csv);
+    if(bTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_UDSG, eta, pt, csv);
   }
-  Double_t scalefactor = 1.0;
-  if(bTagSys == kNo)   scalefactor = sf; 
-  if(bTagSys == kUp)   scalefactor = sfUp;
-  if(bTagSys == kDown) scalefactor = sfDown;
-  return scalefactor;
+  return sf;
 }
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
 double BTagSF::getBTagEff(TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, double eta, double pt){

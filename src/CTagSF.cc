@@ -6,7 +6,7 @@ double CTagSF::getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, doubl
   double pMC = 1.0; 
   if(isCTag) pMC = getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
   else pMC = 1 - getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
-  return pMC;
+  return (pMC >0)?pMC:1.0;
 }
 
 double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTag, int jetFlavor, int cTagSys){
@@ -23,91 +23,29 @@ double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_N
     eff = getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
     pData = 1.0 - sf*eff;
   }
-  return pData;
-}
-
-//https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
-double CTagSF::getExCTagPmc(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, string exCat, bool isCTagL, bool isCTagM, bool isCTagT){
-  double pMC = 1.0;
-  double effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
-  double effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-  double effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-  if(exCat=="forExCatL"){
-    if(isCTagL && !isCTagM) pMC = effL -effM;
-    else if(isCTagM && !isCTagT) pMC = effM -effT; 
-    else if(isCTagT) pMC = effT;
-    else pMC = 1-effL;
-  }
-  if(exCat=="forExCatM"){
-    if(isCTagM && !isCTagT) pMC = effM -effT; 
-    else if(isCTagT) pMC = effT;
-    else pMC = 1-effM;
-  }
-  if(exCat=="forExCatT"){
-    if(isCTagT) pMC = effT;
-    else pMC = 1-effT;
-  }
-  return pMC;
-}
-
-double CTagSF::getExCTagPdata(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM, TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, string exCat, bool isCTagL, bool isCTagM, bool isCTagT, int cTagSys){
-  double pData = 1.0;
-  double sfL = 1.0;
-  double sfM = 1.0;
-  double sfT = 1.0;
-  double effL = 1.0;
-  double effM = 1.0;
-  double effT = 1.0;
-  effL = getCTagEff(h2_qTagEff_NumL, h2_qTagEff_Denom, eta, pt);
-  effM = getCTagEff(h2_qTagEff_NumM, h2_qTagEff_Denom, eta, pt);
-  effT = getCTagEff(h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt);
-  sfL  = getCTagSF(readerL, eta, pt, csv, jetFlavor, cTagSys); 
-  sfM  = getCTagSF(readerM, eta, pt, csv, jetFlavor, cTagSys); //csv value of the jet will be same for M ?
-  sfT  = getCTagSF(readerT, eta, pt, csv, jetFlavor, cTagSys); 
-  if(exCat=="forExCatL"){
-    if(isCTagL && !isCTagM) pData = sfL*effL -sfM*effM;
-    else if(isCTagM && !isCTagT) pData = sfM*effM -sfT*effT; 
-    else if(isCTagT) pData = sfT*effT;
-    else pData = 1- sfL*effL;
-  }
-  if(exCat=="forExCatM"){
-    if(isCTagM && !isCTagT) pData = sfM*effM -sfT*effT; 
-    else if(isCTagT) pData = sfT*effT;
-    else pData = 1-sfM*effM;
-  }
-  if(exCat=="forExCatT"){
-    if(isCTagT) pData = sfT*effT;
-    else pData = 1-sfT*effT;
-  }
-  return pData;
+  return (pData>0)?pData:1.0;
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
 //https://twiki.cern.ch/twiki/pub/CMS/BtagRecommendation80XReReco/CSVv2_Moriond17_B_H.csv
 double CTagSF::getCTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int cTagSys){
-  double sf     =1.0;
-  double sfUp   =1.0;
-  double sfDown =1.0;
+  double sf=1.0;
   if(abs(jetFlavor) ==5){
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_B, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_B, eta, pt, csv);
+    if(cTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
+    if(cTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_B, eta, pt, csv);
+    if(cTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_B, eta, pt, csv);
   }
   else if(abs(jetFlavor)==4){
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_C, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_C, eta, pt, csv);
+    if(cTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_C, eta, pt,csv);
+    if(cTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_C, eta, pt, csv);
+    if(cTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_C, eta, pt, csv);
   }
   else{
-    sf     = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, eta, pt,csv);
-    sfUp   = reader.eval_auto_bounds("up",      BTagEntry::FLAV_UDSG, eta, pt, csv);
-    sfDown = reader.eval_auto_bounds("down",    BTagEntry::FLAV_UDSG, eta, pt, csv);
+    if(cTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, eta, pt,csv);
+    if(cTagSys==1) sf = reader.eval_auto_bounds("up",      BTagEntry::FLAV_UDSG, eta, pt, csv);
+    if(cTagSys==-1)sf = reader.eval_auto_bounds("down",    BTagEntry::FLAV_UDSG, eta, pt, csv);
   }
-  double scalefactor = 1.0;
-  if(cTagSys == kNo)   scalefactor = sf; 
-  if(cTagSys == kUp)   scalefactor = sfUp;
-  if(cTagSys == kDown) scalefactor = sfDown;
-  return scalefactor;
+  return sf;
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods

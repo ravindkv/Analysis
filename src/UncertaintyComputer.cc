@@ -188,9 +188,9 @@ double UncertaintyComputer::getBTagPdataSys(BTagCalibrationReader &reader, TH2D 
   double eta = jet.p4.eta();
   double pt = jet.p4.pt();
   int flavor = abs(jet.partonFlavour);
-  if(scale == 0) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kNo);
-  else if(scale == 1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kUp);
-  else if(scale == -1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,kDown);
+  if(scale == 0) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,0);
+  else if(scale == 1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,1);
+  else if(scale == -1) pData = btsf->getBTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, flavor ,-1);
   return pData;
 }
 
@@ -206,30 +206,9 @@ double UncertaintyComputer::getIncCTagPdataSys(BTagCalibrationReader &reader, TH
   double eta = jet.p4.eta();
   double pt = jet.p4.pt();
   int flavor = abs(jet.partonFlavour);
-  if(scale == 0) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kNo);
-  else if(scale == 1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kUp);
-  else if(scale == -1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,kDown);
-  return pData;
-}
-
-//charm mistagging, for exclusive categories, by event re-weighting 
-double UncertaintyComputer::getExCTagPmcSys(TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, string exCat, bool isCTagL, bool isCTagM, bool isCTagT){
-  double pMC = 1.0; 
-  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
-  double eta = jet.p4.eta();
-  double pt = jet.p4.pt();
-  pMC = ctsf->getExCTagPmc(h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT,  h2_qTagEff_Denom, eta, pt, csv, exCat, isCTagL, isCTagM, isCTagT);
-  return pMC;
-}
-double UncertaintyComputer::getExCTagPdataSys(BTagCalibrationReader &readerL, BTagCalibrationReader &readerM, BTagCalibrationReader &readerT, TH2D *h2_qTagEff_NumL, TH2D *h2_qTagEff_NumM,TH2D *h2_qTagEff_NumT, TH2D *h2_qTagEff_Denom, MyJet jet, string exCat, bool isCTagL, bool isCTagM, bool isCTagT, int scale){
-  double pData = 1.0;
-  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
-  double eta = jet.p4.eta();
-  double pt = jet.p4.pt();
-  int flavor = abs(jet.partonFlavour);
-  if(scale == 0) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, exCat, isCTagL, isCTagM, isCTagT, kNo);
-  else if(scale == 1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, exCat, isCTagL, isCTagM, isCTagT, kUp);
-  else if(scale == -1) pData = ctsf->getExCTagPdata(readerL, readerM, readerT, h2_qTagEff_NumL, h2_qTagEff_NumM, h2_qTagEff_NumT, h2_qTagEff_Denom, eta, pt, csv, flavor, exCat, isCTagL, isCTagM, isCTagT, kDown);
+  if(scale == 0) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,0);
+  else if(scale == 1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,1);
+  else if(scale == -1) pData = ctsf->getIncCTagPdata(reader, h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt, csv, isCTag, flavor ,-1);
   return pData;
 }
 
