@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iomanip>
 
-bool isMuChannel = true;
-bool isEleChannel = false;
+bool isMuChannel = false;
+bool isEleChannel = true;
 
 double sysUncJESTopPt( TH1F * h_JESPlus, TH1F * h_base, TH1F * h_JESMinus, TH1F * h_JERPlus, TH1F * h_JERMinus, TH1F * h_TopPtPlus, TH1F * h_TopPtMinus, int b){
   double uncJES = pow(TMath::Max(fabs(h_JESPlus->GetBinContent(b) - h_base->GetBinContent(b)), fabs(h_base->GetBinContent(b) - h_JESMinus->GetBinContent(b))), 2);

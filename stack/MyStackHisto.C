@@ -5,12 +5,7 @@
 bool isMuChannel = true;
 bool isEleChannel = false;
 
-//USER'S INPUT FOR DATA DRIVEN QCD 
-bool isDataDrivenQCD = false;
-double qcd_sf_btag     =  2.428 ; 
-double qcd_sf_kfit     =  1.987 ;
-double qcd_sf_btag_err =  0.1339;
-double qcd_sf_kfit_err =  0.2441;
+bool isDDqcd = true;
 TFile *f_QCD_dd = new TFile("all_QCD_dd.root","RECREATE");
   
 //SAVE HISTOS ON DISK
@@ -18,8 +13,32 @@ bool isSaveHisto = true;
 ///////////////////////////////////////////  
 
 void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString histName, TString xTitle,bool isData=false, bool isSig=false, double xmin=0, double xmax=10, double unc=false){
-  MyStackHisto MyStackHisto_;
+  MyStackHisto MyS;
   string hist_name (histName);
+
+  //user's input for data driven qcd
+  double qcd_sf_btag     =  0.0;
+  double qcd_sf_kfit     =  0.0;
+  double qcd_sf_btag_err =  0.0;
+  double qcd_sf_kfit_err =  0.0;
+  //muon channel
+  if(isMuChannel){
+    qcd_sf_btag     =  2.652 ;
+    qcd_sf_kfit     =  1.504 ;
+    qcd_sf_btag_err =  0.1504;
+    qcd_sf_kfit_err =  0.2206;
+  }
+  //electron channel
+  if(isEleChannel){
+    qcd_sf_btag     =  2.428 ;
+    qcd_sf_kfit     =  1.996 ;
+    qcd_sf_btag_err =  0.1331;
+    qcd_sf_kfit_err =  0.2419;
+  }
+  //qcd scale factors for data-driven QCD
+  //vector<double> sfAndErr = MyS.getQcdSF(fData, fTT, fST, fWJ, fDY, fVV, histDir, histName);
+  //double qcdSF = sfAndErr[0];
+  //double qcdErr = sfAndErr[1];
   //Pad
   gStyle->SetOptStat(0);
   gStyle->SetFrameLineWidth(3);
@@ -50,15 +69,15 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   // stack MC Bkg histo
   //-------------------------------
   THStack* hStack = new THStack("hStack","");
-  TH1F* hVV = MyStackHisto_.getHisto(fVV, baseDir, isoDir, histDir, histName);
+  TH1F* hVV = MyS.getHisto(fVV, baseDir, isoDir, histDir, histName);
   TH1F* hMC = (TH1F*)hVV->Clone("hMC");
   int col_depth =2;
   if(baseDir=="baseLowMET/") col_depth = 1;
   hVV->SetFillColor(11 + col_depth);
   leg->AddEntry(hVV,"VV","F");
   hStack->Add(hVV);
-  MyStackHisto_.stackHisto(fDY, "Z/#gamma+jets", baseDir, isoDir, histDir, histName, kViolet+col_depth, 1,   hStack, hMC, leg);
-  MyStackHisto_.stackHisto(fWJ, "W+ jets", baseDir, isoDir, histDir, histName, kPink +col_depth , 1,   hStack, hMC, leg);
+  MyS.stackHisto(fDY, "Z/#gamma+jets", baseDir, isoDir, histDir, histName, kViolet+col_depth, 1,   hStack, hMC, leg);
+  MyS.stackHisto(fWJ, "W+ jets", baseDir, isoDir, histDir, histName, kPink +col_depth , 1,   hStack, hMC, leg);
   
   // trim the histDir string
   std::string histDir_str;
@@ -66,14 +85,15 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   std::remove_copy(histDir_orig.begin(), histDir_orig.end(), std::back_inserter(histDir_str), '/');
   TString histDir_(histDir_str);
   // QCD from Data
-  if(histDir=="") isDataDrivenQCD = false;
-  TH1F * hQCD_dd = MyStackHisto_.getHisto(fQCD, baseDir, isoDir, histDir, histName);
-  hQCD_dd->Add(hQCD_dd, -1); // initialize empty hist
-  if(isDataDrivenQCD){
-    if(baseDir=="baseLowMET/")hQCD_dd = MyStackHisto_.getDataDrivenQCD(baseDir, "NonIso/", histDir, histName); // don't apply QCD sf in lowMET region.
-    else if(histDir=="BTag/") hQCD_dd = MyStackHisto_.getDataDrivenQCD(baseDir, "NonIso/", histDir, histName, qcd_sf_btag, qcd_sf_btag_err);
-    else if(histDir=="KinFit/") hQCD_dd = MyStackHisto_.getDataDrivenQCD(baseDir, "NonIso/", histDir, histName,  qcd_sf_kfit,  qcd_sf_kfit_err);
-    else hQCD_dd = MyStackHisto_.getDataDrivenQCD(baseDir, "NonIso/", histDir, histName,  qcd_sf_kfit,  qcd_sf_kfit_err);
+  ///if(histDir=="") isDDqcd = false;
+  TH1F * hQCD_dd = MyS.getHisto(fQCD, baseDir, isoDir, histDir, histName);
+  hQCD_dd->Reset(); // initialize empty hist
+  if(isDDqcd){
+    //hQCD_dd = MyS.getDDqcd(baseDir, "NonIso/", histDir, histName,  qcdSF,  qcdErr);
+    if(baseDir=="baseLowMET/")hQCD_dd = MyS.getDDqcd(baseDir, "NonIso/", histDir, histName); // don't apply QCD sf in lowMET region.
+    else if(histDir=="BTag/") hQCD_dd = MyS.getDDqcd(baseDir, "NonIso/", histDir, histName, qcd_sf_btag, qcd_sf_btag_err);
+    else if(histDir=="KinFit/") hQCD_dd = MyS.getDDqcd(baseDir, "NonIso/", histDir, histName,  qcd_sf_kfit,  qcd_sf_kfit_err);
+    else hQCD_dd = MyS.getDDqcd(baseDir, "NonIso/", histDir, histName,  qcd_sf_kfit,  qcd_sf_kfit_err);
     hQCD_dd->SetFillColor(kGreen+2);
     hQCD_dd->GetXaxis()->SetRangeUser(xmin,xmax);
     //create same dir to the data driven qcd file
@@ -87,9 +107,9 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     hStack->Add(hQCD_dd);
     hMC->Add(hQCD_dd);
   }
-  else MyStackHisto_.stackHisto(fQCD, "QCD", baseDir, isoDir, histDir, histName, kGreen +col_depth, 1,   hStack, hMC, leg);
-  MyStackHisto_.stackHisto(fST, "Single t", baseDir, isoDir, histDir, histName, kYellow+col_depth , 1,   hStack, hMC, leg);
-  MyStackHisto_.stackHisto(fTT,"t#bar{t} + jets", baseDir, isoDir, histDir, histName, kCyan+col_depth, 1,   hStack, hMC, leg);
+  else MyS.stackHisto(fQCD, "QCD", baseDir, isoDir, histDir, histName, kGreen +col_depth, 1,   hStack, hMC, leg);
+  MyS.stackHisto(fST, "Single t", baseDir, isoDir, histDir, histName, kYellow+col_depth , 1,   hStack, hMC, leg);
+  MyS.stackHisto(fTT,"t#bar{t} + jets", baseDir, isoDir, histDir, histName, kCyan+col_depth, 1,   hStack, hMC, leg);
 
   gPad->SetTopMargin(0.10);
   gPad->SetLeftMargin(0.15);
@@ -128,30 +148,22 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //-------------------------------------///
   //unc band
   //-------------------------------------///
-  double qcd_sf = 1;
-  double qcd_sf_err = 1;
-  if(histDir_=="BTag"){ 
-    qcd_sf = qcd_sf_btag;
-    qcd_sf_err = qcd_sf_btag_err;
-  }
-  if(histDir_=="KinFit"){
-    qcd_sf = qcd_sf_kfit;
-    qcd_sf_err = qcd_sf_kfit_err;
-  }
   if(unc){
   TGraphAsymmErrors *UncBand;
-  UncBand = MyStackHisto_.UNCGRAPH(
-            MyStackHisto_.addHistoForUnc("base/", 	 isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JESPlus/",      isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JESMinus/",     isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JERPlus/",      isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JERMinus/",     isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("bTagPlus/",     isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("bTagMinus/",    isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("cTagPlus/",     isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("cTagMinus/",    isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("PileupPlus/",   isoDir, histDir, histName,     isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("PileupMinus/",  isoDir, histDir, histName, 	isDataDrivenQCD),
+  UncBand = MyS.UNCGRAPH(
+            MyS.addHistoForUnc("base/", 	 isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("JESPlus/",      isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("JESMinus/",     isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("JERPlus/",      isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("JERMinus/",     isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus1/",     isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus1/",    isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus2/",     isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus2/",    isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus3/",     isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus3/",    isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("PileupPlus/",   isoDir, histDir, histName,     isDDqcd),
+      	    MyS.addHistoForUnc("PileupMinus/",  isoDir, histDir, histName, 	isDDqcd),
 	    hQCD_dd, true, false);
   UncBand->SetFillColor(kSpring +9);
   UncBand->SetFillStyle(3008);
@@ -162,8 +174,8 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //-------------------------------
   //Data
   //-------------------------------
-  TH1F* hData = MyStackHisto_.getHisto(fData, baseDir, isoDir, histDir, histName);;
-  ///MyStackHisto_.decorateHisto(hData, "", xTitle, "Events");
+  TH1F* hData = MyS.getHisto(fData, baseDir, isoDir, histDir, histName);;
+  ///MyS.decorateHisto(hData, "", xTitle, "Events");
   hData->SetFillColor(kBlack);
   hData->SetMarkerStyle(20); hData->SetMarkerSize(1.2);
   if(isData)hData->Draw("Esame"); 
@@ -172,10 +184,10 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //-------------------------------
   //Signal 
   //-------------------------------
-  TH1F* hSig = MyStackHisto_.getHisto(fSig, baseDir, isoDir, histDir, histName);
+  TH1F* hSig = MyS.getHisto(fSig, baseDir, isoDir, histDir, histName);
   if(histDir_str.find("PtbJet") != string::npos)
-    hSig = MyStackHisto_.getHisto(fSig90, baseDir, isoDir, histDir, histName);
-  ///MyStackHisto_.decorateHisto(hSig, "", xTitle, "Events");
+    hSig = MyS.getHisto(fSig, baseDir, isoDir, histDir, histName);
+  ///MyS.decorateHisto(hSig, "", xTitle, "Events");
   hSig->SetLineColor(kRed); hSig->SetLineStyle(2);
   hSig->SetLineWidth(3); hSig->SetFillColor(0);
   if(isSig)hSig->Draw("HISTSAME"); 
@@ -192,8 +204,8 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   if(baseDir=="baseLowMET/" && hist_name.find("mjj") != string::npos)
 	  hStack->SetMaximum(1.1*yMax);
 
-  //TPaveText *cct = MyStackHisto_.paveText(0.70,0.8554,0.80,0.8562, 0, 19, 1, 0, 132);
-  TPaveText *cct = MyStackHisto_.paveText(0.40,0.8454,0.50,0.8462, 0, 19, 1, 0, 132);
+  //TPaveText *cct = MyS.paveText(0.70,0.8554,0.80,0.8562, 0, 19, 1, 0, 132);
+  TPaveText *cct = MyS.paveText(0.40,0.8454,0.50,0.8462, 0, 19, 1, 0, 132);
   cct->SetTextSize(0.09);
   if(histDir_str.find("PtbJet") != string::npos)
     cct->AddText("M_{H^{+}} = 90 GeV");
@@ -203,17 +215,17 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //  Draw Pave Text 
   //-------------------------------------///
   //hist name
-  TPaveText *hLable = MyStackHisto_.paveText(0.6513423,0.7754898,0.6010067,0.8962187, 0, 19, 1, 0, 132);
+  TPaveText *hLable = MyS.paveText(0.6513423,0.7754898,0.6010067,0.8962187, 0, 19, 1, 0, 132);
   hLable->SetTextSize(0.080);
   hLable->AddText(xTitle);
   
   //channel
-  TPaveText *ch = MyStackHisto_.paveText(0.823,0.9154898,0.9210067,0.9762187, 0, 19, 1, 0, 132);
+  TPaveText *ch = MyS.paveText(0.823,0.9154898,0.9210067,0.9762187, 0, 19, 1, 0, 132);
   ch->SetTextSize(0.12);
   if(isMuChannel) ch->AddText("#mu + jets");
   if(isEleChannel) ch->AddText("e + jets");
   //CMS prili
-  TPaveText *pt = MyStackHisto_.paveText(0.01,0.9554,0.82,0.9562, 0, 19, 1, 0, 132);
+  TPaveText *pt = MyS.paveText(0.01,0.9554,0.82,0.9562, 0, 19, 1, 0, 132);
   if(isData) pt->SetTextSize(0.085);
   else pt->SetTextSize(0.059);
   if(baseDir=="baseLowMET/") pt->AddText(histDir_+"(E_{T}^{miss} < 20 GeV): #sqrt{s} = 13 TeV, 35.9 fb^{-1}");
@@ -239,7 +251,7 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     hRatio->Reset();
     hRatio->Add(hData);
     hRatio->Divide(hMC); 
-    MyStackHisto_.decorateHisto(hRatio, "", xTitle, "#frac{Data}{Bkg}");
+    MyS.decorateHisto(hRatio, "", xTitle, "#frac{Data}{Bkg}");
     hRatio->SetFillColor(kBlack);
     if(baseDir=="baseLowMET/") hRatio->GetYaxis()->SetRangeUser(0, 2);
     else hRatio->GetYaxis()->SetRangeUser(0.5, 1.5);
@@ -250,6 +262,7 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     hRatio->GetYaxis()->SetTitleSize(0.22); 
     hRatio->GetXaxis()->SetTitleSize(0.23);
     hRatio->GetXaxis()->SetLabelSize(0.22); 
+    hRatio->GetYaxis()->SetLabelSize(0.12); 
     if(hist_name.find("mjj") != string::npos){
       hRatio->GetXaxis()->SetTitleSize(0.15); 
       hRatio->GetXaxis()->SetTitleOffset(1.40);
@@ -276,6 +289,7 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
       hRatio->GetXaxis()->LabelsOption("u");
       hRatio->GetXaxis()->SetTickLength(0.08); 
       hRatio->GetXaxis()->SetLabelOffset(0.08);
+      hRatio->GetYaxis()->SetRangeUser(0.8, 1.2);
       /*
       gPad->SetBottomMargin(0.6); //gPad->SetGridy();
       hRatio->GetXaxis()->SetLabelOffset(0.04);
@@ -288,18 +302,20 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     hRatio->Draw("E"); // use "P" or "AP"
     if(unc){
     TGraphAsymmErrors *UncBand_Ratio;
-    UncBand_Ratio = MyStackHisto_.UNCGRAPH(
-	    MyStackHisto_.addHistoForUnc("base/", 	isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JESPlus/",     isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JESMinus/",    isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JERPlus/",     isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("JERMinus/",    isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("bTagPlus/",    isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("bTagMinus/",   isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("cTagPlus/",    isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("cTagMinus/",   isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("PileupPlus/",  isoDir, histDir, histName,  isDataDrivenQCD),
-      	    MyStackHisto_.addHistoForUnc("PileupMinus/", isoDir, histDir, histName,  isDataDrivenQCD),
+    UncBand_Ratio = MyS.UNCGRAPH(
+	    MyS.addHistoForUnc("base/", 	 isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("JESPlus/",     isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("JESMinus/",    isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("JERPlus/",     isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("JERMinus/",    isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus1/",  isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus1/", isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus2/",  isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus2/", isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagPlus3/",  isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("bcTagMinus3/", isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("PileupPlus/",  isoDir, histDir, histName,  isDDqcd),
+      	    MyS.addHistoForUnc("PileupMinus/", isoDir, histDir, histName,  isDDqcd),
 	    hQCD_dd, false, true);
     UncBand_Ratio->SetFillColor(kSpring +9);
     UncBand_Ratio->SetFillStyle(3008);
@@ -325,18 +341,25 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
 
 void MyStackHisto(){
 
-  TString histDir="PtbJetBi"; // BTag/, KinFit/, PtbJetBin/;
+  TString histDir="KinFit/"; // BTag/, KinFit/, PtbJetBin/;
   TString baseDir = "base/"; // base/, baseLowMET/;
 
   TString isoDir = "Iso/";
-  bool isDataMjj=false;
+  bool isDataMjj=true;
   //flags
   bool isData = true;
   bool isSig = true;
   bool isUnc = true;
-   plotStackedHisto(baseDir, "", "", "RelIso_1Mu","I_{rel}^{#mu}", isData,  isSig,  0.0, 1.0,  false);
+  bool isMCqcd = false;
+  if(isMuChannel && isMCqcd){
+   plotStackedHisto(baseDir, "", "", "RelIso_1Mu","I_{rel}^{e}", isData,  isSig,  0.0, 1.0,  false);
    plotStackedHisto(baseDir, "", "", "pt_met_1Mu","E_{T}^{miss}[GeV]", isData,  isSig,  0.0, 500.0, false);
-   plotStackedHisto(baseDir, isoDir, "", "cutflow","cutflow", isData,  isSig,  0.0, 10.0, false);
+  }
+  if(isEleChannel && isMCqcd){
+   plotStackedHisto(baseDir, "", "", "RelIso_1Ele","I_{rel}^{e}", isData,  isSig,  0.0, 1.0,  false);
+   plotStackedHisto(baseDir, "", "", "pt_met_1Ele","E_{T}^{miss}[GeV]", isData,  isSig,  0.0, 500.0, false);
+  }
+  if(isMCqcd) plotStackedHisto(baseDir, isoDir, "", "cutflow","cutflow", isData,  isSig,  0.0, 10.0, false);
 
  if(histDir=="BTag/"){
    plotStackedHisto(baseDir, isoDir, histDir, "mjj", "M_{jj}[GeV]", isDataMjj, isSig,  0, 400, isUnc);
@@ -346,87 +369,58 @@ void MyStackHisto(){
  }
  if(histDir=="KinFit/"){
    plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit", "M_{jj}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagL_SF", "M_{jj}^{Inc_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagM_SF", "M_{jj}^{Inc_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagT_SF", "M_{jj}^{Inc_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagO_SF_Cat", "M_{jj}^{Ex_CTagO}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagL_SF_Cat", "M_{jj}^{Ex_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagM_SF_Cat", "M_{jj}^{Ex_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagT_SF_Cat", "M_{jj}^{Ex_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncL", "M_{jj}^{Inc_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncM", "M_{jj}^{Inc_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncT", "M_{jj}^{Inc_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExO", "M_{jj}^{Ex_CTagO}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExL", "M_{jj}^{Ex_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExM", "M_{jj}^{Ex_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExT", "M_{jj}^{Ex_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "pt_bjetH", "Pt_{bjet}^{Had} [GeV]", isData, isSig,  0, 500, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsL", "pfCombinedCvsLJetTags", isData, isSig,  -1.1, 2.0, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsB", "pfCombinedCvsBJetTags", isData, isSig,  -1.1, 2.0, isUnc);
  }
  if(histDir=="PtbJetBin/"){
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit", "M_{jj}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagL_SF", "M_{jj}^{Inc_CTagL}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagM_SF", "M_{jj}^{Inc_CTagM}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagT_SF", "M_{jj}^{Inc_CTagT}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagO_SF_Cat", "M_{jj}^{Ex_CTagO}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagL_SF_Cat", "M_{jj}^{Ex_CTagL}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagM_SF_Cat", "M_{jj}^{Ex_CTagM}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagT_SF_Cat", "M_{jj}^{Ex_CTagT}[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit", "M_{jj}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagIncL", "M_{jj}^{Inc_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagIncM", "M_{jj}^{Inc_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagIncT", "M_{jj}^{Inc_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagExO", "M_{jj}^{Ex_CTagO}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagExL", "M_{jj}^{Ex_CTagL}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagExM", "M_{jj}^{Ex_CTagM}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "KinFit/", "mjj_kfit_CTagExT", "M_{jj}^{Ex_CTagT}[GeV]", isDataMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_25To42", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_42To57", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_57To74", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_74To99", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_99To500","M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
 
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_25To35", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_35To42", "M_{jj}^{Inc}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_42To50", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_50To57", "M_{jj}^{Inc}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_57To65", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_65To74", "M_{jj}^{Inc}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_74To84", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_84To99", "M_{jj}^{Inc}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_99To124",  "M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetInc/", "mjj_kfit_124To500", "M_{jj}^{Inc}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExO/", "mjj_kfit_25To42", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExO/", "mjj_kfit_42To57", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExO/", "mjj_kfit_57To74", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExO/", "mjj_kfit_74To99", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExO/", "mjj_kfit_99To500","M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
 
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_25To35", "M_{jj}^{Ex_CatL}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_35To42", "M_{jj}^{Ex_CatL}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_42To50", "M_{jj}^{Ex_CatL}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_50To57", "M_{jj}^{Ex_CatL}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_57To65", "M_{jj}^{Ex_CatL}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_65To74", "M_{jj}^{Ex_CatL}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_74To84", "M_{jj}^{Ex_CatL}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_84To99", "M_{jj}^{Ex_CatL}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_99To124",  "M_{jj}^{Ex_CatL}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatL/", "mjj_kfit_124To500", "M_{jj}^{Ex_CatL}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExL/", "mjj_kfit_25To42", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExL/", "mjj_kfit_42To57", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExL/", "mjj_kfit_57To74", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExL/", "mjj_kfit_74To99", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExL/", "mjj_kfit_99To500","M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
 
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_25To35", "M_{jj}^{Ex_CatM}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_35To42", "M_{jj}^{Ex_CatM}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_42To50", "M_{jj}^{Ex_CatM}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_50To57", "M_{jj}^{Ex_CatM}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_57To65", "M_{jj}^{Ex_CatM}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_65To74", "M_{jj}^{Ex_CatM}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_74To84", "M_{jj}^{Ex_CatM}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_84To99", "M_{jj}^{Ex_CatM}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_99To124",  "M_{jj}^{Ex_CatM}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatM/", "mjj_kfit_124To500", "M_{jj}^{Ex_CatM}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExM/", "mjj_kfit_25To42", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExM/", "mjj_kfit_42To57", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExM/", "mjj_kfit_57To74", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExM/", "mjj_kfit_74To99", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExM/", "mjj_kfit_99To500","M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
 
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_25To35", "M_{jj}^{Ex_CatT}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_35To42", "M_{jj}^{Ex_CatT}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_42To50", "M_{jj}^{Ex_CatT}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_50To57", "M_{jj}^{Ex_CatT}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_57To65", "M_{jj}^{Ex_CatT}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_65To74", "M_{jj}^{Ex_CatT}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_74To84", "M_{jj}^{Ex_CatT}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_84To99", "M_{jj}^{Ex_CatT}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_99To124",  "M_{jj}^{Ex_CatT}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatT/", "mjj_kfit_124To500", "M_{jj}^{Ex_CatT}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-
-   /*
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_25To35", "M_{jj}^{Ex_CatO}(25 < Pt_{bjet}^{Had} #leq 35)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_35To42", "M_{jj}^{Ex_CatO}(35 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_42To50", "M_{jj}^{Ex_CatO}(42 < Pt_{bjet}^{Had} #leq 50)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_50To57", "M_{jj}^{Ex_CatO}(50 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_57To65", "M_{jj}^{Ex_CatO}(57 < Pt_{bjet}^{Had} #leq 65)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_65To74", "M_{jj}^{Ex_CatO}(65 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_74To84", "M_{jj}^{Ex_CatO}(74 < Pt_{bjet}^{Had} #leq 84)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_84To99", "M_{jj}^{Ex_CatO}(84 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_99To124",  "M_{jj}^{Ex_CatO}(99 < Pt_{bjet}^{Had} #leq 124)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   plotStackedHisto(baseDir, isoDir, "PtbJetCatO/", "mjj_kfit_124To500", "M_{jj}^{Ex_CatO}(124 < Pt_{bjet}^{Had}#leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
-   */
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExT/", "mjj_kfit_25To42", "M_{jj}^{Inc}(25 < Pt_{bjet}^{Had} #leq 42)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExT/", "mjj_kfit_42To57", "M_{jj}^{Inc}(42 < Pt_{bjet}^{Had} #leq 57)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExT/", "mjj_kfit_57To74", "M_{jj}^{Inc}(57 < Pt_{bjet}^{Had} #leq 74)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExT/", "mjj_kfit_74To99", "M_{jj}^{Inc}(74 < Pt_{bjet}^{Had} #leq 99)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
+   plotStackedHisto(baseDir, isoDir, "PtbJetCTagExT/", "mjj_kfit_99To500","M_{jj}^{Inc}(99 < Pt_{bjet}^{Had} #leq 500)[GeV]", isDataMjj, isSig,  0, 200, isUnc);
   }
  if(histDir=="BTag/" ||histDir=="KinFit/"){
    plotStackedHisto(baseDir, isoDir, histDir, "eta_jet", "#eta^{jets}", isData, isSig,  -3.0, 5.0, isUnc);
-  
    plotStackedHisto(baseDir, isoDir, histDir, "pt_jet", "Pt^{jets} [GeV]", isData, isSig,  0.0, 700.0, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "nvtx", "N^{vertex}", isData, isSig,  0, 70, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "rhoAll", "#rho", isData, isSig,  0, 70, isUnc);
@@ -445,4 +439,3 @@ void MyStackHisto(){
    }
   }
 } 
-

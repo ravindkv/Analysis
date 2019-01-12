@@ -29,29 +29,31 @@ TFile* fQCD	= TFile::Open("all_QCD.root");
 TFile* fST	= TFile::Open("all_ST.root");
 TFile* fTT	= TFile::Open("all_TTJetsP.root");
 TFile *fSig     = TFile::Open("all_Hplus120.root");
-TFile *fSig90     = TFile::Open("all_Hplus90.root");
+TString baseDir = "baseLowMET";
 
 class MyStackHisto{
   public : 
-	//get histogram from root file. Return empty hist, if the hist does not exist.
-	TH1F* getHisto(TFile *inRootFile, TString baseDir, TString isoDir, TString histDir, TString histName);
-        //decorate histogram
-        TH1F* decorateHisto(TH1F* hist, TString myTit, TString xTit, TString yTit);
-	//function to stack histos
-        void stackHisto(TFile *inRootFile, TString lable, TString baseDir, TString isoDir, TString histDir, TString histName, int color, double scale, THStack* MuptStack, TH1F* hMC, TLegend* leg);
-	//qcd from data
-	TH1F* getDataDrivenQCD(TString baseDir, TString isoDir, TString histDir, TString histName, double qcd_sf=1.0, double qcd_sf_err = 0.0);
-	//function to add histograms
-	TH1F*  addHistoForUnc(TString baseDir, TString isoDir, TString histDir, TString histName, bool isDataDrivenQCD = false);
-	//Up/down error in the unc band
-	double errBandUp(int iBin, TH1F *hCentral, TH1F *hJESPlus, TH1F *hJERPlus, TH1F *bTagPlus, TH1F *cTagPlus, TH1F *PileupPlus, TH1F* hQCD_dd);
-	double errBandDown(int iBin, TH1F *hCentral, TH1F *hJESMinus, TH1F *hJERMinus, TH1F *bTagMinus, TH1F *cTagMinus, TH1F* PileupMinus, TH1F* hQCD_dd);
-	//unc graph
-	TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1F *hJERPlus, TH1F *hJERMinus, TH1F *bTagPlus, TH1F *bTagMinus, TH1F *cTagPlus, TH1F *cTagMinus, TH1F *PileupPlus, TH1F* PileupMinus, TH1F* hQCD_dd, bool isFullGraph = false, bool isRatioGraph = false);
+    //get histogram from root file. Return empty hist, if the hist does not exist.
+    TH1F* getHisto(TFile *inRootFile, TString baseDir, TString isoDir, TString histDir, TString histName);
+    //decorate histogram
+    TH1F* decorateHisto(TH1F* hist, TString myTit, TString xTit, TString yTit);
+    //function to stack histos
+    void stackHisto(TFile *inRootFile, TString lable, TString baseDir, TString isoDir, TString histDir, TString histName, int color, double scale, THStack* MuptStack, TH1F* hMC, TLegend* leg);
+    //qcd from data
+    vector<double> getQcdSF(TFile* fData, TFile* fTT, TFile* fST, TFile* fWJ, TFile* fDY, TFile* fVV, TString histDir, TString histName);
+    TH1F* getDDqcd(TString baseDir, TString isoDir, TString histDir, TString histName, double qcd_sf=1.0, double qcd_sf_err = 0.0);
+    double getStatUnc(TH1F* hCentral, double sError = 0.0);
+    //function to add histograms
+    TH1F*  addHistoForUnc(TString baseDir, TString isoDir, TString histDir, TString histName, bool isDataDrivenQCD = false);
+    //Up/down error in the unc band
+    double errBandUp(int iBin, TH1F *hCentral, TH1F *hJESPlus, TH1F *hJERPlus, TH1F *bcTagPlus1, TH1F *bcTagPlus2, TH1F *bcTagPlus3, TH1F *PileupPlus, TH1F* hQCD_dd);
+    double errBandDown(int iBin, TH1F *hCentral, TH1F *hJESMinus, TH1F *hJERMinus, TH1F *bcTagMinus1, TH1F *bcTagMinus2, TH1F *bcTagMinus3, TH1F* PileupMinus, TH1F* hQCD_dd);
+    //unc graph
+    TGraphAsymmErrors *UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1F *hJERPlus, TH1F *hJERMinus, TH1F *bcTagPlus1, TH1F *bcTagMinus1, TH1F *bcTagPlus2, TH1F *bcTagMinus2,TH1F *bcTagPlus3, TH1F *bcTagMinus3, TH1F *PileupPlus, TH1F* PileupMinus, TH1F* hQCD_dd, bool isFullGraph = false, bool isRatioGraph = false);
 TPaveText *paveText(double minX, double minY, double maxX, double maxY, int lineColor, int fillColor, int size, int style, int font );
 
   private :
-	int dont_use ;
+    int dont_use ;
 };
 
 //--------------------------------------------//
@@ -59,24 +61,25 @@ TPaveText *paveText(double minX, double minY, double maxX, double maxY, int line
 //--------------------------------------------//
 TH1F*  MyStackHisto:: getHisto(TFile *inRootFile, TString baseDir, TString isoDir, TString histDir, TString histName){
   TH1F* hist;
+  TString inFile(inRootFile->GetName());
   TString fullPath = baseDir+isoDir+histDir+histName;
-  string exception_msg ("The histogram path, "+fullPath+", does not exist"); 
+  string exception_msg ("The histogram path, "+inFile+"/"+fullPath+", does not exist"); 
   try{
     if(!(inRootFile->Get(fullPath)))
        throw  exception_msg.c_str();
   }catch (const char *e){
-    cout<<"WARNING:"<<e<<endl;
+    //cout<<"WARNING:"<<e<<endl;
   }
   try{
-    if(!(fTT->Get(fullPath)))
+    if(!(fTT->Get("base/Iso/"+histDir+histName))) //to initialise an empty hist
        throw  exception_msg.c_str();
   }catch (const char *e){
     cout<<"\033[01;31mERROR: \033[0m"<<e<< endl;
     exit(0);
   }
   if(!(inRootFile->Get(fullPath))){
-    hist = (TH1F*)(fTT->Get(fullPath))->Clone(histName);
-    hist->Add(hist, -1);
+    hist = (TH1F*)(fTT->Get("base/Iso/"+histDir+histName))->Clone(histName); //to initialise an empty hist
+    hist->Reset();
   }else hist = (TH1F*)(inRootFile->Get(fullPath))->Clone(histName);
   return hist;
 }
@@ -108,27 +111,29 @@ void  MyStackHisto:: stackHisto(TFile *inRootFile, TString lable, TString baseDi
   hMC->Add(hist);
 }
 
-double MyStackHisto:: errBandUp(int iBin, TH1F *hCentral, TH1F *hJESPlus, TH1F *hJERPlus, TH1F *bTagPlus, TH1F *cTagPlus, TH1F* PileupPlus, TH1F *hQCD_dd){
+double MyStackHisto:: errBandUp(int iBin, TH1F *hCentral, TH1F *hJESPlus, TH1F *hJERPlus, TH1F *bcTagPlus1, TH1F *bcTagPlus2, TH1F *bcTagPlus3, TH1F *PileupPlus, TH1F* hQCD_dd){
   double errUp = sqrt(pow(fabs(hJESPlus->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
 		  pow(fabs(hJERPlus->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
-		  pow(fabs(bTagPlus->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
-		  pow(fabs(cTagPlus->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(bcTagPlus1->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(bcTagPlus2->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(bcTagPlus3->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
 		  pow(fabs(PileupPlus->GetBinContent(iBin+1) - hCentral->GetBinContent(iBin+1)),2) + 
 		  pow(hCentral->GetBinError(iBin+1),2)+ pow(hQCD_dd->GetBinError(iBin+1),2));
   return errUp;
 }
 
-double MyStackHisto:: errBandDown(int iBin, TH1F *hCentral, TH1F *hJESMinus, TH1F *hJERMinus, TH1F *bTagMinus, TH1F *cTagMinus, TH1F* PileupMinus, TH1F *hQCD_dd){
+double MyStackHisto:: errBandDown(int iBin, TH1F *hCentral, TH1F *hJESMinus, TH1F *hJERMinus, TH1F *bcTagMinus1, TH1F *bcTagMinus2, TH1F *bcTagMinus3, TH1F* PileupMinus, TH1F* hQCD_dd){
   double errDown =sqrt(pow(fabs(hCentral->GetBinContent(iBin+1) - hJESMinus->GetBinContent(iBin+1)),2) + 
 		  pow(fabs(hCentral->GetBinContent(iBin+1) - hJERMinus->GetBinContent(iBin+1)),2) + 
-		  pow(fabs(hCentral->GetBinContent(iBin+1) - bTagMinus->GetBinContent(iBin+1)),2) + 
-		  pow(fabs(hCentral->GetBinContent(iBin+1) - cTagMinus->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(hCentral->GetBinContent(iBin+1) - bcTagMinus1->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(hCentral->GetBinContent(iBin+1) - bcTagMinus2->GetBinContent(iBin+1)),2) + 
+		  pow(fabs(hCentral->GetBinContent(iBin+1) - bcTagMinus3->GetBinContent(iBin+1)),2) + 
 		  pow(fabs(hCentral->GetBinContent(iBin+1) - PileupMinus->GetBinContent(iBin+1)),2) + 
 		  pow(hCentral->GetBinError(iBin+1),2)+pow(hQCD_dd->GetBinError(iBin+1),2));
   return errDown;
 }
 
-TGraphAsymmErrors * MyStackHisto:: UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1F *hJERPlus, TH1F *hJERMinus, TH1F *bTagPlus, TH1F *bTagMinus, TH1F *cTagPlus, TH1F *cTagMinus, TH1F* PileupPlus, TH1F* PileupMinus, TH1F* hQCD_dd, bool isFullGraph = false, bool isRatioGraph = false){
+TGraphAsymmErrors * MyStackHisto::UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F *hJESMinus, TH1F *hJERPlus, TH1F *hJERMinus, TH1F *bcTagPlus1, TH1F *bcTagMinus1, TH1F *bcTagPlus2, TH1F *bcTagMinus2,TH1F *bcTagPlus3, TH1F *bcTagMinus3, TH1F *PileupPlus, TH1F* PileupMinus, TH1F* hQCD_dd, bool isFullGraph = false, bool isRatioGraph = false){
   TGraphAsymmErrors *gr;
   int n1 = hCentral->GetNbinsX(); 
   double *Yval, *errorU, *errorD, *XerrorU, *XerrorD, *Xval ;
@@ -138,15 +143,15 @@ TGraphAsymmErrors * MyStackHisto:: UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F
   for(int i=0; i<n1; i++){
     if(isFullGraph){
     Yval[i]   = hCentral->GetBinContent(i+1);
-    errorU[i] = errBandUp(i, hCentral, hJESPlus, hJERPlus, bTagPlus, cTagPlus, PileupPlus, hQCD_dd); 
-    errorD[i] = errBandDown(i, hCentral, hJESMinus, hJERMinus, bTagMinus, cTagMinus, PileupMinus, hQCD_dd); 
-    //cout<<"bin = "<<i<<endl;
-    cout<<i<<"\t"<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<errorD[i]<<endl;
+    errorU[i] = errBandUp(i, hCentral, hJESPlus, hJERPlus, bcTagPlus1, bcTagPlus2, bcTagPlus3, PileupPlus, hQCD_dd); 
+    errorD[i] = errBandDown(i, hCentral, hJESMinus, hJERMinus, bcTagMinus1, bcTagMinus2, bcTagMinus3, PileupMinus, hQCD_dd); 
     }
     if(isRatioGraph){
     Yval[i]   = 1;
-    errorU[i] = errBandUp(i, hCentral, hJESPlus, hJERPlus, bTagPlus, cTagPlus, PileupPlus, hQCD_dd); 
-    errorD[i] = errBandDown(i, hCentral, hJESMinus, hJERMinus, bTagMinus, cTagMinus, PileupMinus, hQCD_dd); 
+    errorU[i] = errBandUp(i, hCentral, hJESPlus, hJERPlus, bcTagPlus1, bcTagPlus2, bcTagPlus3, PileupPlus, hQCD_dd); 
+    errorD[i] = errBandDown(i, hCentral, hJESMinus, hJERMinus, bcTagMinus1, bcTagMinus2, bcTagMinus3, PileupMinus, hQCD_dd); 
+    //cout<<"bin = "<<i<<endl;
+    //cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<hCentral->GetBinContent(i+1)<<endl;
     errorU[i] = errorU[i]/hCentral->GetBinContent(i+1);
     errorD[i] = errorD[i]/hCentral->GetBinContent(i+1);
     //cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<hCentral->GetBinContent(i+1)<<endl;
@@ -160,7 +165,7 @@ TGraphAsymmErrors * MyStackHisto:: UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F
   delete [] Yval; delete [] errorU; delete [] errorD; delete [] XerrorU; delete [] XerrorD; delete [] Xval;
 }
 
-TH1F* MyStackHisto:: getDataDrivenQCD(TString baseDir, TString isoDir, TString histDir, TString histName, double qcd_sf=1.0, double qcd_sf_err = 0.0){
+TH1F* MyStackHisto:: getDDqcd(TString baseDir, TString isoDir, TString histDir, TString histName, double qcd_sf=1.0, double qcd_sf_err = 0.0){
   TH1F* hVV =   getHisto(fVV,   baseDir, "NonIso/", histDir, histName);
   TH1F* hDY =   getHisto(fDY,   baseDir, "NonIso/", histDir, histName); 
   TH1F* hST =   getHisto(fST,   baseDir, "NonIso/", histDir, histName); 
@@ -174,7 +179,6 @@ TH1F* MyStackHisto:: getDataDrivenQCD(TString baseDir, TString isoDir, TString h
   hOtherMC->Add(hTT); 
   TH1F* hQCD = (TH1F*)hData->Clone(histName); 
   hQCD->Add(hOtherMC, -1);
-  cout<<"-------------------------------------"<<endl;
   cout<<histDir<<"/"<<histName<<endl;
   double sError = 0.0;
   double  norm = hQCD->IntegralAndError(1, hQCD->GetNbinsX(), sError);
@@ -225,4 +229,82 @@ TPaveText * MyStackHisto:: paveText(double minX, double minY, double maxX, doubl
   pt->SetLineColor(lineColor);
   pt->SetTextFont(font);
   return pt;
+}
+double MyStackHisto::getStatUnc(TH1F* hCentral, double sError = 0.0){
+  double  norm = hCentral->IntegralAndError(1, hCentral->GetNbinsX(), sError);
+  //double statUnc = (norm > 0) ? 1 + (fabs(sError)/norm) : 1.00;
+  double statUnc = sError;
+  return statUnc;
+}
+
+vector<double> MyStackHisto::getQcdSF(TFile* fData, TFile* fTT, TFile* fST, TFile* fWJ, TFile* fDY, TFile* fVV, TString histDir, TString histName){
+  //RegionC = LowMET, Iso
+  TH1F* hVV_RegC = getHisto(fVV,   "baseLowMET/", "NonIso/", histDir, histName);//Reg = Region
+  TH1F* hDY_RegC = getHisto(fDY,   "baseLowMET/", "NonIso/", histDir, histName);
+  TH1F* hWJ_RegC = getHisto(fWJ,   "baseLowMET/", "NonIso/", histDir, histName);
+  TH1F* hST_RegC = getHisto(fST,   "baseLowMET/", "NonIso/", histDir, histName);
+  TH1F* hTT_RegC = getHisto(fTT,   "baseLowMET/", "NonIso/", histDir, histName);
+  TH1F* hMC_RegC = (TH1F*)hVV_RegC->Clone("hAllMC");
+  hMC_RegC->Add(hDY_RegC);
+  hMC_RegC->Add(hWJ_RegC);
+  hMC_RegC->Add(hST_RegC);
+  hMC_RegC->Add(hTT_RegC);
+  TH1F* hData_RegC= (TH1F*) getHisto(fData, "baseLowMET/", "NonIso/", histDir, histName);
+
+  //RegionD = LowMET, NonIso
+  TH1F* hVV_RegD = getHisto(fVV,   "baseLowMET/", "Iso/", histDir, histName);
+  TH1F* hDY_RegD = getHisto(fDY,   "baseLowMET/", "Iso/", histDir, histName);
+  TH1F* hWJ_RegD = getHisto(fWJ,   "baseLowMET/", "Iso/", histDir, histName);
+  TH1F* hST_RegD = getHisto(fST,   "baseLowMET/", "Iso/", histDir, histName);
+  TH1F* hTT_RegD = getHisto(fTT,   "baseLowMET/", "Iso/", histDir, histName);
+  TH1F* hMC_RegD = (TH1F*)hVV_RegD->Clone("hAllMC");
+  hMC_RegD->Add(hDY_RegD);
+  hMC_RegD->Add(hWJ_RegD);
+  hMC_RegD->Add(hST_RegD);
+  hMC_RegD->Add(hTT_RegD);
+  TH1F* hData_RegD=  getHisto(fData, "baseLowMET/", "Iso/", histDir, histName);
+
+  //(Data - MC) from RegionC
+  double intMC_RegC   = hMC_RegC->Integral();
+  double errMC_RegC   = getStatUnc(hMC_RegC, 0.0);
+  double intData_RegC = hData_RegC->Integral();
+  double errData_RegC = getStatUnc(hData_RegC, 0.0);
+  //double intDiff_RegC = abs(intData_RegC - intMC_RegC);
+  double intDiff_RegC = (intData_RegC - intMC_RegC);
+  double errDiff_RegC = sqrt(errMC_RegC*errMC_RegC + errData_RegC*errData_RegC);
+
+  //(Data - MC) from RegionD
+  double intMC_RegD   = hMC_RegD->Integral();
+  double errMC_RegD   = getStatUnc(hMC_RegD, 0.0);
+  double intData_RegD = hData_RegD->Integral();
+  double errData_RegD = getStatUnc(hData_RegD, 0.0);
+  //double intDiff_RegD = abs(intData_RegD - intMC_RegD);
+  double intDiff_RegD = (intData_RegD - intMC_RegD);
+  double errDiff_RegD = sqrt(errMC_RegD*errMC_RegD + errData_RegD*errData_RegD);
+  
+  //Ratio of (Data-MC) from RegionD and RegionC
+  double ratioDiffRegDC = intDiff_RegD/intDiff_RegC;
+  double tmp_RegD = errDiff_RegD/intDiff_RegD;
+  double tmp_RegC = errDiff_RegC/intDiff_RegC;
+  double errDiffRegDC = ratioDiffRegDC*sqrt(tmp_RegD*tmp_RegD + tmp_RegC*tmp_RegC); 
+
+  //QCD scale factor and error
+  bool isRealSF = false;
+  //if(intDiff_RegC >0 && intDiff_RegD >0 && intDiff_RegC > 0) isRealSF = true;
+  //double sf = (isRealSF)?ratioDiffRegDC: 1.0;
+  //double err = (isRealSF)?errDiffRegDC:1.0; 
+  double sf =  ratioDiffRegDC;
+  double err = errDiffRegDC; 
+  cout<<"-------------------------------------"<<endl;
+  cout<<"intMC_RegC   = "<<intMC_RegC<<endl;
+  cout<<"intData_RegC = "<<intData_RegC<<endl;
+  cout<<"intMC_RegD   = "<<intMC_RegD<<endl;
+  cout<<"intData_RegD = "<<intData_RegD<<endl;
+  cout<<"intDiff_RegC = "<<intDiff_RegC<<endl;
+  cout<<"intDiff_RegD = "<<intDiff_RegD<<endl;
+  cout<<"sf 	      = "<<sf<<endl;
+  vector<double>sfAndErr;
+  sfAndErr.push_back(sf);
+  sfAndErr.push_back(err);
+  return sfAndErr;
 }

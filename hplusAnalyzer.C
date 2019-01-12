@@ -26,6 +26,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
+  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -49,6 +50,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -1162,11 +1164,11 @@ void hplusAnalyzer::processEvents(){
   ///CutFlowAnalysis("TTJetsP_MuMC_20171104_Ntuple_1.root", "PF", ""); 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20180419/EleMC_20180419/TTJetsP_EleMC_20180419/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20180419/180419_065438/0000/TTJetsP_EleMC_20180419_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20180419/EleMC_20180419/TTJetsP_EleMC_20180419/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20180419/180419_065438/0000/TTJetsP_EleMC_20180419_Ntuple_1.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleData_kfitM_20180418/EleData_20180418/EleRunBver2v2_EleData_20180418/SingleElectron/EleRunBver2v2_EleData_20180418/180418_191623/0000/EleRunBver2v2_EleData_20180418_Ntuple_101.root", "PF", "");
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

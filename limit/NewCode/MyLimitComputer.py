@@ -98,24 +98,26 @@ if __name__=="__main__":
     #USERS INPUTS
     #---------------------------------------------
     path_file_dir="/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_25/src/HiggsAnalysis/HplusTocs13TeVLimit/Limit/"
-    muon_file_dir=path_file_dir+"stack_20180418_Mu_Sys_PreApp_5bJetPtBins"
-    #ele_file_dir=path_file_dir+"tmp_eleCh_nonKinFit"
-    ele_file_dir=path_file_dir+"stack_20180418_Ele_Sys_PreApp_5bJetPtBins"
+    muon_file_dir=path_file_dir+"stack_20180418_Mu_Sys_PreApp_bcCorrelation"
+    ele_file_dir=path_file_dir+"stack_20180418_Ele_Sys_PreApp_bcCorrelation"
 
     hist_array_Inc = []
-    #hist_array_Inc.append(["nonKinFit", "mjj_non_kfit"])
     hist_array_Inc.append(["KinFit", "mjj_kfit"])
+    #hist_array_Inc.append(["nonKinFit", "mjj_non_kfit"])
+
     hist_array_CTagL = []
-    hist_array_CTagL.append(["KinFit", "mjj_kfit_CTagL_SF"])
+    hist_array_CTagL.append(["KinFit", "mjj_kfit_CTagIncL"])
+    #hist_array_CTagL.append(["nonKinFit", "mjj_non_kfit"])
     hist_array_CTagM = []
-    hist_array_CTagM.append(["KinFit", "mjj_kfit_CTagM_SF"])
+    hist_array_CTagM.append(["KinFit", "mjj_kfit_CTagIncM"])
     hist_array_CTagT = []
-    hist_array_CTagT.append(["KinFit", "mjj_kfit_CTagT_SF"])
+    hist_array_CTagT.append(["KinFit", "mjj_kfit_CTagIncT"])
 
     hist_array_CTagCat = []
-    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagL_SF_Cat"])
-    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagM_SF_Cat"])
-    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagT_SF_Cat"])
+    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagExL"])
+    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagExM"])
+    hist_array_CTagCat.append(["KinFit", "mjj_kfit_CTagExT"])
+    #hist_array_CTagCat.append(["nonKinFit", "mjj_non_kfit"])
 
     #mass_array = [90, 100]
     mass_array = [80, 90, 100, 120, 140, 150, 155, 160]
@@ -150,6 +152,5 @@ if __name__=="__main__":
  
     if(args.allMass): in_mass = mass_array
     else: in_mass = [args.mass]
-
     calcCombinedLimit(in_channel, in_file, in_hist, cat_dir, in_mass, args.batch)
 

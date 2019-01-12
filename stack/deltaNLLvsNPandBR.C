@@ -49,7 +49,7 @@ TGraph* decorateGraph(TGraph *graph, TString xTitle, TString yTitle, TString myT
   graph->GetYaxis()->SetTitleSize(0.07);
   graph->GetYaxis()->SetNdivisions(5);
   //graph->GetYaxis()->SetRangeUser(yMin, yMax);
-  //graph->GetXaxis()->SetRangeUser(0, 10);
+  graph->GetYaxis()->SetRangeUser(0, 20);
   graph->GetYaxis()->SetLabelSize(0.09);
   graph->SetLineColor(color);
   graph->SetLineWidth(2);
@@ -68,7 +68,7 @@ TGraph* scanNuisParamGraph(string nuisName, TFile &f, int col){
   
   vector<Float_t> nuisVal;
   vector<Float_t> mlVal;
-  if(limit->GetEntries()==21) cout<<"FULL SUCCESS: "<<nuisName<<endl;
+  //if(limit->GetEntries()==21) cout<<"FULL SUCCESS: "<<nuisName<<endl;
   for(int k = 1 ; k< limit->GetEntries() ; k++){
     limit->GetEntry(k);
     nuisVal.push_back(r);
@@ -76,10 +76,11 @@ TGraph* scanNuisParamGraph(string nuisName, TFile &f, int col){
   }
   cout<<"---------------------------"<<endl;
   for(i=0; i<nuisVal.size(); i++){
-  cout<<"nuisVal = "<<nuisVal[i]<<", mlVal ="<<mlVal[i]<<endl;
+  //cout<<"nuisVal = "<<nuisVal[i]<<", mlVal ="<<mlVal[i]<<endl;
   }
   TGraph* myGraph = makeGraph(nuisVal, mlVal);
-  decorateGraph(myGraph, nuisName, "2 deltaNLL", "2*deltaNLL vs "+nuisName, 150, 300, col);  
+  decorateGraph(myGraph, nuisName, "2 deltaNLL", nuisName, 150, 300, col);  
+  //decorateGraph(myGraph, nuisName, "2 deltaNLL", "2*deltaNLL vs "+nuisName, 150, 300, col);  
   //myGraph->Draw();
   return myGraph;
 }

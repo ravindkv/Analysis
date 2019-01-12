@@ -1,6 +1,6 @@
 
 TString inFile("$PWD/");
-TString inFile_HiggsBkg("$PWD/higgsBkg_muChannel/");
+TString inFile_HiggsBkg("$PWD/higgsBkg_eleChannel/");
 TString histPath(histSubDir+histName);
 TFile *wh80 	  		= new TFile(inFile+"all_Hplus80.root"); 
 TFile *wh90 	  		= new TFile(inFile+"all_Hplus90.root"); 
@@ -18,8 +18,8 @@ TFile *qcd  			= new TFile(inFile+"all_QCD.root");
 TFile *stop  			= new TFile(inFile+"all_ST.root");
 TFile *vv 		= new TFile(inFile+"all_VV.root");
 
-//TFile *data = new TFile(inFile+"all_EleData.root");
-TFile *data = new TFile(inFile+"all_muData.root");
+TFile *data = new TFile(inFile+"all_EleData.root");
+//TFile *data = new TFile(inFile+"all_muData.root");
 
 //Files
 //Gluon gluon fusion                //Gluon gluon fusion                                      

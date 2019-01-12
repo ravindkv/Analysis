@@ -113,7 +113,8 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   if(CHANNEL=="mu") ch_name = "#mu";
   if(CHANNEL=="ele") ch_name = "e";
   if(CHANNEL=="mu_ele") ch_name = "lep";
-  mg->SetMaximum(yMax);
+  if(CAT.Contains("Cat1") || CAT.Contains("Cat2")) mg->SetMaximum(1.5*yMax);
+  else mg->SetMaximum(yMax);
 
   TGraphAsymmErrors* expected = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL ,expX1sL , expX1sL, expX1sL);
   TGraphAsymmErrors* oneSigma = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL, expX1sL,  expY1sL, expY1sH);
@@ -161,7 +162,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   mg->GetYaxis()->SetNdivisions(6);
   mg->GetXaxis()->SetTitleOffset(1.15);
   //mg->SetMinimum(0.);
-  mg->SetMaximum(yMax);
+  //mg->SetMaximum(yMax);
   mg->GetXaxis()->SetTitle("M_{H^{#pm}} (GeV)");
   mg->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{#pm})"); 
   mg->GetYaxis()->SetTitleSize(0.07);   
@@ -174,7 +175,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   //leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{ LUMI fb^{-1}, %s}",CHANNEL.Data()));
 
   leg->AddEntry(expected,"Expected","L");
-  if(obs) leg->AddEntry(observed,"Observed","L");
+  if(obs) leg->AddEntry(observed,"Observed","LP");
   leg->AddEntry(oneSigma, "#pm 1 #sigma","F");
   leg->AddEntry(twoSigma, "#pm 2 #sigma","F");
   leg->Draw();
@@ -237,16 +238,16 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
 }
 
 void MyLimitPlotter(){
-  double yMax = 0.10;  
-  LimitPlotter("mu", "Cat1_Inc",              yMax, true, true );
-  LimitPlotter("mu", "Cat2_cTagInc",          yMax, true, true );
-  LimitPlotter("mu", "Cat3_cTagEx",           yMax, true, true );
+  double yMax = 0.08;  
+  LimitPlotter("mu", "Cat1_Inc",              yMax, false, true );
+  LimitPlotter("mu", "Cat2_cTagInc",          yMax, false, true );
+  LimitPlotter("mu", "Cat3_cTagEx",           yMax, false, true );
 
-  LimitPlotter("ele", "Cat1_Inc",              yMax, true, true );
-  LimitPlotter("ele", "Cat2_cTagInc",          yMax, true, true );
-  LimitPlotter("ele", "Cat3_cTagEx",           yMax, true, true );
+  LimitPlotter("ele", "Cat1_Inc",              yMax, false, true );
+  LimitPlotter("ele", "Cat2_cTagInc",          yMax, false, true );
+  LimitPlotter("ele", "Cat3_cTagEx",           yMax, false, true );
 
-  LimitPlotter("mu_ele", "Cat1_Inc",              yMax, true, true );
-  LimitPlotter("mu_ele", "Cat2_cTagInc",          yMax, true, true );
-  LimitPlotter("mu_ele", "Cat3_cTagEx",           yMax, true, true );
+  LimitPlotter("mu_ele", "Cat1_Inc",              yMax, false, true );
+  LimitPlotter("mu_ele", "Cat2_cTagInc",          yMax, false, true );
+  LimitPlotter("mu_ele", "Cat3_cTagEx",           yMax, false, true );
 }

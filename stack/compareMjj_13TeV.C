@@ -18,7 +18,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   gStyle->SetOptStat(0);
   gStyle->SetFrameLineWidth(3);
   const float xpad[2] = {0.,1};
-  const float ypad[4] = {0.,0.30,0.30,0.98};
+  const float ypad[4] = {0.,0.40,0.40,0.98};
   TCanvas *c1 = new TCanvas();
   c1->Divide(1, 2);
   //c1->cd(postion);
@@ -30,8 +30,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   gPad->SetRightMargin(0.05);
   double scale_factor = 1; 
   if(process.Contains("WH120")){
-   //TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
-   TLegend* leg = new TLegend(0.70,0.60,0.80,0.85,NULL,"brNDC");
+   TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
   }else{
    TLegend* leg = new TLegend(0.70,0.60,0.80,0.85,NULL,"brNDC");
   }
@@ -41,8 +40,8 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   leg->SetTextSize(0.07);
   //  leg->SetHeader("#splitline{CMS Preliminary}{   @ #sqrt{s} = 7 TeV}");
 
-  TFile* f = TFile::Open(inFile+"HplusShapes_mu_mjj_kfit_13TeV.root");
-  //TFile* f = TFile::Open(inFile+"HplusShapes_ele_mjj_kfit_13TeV.root");
+  TFile* f = TFile::Open(inFile+"Shapes_mu_Cat2_WH120.root");
+  //TFile* f = TFile::Open(inFile+"Shapes_ele_Cat2_WH120.root");
   if(f == 0) return;
   if(f->IsZombie()){f->Close(); return;}
 
@@ -193,8 +192,8 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   hRatio_Up->GetXaxis()->SetTitleOffset(1.10);
   hRatio_Up->GetYaxis()->SetTitle("#frac{Nominal}{Unc}"); hRatio_Up->GetYaxis()->CenterTitle();
   hRatio_Up->GetYaxis()->SetTitleSize(0.15); hRatio_Up->GetXaxis()->SetTitleSize(0.20);
-  hRatio_Up->GetXaxis()->SetLabelSize(0.20); hRatio_Up->GetXaxis()->LabelsOption("u"); // extra
-  hRatio_Up->GetYaxis()->SetLabelSize(0.15); hRatio_Up->GetXaxis()->LabelsOption("u"); // extra
+  hRatio_Up->GetXaxis()->SetLabelSize(0.20); 
+  hRatio_Up->GetYaxis()->SetLabelSize(0.15); 
   hRatio_Up->Draw("E"); // use "P" or "AP"
   
   TH1F *hRatio_Down = (TH1F*)h2->Clone("hRatio_Up");
@@ -257,17 +256,19 @@ void compareMjj_13TeV(){
   plotSeparate( "t#bar{t} + jets", "ttbar", "JER");
   plotSeparate( "t#bar{t} + jets", "ttbar", "JES");
   plotSeparate( "t#bar{t} + jets", "ttbar", "topPt");
-  plotSeparate( "t#bar{t} + jets", "ttbar", "bTag");
-  plotSeparate( "t#bar{t} + jets", "ttbar", "cTag");
-  plotSeparate( "t#bar{t} + jets", "ttbar", "scale");
-  plotSeparate( "t#bar{t} + jets", "ttbar", "mass");
-  plotSeparate( "t#bar{t} + jets", "ttbar", "matching");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "bcTag1");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "bcTag2");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "bcTag3");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "scaleRF_tt");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "topMass_tt");
+  plotSeparate( "t#bar{t} + jets", "ttbar", "hDamp_tt");
 
   plotSeparate( "WH120", "WH120", "Pileup");
   plotSeparate( "WH120", "WH120", "JER");
   plotSeparate( "WH120", "WH120", "JES");
   plotSeparate( "WH120", "WH120", "topPt");
-  plotSeparate( "WH120", "WH120", "bTag");
-  plotSeparate( "WH120", "WH120", "cTag");
+  plotSeparate( "WH120", "WH120", "bcTag1");
+  plotSeparate( "WH120", "WH120", "bcTag2");
+  plotSeparate( "WH120", "WH120", "bcTag3");
 }
 

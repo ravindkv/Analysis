@@ -17,6 +17,8 @@ class MyHPlusDataCardMaker{
   TH1F* readWriteHisto(TFile *inFile, TString histPath, TString inHistName, double sf, TFile *outFile, TFile *fTT, TString outHistName,  bool isWrite = false, double min_thres = 0, bool isNeffThreshold = false);
   double getBTagUnc(TH1F *hCentral, TH1F* hUp, TH1F* hDown);
   double getStatUnc(TH1F* hCentral, double sError = 0.0);
+  double getUncExL(TH1F* yLyMyT, TH1F* yLyMnT, TH1F* yLnMyT, TH1F* yLnMnT);
+  double getUncExM(TH1F* yMyT, TH1F* yMnT);
   TH1F* trimHisto(TH1F* hist, TString histName, int binWidth, int xMin, int xMax);
   
   private:
@@ -89,4 +91,44 @@ TH1F* MyHPlusDataCardMaker::trimHisto(TH1F* hist, TString histName, int binWidth
       newHisto->SetBinError(i_new, binErr);
     }
     return newHisto;
+}
+
+double MyHPlusDataCardMaker::getUncExL(TH1F* yLyMyT, TH1F* yLyMnT, TH1F* yLnMyT, TH1F* yLnMnT){
+  double m_yLyMyT = yLyMyT->GetMean();
+  double m_yLyMnT = yLyMnT->GetMean();
+  double m_yLnMyT = yLnMyT->GetMean();
+  double m_yLnMnT = yLnMnT->GetMean();
+  vector<double> vecExL;
+  vecExL.push_back(m_yLyMyT);
+  vecExL.push_back(m_yLyMnT);
+  vecExL.push_back(m_yLnMyT);
+  vecExL.push_back(m_yLnMnT);
+  auto it_min = min_element(std::begin(vecExL), std::end(vecExL));
+  auto it_max = max_element(std::begin(vecExL), std::end(vecExL));
+  double min = *it_min;
+  double max = *it_max;
+  double unc = max/min;
+  //--------------------
+  //double tmp_budh = unc -1;
+  //unc = 1+ 2*tmp_budh;
+  //--------------------
+  return (min>0 && max>0)?unc:1.0;
+}
+
+double MyHPlusDataCardMaker::getUncExM(TH1F* yMyT, TH1F* yMnT){
+  double m_yMyT = yMyT->GetMean();
+  double m_yMnT = yMnT->GetMean();
+  vector<double> vecExM;
+  vecExM.push_back(m_yMyT);
+  vecExM.push_back(m_yMnT);
+  auto it_min = min_element(std::begin(vecExM), std::end(vecExM));
+  auto it_max = max_element(std::begin(vecExM), std::end(vecExM));
+  double min = *it_min;
+  double max = *it_max;
+  double unc = max/min;
+  //--------------------
+  //double tmp_budh = unc -1;
+  //unc = 1+ 2*tmp_budh;
+  //--------------------
+  return (min>0 && max>0)?unc:1.0;
 }
