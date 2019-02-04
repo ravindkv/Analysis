@@ -5,6 +5,7 @@ import json
 import argparse
 import CombineHarvester.CombineTools.plotting as plot
 import CombineHarvester.CombineTools.combine.rounding as rounding
+from decimal import Decimal
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
@@ -15,7 +16,7 @@ parser.add_argument('--input', '-i', help='input json file')
 parser.add_argument('--output', '-o', help='name of the output file to create')
 parser.add_argument('--translate', '-t', help='JSON file for remapping of parameter names')
 parser.add_argument('--units', default=None, help='Add units to the best-fit parameter value')
-parser.add_argument('--per-page', type=int, default=55, help='Number of parameters to show per page')
+parser.add_argument('--per-page', type=int, default=60, help='Number of parameters to show per page')
 parser.add_argument('--cms-label', default='Internal', help='Label next to the CMS logo')
 parser.add_argument('--transparent', action='store_true', help='Draw areas as hatched lines instead of solid')
 parser.add_argument('--checkboxes', action='store_true', help='Draw an extra panel with filled checkboxes')
@@ -113,7 +114,7 @@ if args.color_groups is not None:
         plot.Set(color_group_hists[name], FillColor=col, Title=name)
 
 for page in xrange(n):
-    canv = ROOT.TCanvas(args.output, args.output, 750, 900)
+    canv = ROOT.TCanvas(args.output, args.output, 1600, 1800)
     n_params = len(data['params'][show * page:show * (page + 1)])
     pdata = data['params'][show * page:show * (page + 1)]
     print '>> Doing page %i, have %i parameters' % (page, n_params)
@@ -125,8 +126,9 @@ for page in xrange(n):
         h = (y2 - y1) / float(n_params)
         y1 = y1 + float(i) * h
         y2 = y1 + h
-        box = ROOT.TPaveText(0, y1, 1, y2, 'NDC')
-        plot.Set(box, TextSize=0.02, BorderSize=0, FillColor=0, TextAlign=12, Margin=0.005)
+        box = ROOT.TPaveText(0, y1, 1-0.08, y2, 'NDC') #rverma
+        ##box = ROOT.TPaveText(0, y1, 1, y2, 'NDC')
+        plot.Set(box, TextSize=0.015, BorderSize=0, FillColor=0, TextAlign=12, Margin=0.005)
         if i % 2 == 0:
             box.SetFillColor(18)
         box.AddText('%i' % (n_params - i + page * show))
@@ -152,8 +154,8 @@ for page in xrange(n):
     g_check_i = 0
 
     max_impact = 0.
-
     text_entries = []
+    text_entries_3sigma = []
     redo_boxes = []
     for p in xrange(n_params):
         i = n_params - (p + 1)
@@ -180,8 +182,30 @@ for page in xrange(n):
                 pull_lo =  pull - pull_lo
 
             g_pulls.SetPoint(i, pull, float(i) + 0.5)
-            g_pulls.SetPointError(
-                i, pull_lo, pull_hi, 0., 0.)
+            nuisName = Translate(pdata[p]['name'],translate)
+            if(abs(pull) >0):
+                if("prop" in nuisName):
+                    chName = nuisName.split("_")[1].replace("bin", "")
+                    binName = nuisName.split("_")[2].replace("bin", "")
+                    print '%s\t %s\t %s\t %f \t %f \t %f' % (nuisName, chName, binName, pull_lo, pull, pull_hi)
+                else:
+                    print "-----------------------------"
+                    print '%s\t %f \t %f \t %f' % (nuisName, fit[0], fit[1], fit[2])
+                    print "-----------------------------"
+            g_pulls.SetPointError( i, pull_lo, pull_hi, 0., 0.)
+            #Put a text on points not shown in the graph
+            if(abs(pull) >3):
+                y1 = ROOT.gStyle.GetPadBottomMargin()
+                y2 = 1. - ROOT.gStyle.GetPadTopMargin()
+                x1 = ROOT.gStyle.GetPadLeftMargin()
+                h = (y2 - y1) / float(n_params)
+                y1 = y1 + ((float(i)+0.5) * h)
+                x1 = x1 + (1 - pads[0].GetRightMargin() -x1)/2.
+                s_nom, s_hi, s_lo = GetRounded(fit[1], fit[2] - fit[1], fit[1] - fit[0])
+                s_nom_rounded ='%.1E' % Decimal(s_nom)
+                s_hi_rounded = '%.1E' % Decimal(s_hi)
+                s_lo_rounded = '%.1E' % Decimal(s_lo)
+                text_entries_3sigma.append((x1, y1, '%s^{#plus%s}_{#minus%s}' % (s_nom_rounded, s_hi_rounded, s_lo_rounded)))
         else:
             # Hide this point
             g_pulls.SetPoint(i, 0., 9999.)
@@ -192,7 +216,10 @@ for page in xrange(n):
             y1 = y1 + ((float(i)+0.5) * h)
             x1 = x1 + (1 - pads[0].GetRightMargin() -x1)/2.
             s_nom, s_hi, s_lo = GetRounded(fit[1], fit[2] - fit[1], fit[1] - fit[0])
-            text_entries.append((x1, y1, '%s^{#plus%s}_{#minus%s}' % (s_nom, s_hi, s_lo)))
+            s_nom_rounded ='%.1E' % Decimal(s_nom)
+            s_hi_rounded = '%.1E' % Decimal(s_hi)
+            s_lo_rounded = '%.1E' % Decimal(s_lo)
+            text_entries.append((x1, y1, '%s^{#plus%s}_{#minus%s}' % (s_nom_rounded, s_hi_rounded, s_lo_rounded)))
             redo_boxes.append(i)
         g_impacts_hi.SetPoint(i, 0, float(i) + 0.5)
         g_impacts_lo.SetPoint(i, 0, float(i) + 0.5)
@@ -242,7 +269,7 @@ for page in xrange(n):
 
     # Go to the other pad and draw the impacts histo
     pads[1].cd()
-    ROOT.gPad.SetRightMargin(0.10)
+    ROOT.gPad.SetRightMargin(0.08)
     if max_impact == 0.: max_impact = 1E-6  # otherwise the plotting gets screwed up
     h_impacts = ROOT.TH2F(
         "impacts", "impacts", 6, -max_impact * 1.1, max_impact * 1.1, n_params, 0, n_params)
@@ -266,7 +293,15 @@ for page in xrange(n):
 
     # Back to the first pad to draw the pulls graph
     pads[0].cd()
-    plot.Set(g_pulls, MarkerSize=0.8, LineWidth=2)
+    #prefit band from -1 to +1
+    box_prefit = ROOT.TBox()
+    box_prefit.SetLineColor(25)
+    box_prefit.SetFillColor(25)
+    box_prefit.DrawBox(-1, 0, +1, n_params)
+    for entry in text_entries_3sigma:
+        latex.DrawLatex(*entry)
+
+    plot.Set(g_pulls, MarkerSize=1.5, LineWidth=2)
     g_pulls.Draw('PSAME')
 
     # And back to the second pad to draw the impacts graphs
@@ -317,8 +352,11 @@ for page in xrange(n):
     plot.DrawCMSLogo(pads[0], 'CMS', args.cms_label, 0, 0.25, 0.00, 0.00)
     s_nom, s_hi, s_lo = GetRounded(POI_fit[1], POI_fit[2] - POI_fit[1], POI_fit[1] - POI_fit[0])
     if not args.blind:
+        s_nom_rounded ='%.1E' % Decimal(s_nom)
+        s_hi_rounded = '%.1E' % Decimal(s_hi)
+        s_lo_rounded = '%.1E' % Decimal(s_lo)
         plot.DrawTitle(pads[1], '#hat{%s} = %s^{#plus%s}_{#minus%s}%s' % (
-            Translate(POI, translate), s_nom, s_hi, s_lo,
+            Translate(POI, translate), s_nom_rounded, s_hi_rounded, s_lo_rounded,
             '' if args.units is None else ' '+args.units), 3, 0.27)
     extra = ''
     if page == 0:

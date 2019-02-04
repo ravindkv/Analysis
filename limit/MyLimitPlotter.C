@@ -24,7 +24,7 @@
 using namespace std;
 
 void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
-        Float_t yMax= 0.03, bool obs= false, bool isOut= true )
+         bool obs= false, bool isOut= true )
   {
   gStyle->SetFrameLineWidth(3);
   TCanvas *c1 = new TCanvas();
@@ -67,10 +67,10 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   "Mass150/higgsCombine_hcs_13TeV_"+ch_hist+".AsymptoticLimits.mH150.root",
   "Mass155/higgsCombine_hcs_13TeV_"+ch_hist+".AsymptoticLimits.mH155.root",
   "Mass160/higgsCombine_hcs_13TeV_"+ch_hist+".AsymptoticLimits.mH160.root"};
-
+  
+  double maxY = 1.0;
   for(unsigned int i = 0 ; i < nMassPoints; i++){
-    ///cout<<"limit/"+CHANNEL+"/"+CAT+"/"<<massFiles[i]<<endl;
-    TFile f("limit/"+CHANNEL+"/"+CAT+"/"+massFiles[i],"READ"); // higgsCombine_hcs_13TeV_mu.AsymptoticLimits.mH140.root
+    TFile f("limit/"+CHANNEL+"/"+CAT+"/"+massFiles[i],"READ"); 
     if(f.IsZombie()){
       cout << "Cannot open file for " << string(CHANNEL.Data()) << " and mass " << X[i] << endl;
       continue;
@@ -89,6 +89,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
       if(k==4) expY2sH[i] = r;
       if(k==5) obsY[i]    = r;
     }
+    if(massFiles[i].Contains("80")) maxY = expY2sH[i];
   }
   cout<<std::setprecision(4)<<endl;
   cout<<"Mass:"<<setw(15)<<"base value"<<setw(15)<<"-2 #sigma"<<setw(15)<<"-1 #sigma"<<setw(15)<<"+1 #sigma"<<setw(15)<<"+2 #sigma"<<endl; 
@@ -113,8 +114,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   if(CHANNEL=="mu") ch_name = "#mu";
   if(CHANNEL=="ele") ch_name = "e";
   if(CHANNEL=="mu_ele") ch_name = "lep";
-  if(CAT.Contains("Cat1") || CAT.Contains("Cat2")) mg->SetMaximum(1.5*yMax);
-  else mg->SetMaximum(yMax);
+  mg->SetMaximum(1.02*maxY);
 
   TGraphAsymmErrors* expected = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL ,expX1sL , expX1sL, expX1sL);
   TGraphAsymmErrors* oneSigma = new TGraphAsymmErrors(nMassPoints, X, expY, expX1sL, expX1sL,  expY1sL, expY1sH);
@@ -122,19 +122,19 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   TGraphAsymmErrors* observed = new TGraphAsymmErrors(nMassPoints, X, obsY, expX1sL ,expX1sL , expX1sL, expX1sL);
 
  
-  oneSigma->SetMarkerColor(kBlack);
-  oneSigma->SetMarkerStyle(kFullCircle);
+  //oneSigma->SetMarkerColor(kBlack);
+  //oneSigma->SetMarkerStyle(kFullCircle);
   oneSigma->SetFillColor(kGreen+1);
   oneSigma->SetFillStyle(1001);
 
-  twoSigma->SetMarkerColor(kBlack);
-  twoSigma->SetMarkerStyle(kFullCircle);
+  //twoSigma->SetMarkerColor(kBlack);
+  //twoSigma->SetMarkerStyle(kFullCircle);
   twoSigma->SetFillColor(kYellow+1);
   twoSigma->SetFillStyle(1001);
 
-  expected->SetMarkerColor(kBlack);
-  expected->SetMarkerStyle(kFullCircle);
-  expected->SetMarkerSize(0.0);
+  //expected->SetMarkerColor(kBlack);
+  //expected->SetMarkerStyle(kFullCircle);
+  //expected->SetMarkerSize(0.0);
   expected->SetLineColor(kBlack);
   expected->SetLineWidth(2);
 
@@ -147,12 +147,11 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   mg->Add(twoSigma);
   mg->Add(oneSigma);
   mg->Add(expected);
+  mg->Draw("ALP3");
   if(obs) mg->Add(observed);
 
-  mg->Draw("ALP3");
-
   gPad->Modified();
-  gPad->SetBottomMargin(0.22);
+  gPad->SetBottomMargin(0.18);
   gPad->SetLeftMargin(0.18);
   //gPad->SetGridy();
   gPad->SetRightMargin(0.05);
@@ -160,7 +159,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   mg->GetXaxis()->SetLimits(75,165);
   mg->GetYaxis()->SetTitleOffset(1.30);
   mg->GetYaxis()->SetNdivisions(6);
-  mg->GetXaxis()->SetTitleOffset(1.15);
+  mg->GetXaxis()->SetTitleOffset(1.00);
   //mg->SetMinimum(0.);
   //mg->SetMaximum(yMax);
   mg->GetXaxis()->SetTitle("M_{H^{#pm}} (GeV)");
@@ -169,7 +168,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   mg->GetXaxis()->SetTitleSize(0.08);
   mg->GetXaxis()->SetLabelSize(0.07);   
   mg->GetYaxis()->SetLabelSize(0.07);   
-  mg->GetXaxis()->SetTickLength(0.07);
+  //mg->GetXaxis()->SetTickLength(0.07);
   mg->GetYaxis()->SetTickLength(0.04);
 
   //leg->SetHeader(Form("#splitline{CMS Preliminary #sqrt{s}=13 TeV}{ LUMI fb^{-1}, %s}",CHANNEL.Data()));
@@ -226,7 +225,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   gPad->RedrawAxis();
   TString outFile = "limit_"+CHANNEL+"_"+CAT;
   TString outDir = "limit/"+CHANNEL+"/"+CAT;
-  gPad->SaveAs(outDir+"/"+outFile+".png");
+  gPad->SaveAs(outDir+"/"+outFile+".pdf");
   if(isOut){
     TFile *fout = new TFile(outDir+"/"+outFile+".root", "RECREATE");
     expected->Write("expected");
@@ -238,16 +237,17 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
 }
 
 void MyLimitPlotter(){
-  double yMax = 0.08;  
-  LimitPlotter("mu", "Cat1_Inc",              yMax, false, true );
-  LimitPlotter("mu", "Cat2_cTagInc",          yMax, false, true );
-  LimitPlotter("mu", "Cat3_cTagEx",           yMax, false, true );
+  /*
+  LimitPlotter("mu", "Cat1_Inc",     true, true );
+  LimitPlotter("mu", "Cat2_cTagInc", true, true );
+  LimitPlotter("mu", "Cat3_cTagEx",  true, true );
 
-  LimitPlotter("ele", "Cat1_Inc",              yMax, false, true );
-  LimitPlotter("ele", "Cat2_cTagInc",          yMax, false, true );
-  LimitPlotter("ele", "Cat3_cTagEx",           yMax, false, true );
+  LimitPlotter("ele", "Cat1_Inc",     true, true );
+  LimitPlotter("ele", "Cat2_cTagInc", true, true );
+  LimitPlotter("ele", "Cat3_cTagEx",  true, true );
 
-  LimitPlotter("mu_ele", "Cat1_Inc",              yMax, false, true );
-  LimitPlotter("mu_ele", "Cat2_cTagInc",          yMax, false, true );
-  LimitPlotter("mu_ele", "Cat3_cTagEx",           yMax, false, true );
+  LimitPlotter("mu_ele", "Cat1_Inc",     true, true );
+  LimitPlotter("mu_ele", "Cat2_cTagInc", true, true );
+  */
+  LimitPlotter("mu_ele", "Cat3_cTagEx",  true, true );
 }

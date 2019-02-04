@@ -1,50 +1,32 @@
 #!/bin/bash
-
-#REFERENCE
-#https://github.com/florez/CONDOR
-
-#------------------------------------------------
-#pass the arguments to Analysis/runMe.sh script 
-#these arguments will go to the hplusAnalyzer.C
-#------------------------------------------------
-
 massPoint=$1
 channel=$2
 category=$3
 date
-
-#------------------------------------------------
-#this script runs on some remote condor machine.
-#link lxplus to this remote machine, using scram.
-#copy the compiled lxplus package to this machine
-
-#//////////// T3 /////////////////////////////////
 echo "CONDOR DIR: $_CONDOR_SCRATCH_DIR"
-cd ${_CONDOR_SCRATCH_DIR}
-cp -r /home/rverma/t3store2/combine/CMSSW_8_0_25/ .
+limitDir="/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_26/src/HiggsAnalysis/HplusTocs13TeVLimit"
 
-#------------------------------------------------
-#copy the lxplus package to the remote machine
-#and run the codes at remote machine
-#------------------------------------------------
-cd CMSSW_8_0_25/src/HiggsAnalysis/LimitBinned/
+if [ $category -eq 1 ] 
+then 
+    catDir="Cat1_Inc"  
+elif [ $category -eq 2 ]
+then 
+    catDir="Cat2_cTagInc" 
+else [ $category -eq 3 ] 
+    catDir="Cat3_cTagEx" 
+fi
+
+outDir=$limitDir"/condor/out/"$channel"/"$catDir"/Mass"$massPoint
+mkdir -p $outDir
+echo $outDir
+cp $limitDir"/MyHPlusDataCardMaker.C" $outDir
+cp $limitDir"/MyHPlusDataCardMaker.h" $outDir
+cp $limitDir"/MyLimitComputer.py" $outDir
+cp $limitDir"/MyTemplateDataCard.txt" $outDir
+cd $outDir
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
-./runMe.sh $massPoint $channel $category
-
-#---------------------------------------------
-#copy the output from remote machine to the lxplus
-#or to any other place e.g. Tier-2
-#Remove the package, after copying the output
-#------------------------------------------------
-echo "OUTPUT: "
-ls ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/HiggsAnalysis/LimitBinned/$channel/$category
-cp -rf ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/HiggsAnalysis/LimitBinned/$channel/$category/* /home/rverma/t3store2/condor_out/limit_condor/limit_out/$channel/$category/ 
-
-#xrdcp -f -R ${_CONDOR_SCRATCH_DIR}/CMSSW_8_0_25/src/Analysis/13TeV/$category root://se01.indiacms.res.in:1094//cms/store/user/rverma/histo_MuMC_MuData_20170608_TIFR/
-cd ${_CONDOR_SCRATCH_DIR}
-rm -rf CMSSW_8_0_25
-
+python MyLimitComputer.py --ch $channel --cat $category --mass $massPoint --batch True --isGOF True 
 echo "DONE"
 date
 

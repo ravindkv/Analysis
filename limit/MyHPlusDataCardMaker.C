@@ -246,12 +246,12 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   //cout<<"base/"+histSubDir+"/"+histName<<endl;
   TH1F* qcd_dd = DC.readWriteHisto(fQCD_dd, "base/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd", true);
   //Data
-  double sf_data = 1; //should be 1, always
+  double sf_data = 1.0; //should be 1, always
   TH1F* data_obs = DC.readWriteHisto(fData, "base/"+histSubDir, histName, sf_data, fout, fTT, "data_obs", true);
 
 
   //wh
-  double sf_wh = 1; 
+  double sf_wh = 1.0; 
   TH1F* wh = DC.readWriteHisto(fWH, "base/"+histSubDir, histName, sf_wh, fout, fTT, label, true);
   TH1F* wh_JESUp = DC.readWriteHisto(fWH, "JESPlus/"+histSubDir, histName, sf_wh, fout, fTT, label+"_JESUp", true);
   TH1F* wh_JESDown = DC.readWriteHisto(fWH, "JESMinus/"+histSubDir, histName, sf_wh, fout, fTT, label+"_JESDown", true);
@@ -475,7 +475,6 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
         line.replace( line.find("TTTT") , 4 , string(Form("%.3f", topPtUnc_ttbar)) ); 
         out << line << endl;
       }
-      /*
       else if(line.find("scaleRF_tt")!=string::npos){
         float scaleUnc_ttbar = (ttbar->Integral() > 0) ? DC.getBTagUnc(ttbar, ttbar_scaleUp, ttbar_scaleDown) : 1.00; 
         line.replace( line.find("TTTT") , 4 , string(Form("%.3f", scaleUnc_ttbar)) ); 
@@ -483,13 +482,12 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
       }
       else if(line.find("hDamp_tt")!=string::npos){
         float matchUnc_ttbar = (ttbar->Integral() > 0) ? DC.getBTagUnc(ttbar, ttbar_matchingUp, ttbar_matchingDown) : 1.00; 
-        line.replace( line.find("TTTT") , 4 , string(Form("%.3f", matchUnc_ttbar)) ); 
+        line.replace( line.find("TTTT") , 4 , string(Form("%.2f", matchUnc_ttbar)) ); 
         out << line << endl;
       }
-      */
       else if(line.find("topMass_tt")!=string::npos){
         float mtopUnc_ttbar = (ttbar->Integral() > 0) ? DC.getBTagUnc(ttbar, ttbar_mtop1735, ttbar_mtop1715) : 1.00; 
-        line.replace( line.find("TTTT") , 4 , string(Form("%.3f", mtopUnc_ttbar)) ); 
+        line.replace( line.find("TTTT") , 4 , string(Form("%.2f", mtopUnc_ttbar)) ); 
         out << line << endl;
       }
       else{ //default without changes

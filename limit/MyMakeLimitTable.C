@@ -142,7 +142,7 @@ string getLimitNumbers(TString massFiles){
     //convert float to string 
     ostringstream convert;
     string result("");
-    convert<<"$"<<std::setprecision(2)<<100*expY<<"^{+"<<expY1sH_<<"}"<<"_"<<"{-"<< expY1sL_<<"}"<<"$";
+    convert<<"$"<<std::setprecision(4)<<100*expY<<"^{+"<<expY1sH_<<"}"<<"_"<<"{-"<< expY1sL_<<"}"<<"$"<<"&"<<100*obsY<<endl;
     result = convert.str(); 
     return result;
 }
@@ -166,11 +166,13 @@ void MyMakeLimitTable(){
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c| }"<<endl; 
+  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  "<< " \\\\ "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)  "<<" \\\\ "<<endl;
+  outFile<<"\\multicolumn{1}{|c}{} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"{\\bf{$M_{H^\\pm}$}}"<<" & "<< "Expected & Observed & Expected & Observed & Expected & Observed "<< " \\\\ "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%) & "<<"(\\%) & "<<"(\\%) & "<<"(\\%) "<<" \\\\ "<<endl;
   outFile<<"[0.1cm] \\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getLimitNumbers(massFiles_mu_Cat1_Inc[0])<<" & "<<getLimitNumbers(massFiles_mu_Cat2_cTagInc[0])<<" & "<<getLimitNumbers(massFiles_mu_Cat3_cTagEx[0])<< "\\\\"<<endl;
@@ -205,20 +207,24 @@ void MyMakeLimitTable(){
   outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{muon + jets channel}"<<endl; 
+  outFile<<"\\caption{95\\% CL exclusion limit for muon + jets channel.}"<<endl; 
+  outFile<<"\\label{tab:limitMu}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
+  outFile<<endl;
 
   cout<<"=============================="<<endl;
   cout<<"        ELECTRON CHANNEL        "<<endl;
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c| }"<<endl; 
+  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  "<< " \\\\ "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)   "<<" \\\\ "<<endl;
+  outFile<<"\\multicolumn{1}{|c}{} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<< "{\\bf{$M_{H^\\pm}$}}"<<" & "<< "Expected & Observed & Expected & Observed & Expected & Observed "<< " \\\\ "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%) & "<<"(\\%) & "<<"(\\%) & "<<"(\\%)"<<" \\\\ "<<endl;
   outFile<<"[0.1cm] \\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getLimitNumbers(massFiles_ele_Cat1_Inc[0])<<" & "<<getLimitNumbers(massFiles_ele_Cat2_cTagInc[0])<<" & "<<getLimitNumbers(massFiles_ele_Cat3_cTagEx[0])<< "\\\\"<<endl;
@@ -253,20 +259,24 @@ void MyMakeLimitTable(){
   outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{electron + jets channel}"<<endl; 
+  outFile<<"\\caption{95\\% CL exclusion limit for electron + jets channel.}"<<endl; 
+  outFile<<"\\label{tab:limitEle}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
+  outFile<<endl;
 
   cout<<"=============================="<<endl;
   cout<<"        LEPTON CHANNEL        "<<endl;
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c| }"<<endl; 
+  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<< " "<<" & "<< "Ex. Limit using & "<< "Ex. Limit using & "<< "Ex. Limit using  "<< " \\\\ "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{1}{|c}{$M_{jj}(Inc)$} & \\multicolumn{1}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{1}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%)  "<<" \\\\ "<<endl;
+  outFile<<"\\multicolumn{1}{|c}{} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<< "{\\bf{$M_{H^\\pm}$}}"<<" & "<< "Expected & Observed & Expected & Observed & Expected & Observed "<< " \\\\ "<<endl;
+  outFile<<"[0.1cm]  "<<endl;
+  outFile<< " "<<" (GeV) & "<< "(\\%) & "<< "(\\%) & "<< "(\\%) & "<<"(\\%) & "<<"(\\%) & "<<"(\\%) "<<" \\\\ "<<endl;
   outFile<<"[0.1cm] \\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getLimitNumbers(massFiles_mu_ele_Cat1_Inc[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_Cat2_cTagInc[0])<<" & "<<getLimitNumbers(massFiles_mu_ele_Cat3_cTagEx[0])<< "\\\\"<<endl;
@@ -301,7 +311,8 @@ void MyMakeLimitTable(){
   outFile<<"[0.1cm]  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{lepton + jets channel}"<<endl; 
+  outFile<<"\\caption{95\\% CL exclusion limit for lepton + jets channel.}"<<endl; 
+  outFile<<"\\label{tab:limitLep}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
   outFile<<"\\end{document}"<<endl;  
