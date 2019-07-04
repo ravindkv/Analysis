@@ -17,12 +17,29 @@ TH1F* getHisto(TFile *histFile, TString histPath, double sf){
   return hist;
 }
 
+//get statistical uncertainity
+double getStatUnc(TH1F* hCentral, double sError = 0.0){
+  double  norm = hCentral->IntegralAndError(1, hCentral->GetNbinsX(), sError);
+  return sError;
+}
+
 void getABCDNumbers(ofstream &outFile, TFile *f, string proc, TString A, TString B, TString C, TString D, double sf = 1){
   TH1F * hA = getHisto(f, A, sf);
   TH1F * hB = getHisto(f, B, sf);
   TH1F * hC = getHisto(f, C, sf);
   TH1F * hD = getHisto(f, D, sf);
-  outFile<< proc<<" & "<<hA->Integral()<<" & "<< hB->Integral()<<" & "<< hC->Integral()<<" & "<< hD->Integral()<<" \\\\ "<<endl;
+  double intA =lround(hA->Integral());
+  double errA =lround(getStatUnc(hA, 0.0)); 
+  double intB =lround(hB->Integral());
+  double errB =lround(getStatUnc(hB, 0.0)); 
+  double intC =lround(hC->Integral());
+  double errC =lround(getStatUnc(hC, 0.0)); 
+  double intD =lround(hD->Integral());
+  double errD =lround(getStatUnc(hD, 0.0)); 
+  outFile<< proc<<" & "<<intA <<" $\\pm$ "<< errA <<
+      " & "<< intB <<"$\\pm$"<< errB<<
+      " & "<< intC <<"$\\pm$"<< errC<<
+      " & "<< intD <<"$\\pm$"<< errD<<" \\\\ "<<endl;
 }
 
 void makeABCDTable_13TeV(){  
@@ -34,10 +51,12 @@ void makeABCDTable_13TeV(){
   TFile *diboson 		= new TFile(inFile+"all_VV.root");
   TFile *qcd  			= new TFile(inFile+"all_QCD.root");
   TFile *allMC 			= new TFile(inFile+"all_MC.root");
- 
-  TString dir = "baseLowMET"; 
-  TFile *data = new TFile(inFile+"all_muData.root");
-  //TFile *data = new TFile(inFile+"all_EleData.root");
+  
+  TString dirLowMET = "baseLowMET"; 
+  TString dirHighMET = "base";
+  //TString dirLowMET = "baseIso20LowMET"; 
+  //TString dirHighMET = "baseIso20HighMET";
+  TFile *data = new TFile(inFile+"all_Data.root");
   ofstream outFile; 
   outFile.open("qcdABCDTable.tex"); 
   //outFile<<"\\documentclass[landscape,letterpaper]{article}"<<endl;  
@@ -48,43 +67,35 @@ void makeABCDTable_13TeV(){
   outFile<<"\\usepackage{array}"<<endl;  
   outFile<<"\\usepackage{multirow}"<<endl;  
   outFile<<"\\usepackage[cm]{fullpage}"<<endl;  
-  outFile<<"\\textheight = 8.in"<<endl;  
-  outFile<<"\\textwidth 7.0in"<<endl;  
   outFile<<"\\begin{document}"<<endl;  
   outFile<<""<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c|c| }"<<endl; 
-  outFile<<"\\multicolumn{5}{c}{ } \\\\"<<endl; 
+  outFile<<"\\begin{tabular}{ccccc}"<<endl; 
+  outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<< "\\bf{Process}"<<" & "<< "Region-A & "<< "Region-B & "<< "Region-C & "<< "Region-D "<<" \\\\ "<<endl;
   outFile<<"" <<" & "<< "(Iso, high MET) & "<< "(Non iso, high MET) & "<< "(Non iso, low MET)& "<< "(Iso, low MET)"<<" \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   //Add another table with JESUP
-   getABCDNumbers(outFile, qcd, "MC QCD", "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
+   getABCDNumbers(outFile, qcd, "MC QCD", dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
 
-   getABCDNumbers(outFile, ttbar, "$t\\bar{t}$ + jets", "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit", ttbar_sf);
-  outFile<<"\\hline "<<endl;
+   getABCDNumbers(outFile, ttbar, "$t\\bar{t}$ + jets", dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit", ttbar_sf);
   
-  getABCDNumbers(outFile, stop, "Single ~t",            "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
-  outFile<<"\\hline "<<endl;
+  getABCDNumbers(outFile, stop, "Single ~t",            dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
 
-   getABCDNumbers(outFile, wjet, " W + jets",           "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
-  outFile<<"\\hline "<<endl;
+   getABCDNumbers(outFile, wjet, " W + jets",           dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
 
-   getABCDNumbers(outFile, zjet, "$Z/\\gamma$ + jets",  "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
-  outFile<<"\\hline "<<endl;
+   getABCDNumbers(outFile, zjet, "$Z/\\gamma$ + jets",  dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
  
-  getABCDNumbers(outFile, diboson, "VV",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
+  getABCDNumbers(outFile, diboson, "VV",                dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
-  getABCDNumbers(outFile, allMC, "nonQCDBkg",                 "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
+  getABCDNumbers(outFile, allMC, "nonQCDBkg",                 dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
 
-   getABCDNumbers(outFile, data, "Data",                "base/Iso/KinFit/mjj_kfit", "base/NonIso/KinFit/mjj_kfit", dir+"/NonIso/KinFit/mjj_kfit", dir+"/Iso/KinFit/mjj_kfit");
-  outFile<<"\\hline "<<endl;
+   getABCDNumbers(outFile, data, "Data",                dirHighMET+"/Iso/KinFit/mjj_kfit", dirHighMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/NonIso/KinFit/mjj_kfit", dirLowMET+"/Iso/KinFit/mjj_kfit");
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
   outFile<<"\\end{center}"<<endl; 

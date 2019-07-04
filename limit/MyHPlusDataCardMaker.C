@@ -22,6 +22,8 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
         TString label="WH80", 
         TString hPlusFileName="all_Hplus80.root")
   {
+  //TString baseDir = "topPtWeight";
+  TString baseDir = "base";
   TString histSubDir = "Iso/"+histSubDir_+"/";
   bool isMuChannel = false; 
   if(channelName=="mu") isMuChannel = true;
@@ -55,8 +57,8 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   if(histName.Contains("ExM")) isExM = true;
 
   //ttbar
-  double sf_ttbar = 1; 
-  TH1F* ttbar = DC.readWriteHisto(fTT, "base/"+histSubDir, histName, sf_ttbar, fout, fTT,  "ttbar", true);
+  double sf_ttbar = 1.0; 
+  TH1F* ttbar = DC.readWriteHisto(fTT, baseDir+"/"+histSubDir, histName, sf_ttbar, fout, fTT,  "ttbar", true);
   TH1F* ttbar_JESUp = DC.readWriteHisto(fTT, "JESPlus/"+histSubDir, histName, sf_ttbar, fout, fTT, "ttbar_JESUp", true);
   TH1F* ttbar_JESDown = DC.readWriteHisto(fTT, "JESMinus/"+histSubDir, histName, sf_ttbar, fout, fTT, "ttbar_JESDown", true);
   TH1F* ttbar_PileupUp = DC.readWriteHisto(fTT, "PileupPlus/"+histSubDir, histName, sf_ttbar, fout, fTT, "ttbar_PileupUp", true);
@@ -75,39 +77,39 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_ttbar_ExL = 1.0;
   double unc_ttbar_ExM = 1.0;
   if(isExL){
-    TH1F* ttbar_yLyMyT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* ttbar_yLyMnT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* ttbar_yLnMyT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* ttbar_yLnMnT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* ttbar_yLyMyT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
+    TH1F* ttbar_yLyMnT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
+    TH1F* ttbar_yLnMyT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
+    TH1F* ttbar_yLnMnT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
     unc_ttbar_ExL = DC.getUncExL(ttbar_yLyMyT, ttbar_yLyMnT, ttbar_yLnMyT, ttbar_yLnMnT);
   }
   if(isExM){
-    TH1F* ttbar_yMyT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* ttbar_yMnT = DC.getHisto(fTT, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* ttbar_yMyT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
+    TH1F* ttbar_yMnT = DC.getHisto(fTT, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
     unc_ttbar_ExM = DC.getUncExM(ttbar_yMyT, ttbar_yMnT);
   }
   //ttbar scaleUp
   double sf_ttbar_scaleUp = 1; 
-  TH1F* ttbar_scaleUp = DC.readWriteHisto(fTT_up, "base/"+histSubDir, histName, sf_ttbar_scaleUp, fout, fTT, "ttbar_scaleRF_ttUp", true);
+  TH1F* ttbar_scaleUp = DC.readWriteHisto(fTT_up, baseDir+"/"+histSubDir, histName, sf_ttbar_scaleUp, fout, fTT, "ttbar_scaleRF_ttUp", true);
   //ttbar scaleDown
   double sf_ttbar_scaleDown = 1; 
-  TH1F* ttbar_scaleDown = DC.readWriteHisto(fTT_down, "base/"+histSubDir, histName, sf_ttbar_scaleDown, fout, fTT, "ttbar_scaleRF_ttDown", true);
+  TH1F* ttbar_scaleDown = DC.readWriteHisto(fTT_down, baseDir+"/"+histSubDir, histName, sf_ttbar_scaleDown, fout, fTT, "ttbar_scaleRF_ttDown", true);
   //ttbar mtop1715
   double sf_ttbar_mtop1715 = 1; 
-  TH1F* ttbar_mtop1715 = DC.readWriteHisto(fTT_mtop1715, "base/"+histSubDir, histName, sf_ttbar_mtop1715, fout, fTT, "ttbar_topMass_ttUp", true);
+  TH1F* ttbar_mtop1715 = DC.readWriteHisto(fTT_mtop1715, baseDir+"/"+histSubDir, histName, sf_ttbar_mtop1715, fout, fTT, "ttbar_topMass_ttUp", true);
   //ttbar mtop1735
   double sf_ttbar_mtop1735 = 1; 
-  TH1F* ttbar_mtop1735 = DC.readWriteHisto(fTT_mtop1735, "base/"+histSubDir, histName, sf_ttbar_mtop1735, fout, fTT, "ttbar_topMass_ttDown", true);
+  TH1F* ttbar_mtop1735 = DC.readWriteHisto(fTT_mtop1735, baseDir+"/"+histSubDir, histName, sf_ttbar_mtop1735, fout, fTT, "ttbar_topMass_ttDown", true);
   //ttbar matchingUp
   double sf_ttbar_matchingUp = 1; 
-  TH1F* ttbar_matchingUp = DC.readWriteHisto(fTT_hdampUP, "base/"+histSubDir, histName, sf_ttbar_matchingUp, fout, fTT, "ttbar_hDamp_ttUp", true);
+  TH1F* ttbar_matchingUp = DC.readWriteHisto(fTT_hdampUP, baseDir+"/"+histSubDir, histName, sf_ttbar_matchingUp, fout, fTT, "ttbar_hDamp_ttUp", true);
   //ttbar matchingDown
   double sf_ttbar_matchingDown = 1; 
-  TH1F* ttbar_matchingDown = DC.readWriteHisto(fTT_hdampDOWN, "base/"+histSubDir, histName, sf_ttbar_matchingDown, fout, fTT, "ttbar_hDamp_ttDown", true);
+  TH1F* ttbar_matchingDown = DC.readWriteHisto(fTT_hdampDOWN, baseDir+"/"+histSubDir, histName, sf_ttbar_matchingDown, fout, fTT, "ttbar_hDamp_ttDown", true);
 
   //w+jets
   double sf_wjet = 1;
-  TH1F* wjet = DC.readWriteHisto(fWJ, "base/"+histSubDir, histName, sf_wjet, fout, fTT, "wjet", true);
+  TH1F* wjet = DC.readWriteHisto(fWJ, baseDir+"/"+histSubDir, histName, sf_wjet, fout, fTT, "wjet", true);
   TH1F* wjet_JESUp = DC.readWriteHisto(fWJ, "JESPlus/"+histSubDir, histName, sf_wjet, fout, fTT, "wjet_JESUp", true);
   TH1F* wjet_JESDown = DC.readWriteHisto(fWJ, "JESMinus/"+histSubDir, histName, sf_wjet, fout, fTT, "wjet_JESDown", true);
   TH1F* wjet_PileupUp = DC.readWriteHisto(fWJ, "PileupPlus/"+histSubDir, histName, sf_wjet, fout, fTT, "wjet_PileupUp", true);
@@ -123,21 +125,21 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_wjet_ExL = 1.0;
   double unc_wjet_ExM = 1.0;
   if(isExL){
-    TH1F* wjet_yLyMyT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* wjet_yLyMnT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* wjet_yLnMyT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* wjet_yLnMnT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* wjet_yLyMyT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
+    TH1F* wjet_yLyMnT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
+    TH1F* wjet_yLnMyT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
+    TH1F* wjet_yLnMnT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
     unc_wjet_ExL = DC.getUncExL(wjet_yLyMyT, wjet_yLyMnT, wjet_yLnMyT, wjet_yLnMnT);
   }
   if(isExM){
-    TH1F* wjet_yMyT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* wjet_yMnT = DC.getHisto(fWJ, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* wjet_yMyT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
+    TH1F* wjet_yMnT = DC.getHisto(fWJ, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
     unc_wjet_ExM = DC.getUncExM(wjet_yMyT, wjet_yMnT);
   }
 
   //Z+Jets
   double sf_zjet = 1;
-  TH1F* zjet = DC.readWriteHisto(fDY, "base/"+histSubDir, histName, sf_zjet, fout, fTT, "zjet", true);
+  TH1F* zjet = DC.readWriteHisto(fDY, baseDir+"/"+histSubDir, histName, sf_zjet, fout, fTT, "zjet", true);
   TH1F* zjet_JESUp = DC.readWriteHisto(fDY, "JESPlus/"+histSubDir, histName, sf_zjet, fout, fTT, "zjet_JESUp", true);
   TH1F* zjet_JESDown = DC.readWriteHisto(fDY, "JESMinus/"+histSubDir, histName, sf_zjet, fout, fTT, "zjet_JESDown", true);
   TH1F* zjet_PileupUp = DC.readWriteHisto(fDY, "PileupPlus/"+histSubDir, histName, sf_zjet, fout, fTT, "zjet_PileupUp", true);
@@ -153,21 +155,21 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_zjet_ExL = 1.0;
   double unc_zjet_ExM = 1.0;
   if(isExL){
-    TH1F* zjet_yLyMyT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* zjet_yLyMnT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* zjet_yLnMyT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* zjet_yLnMnT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* zjet_yLyMyT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
+    TH1F* zjet_yLyMnT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
+    TH1F* zjet_yLnMyT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
+    TH1F* zjet_yLnMnT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
     unc_zjet_ExL = DC.getUncExL(zjet_yLyMyT, zjet_yLyMnT, zjet_yLnMyT, zjet_yLnMnT);
   }
   if(isExM){
-    TH1F* zjet_yMyT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* zjet_yMnT = DC.getHisto(fDY, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* zjet_yMyT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
+    TH1F* zjet_yMnT = DC.getHisto(fDY, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
     unc_zjet_ExM = DC.getUncExM(zjet_yMyT, zjet_yMnT);
   }
 
   //SingleTop
-  double sf_stop = 1;
-  TH1F* stop = DC.readWriteHisto(fST, "base/"+histSubDir, histName, sf_stop, fout, fTT, "stop", true);
+  double sf_stop = 1.0;
+  TH1F* stop = DC.readWriteHisto(fST, baseDir+"/"+histSubDir, histName, sf_stop, fout, fTT, "stop", true);
   TH1F* stop_JESUp = DC.readWriteHisto(fST, "JESPlus/"+histSubDir, histName, sf_stop, fout, fTT, "stop_JESUp", true);
   TH1F* stop_JESDown = DC.readWriteHisto(fST, "JESMinus/"+histSubDir, histName, sf_stop, fout, fTT, "stop_JESDown", true);
   TH1F* stop_PileupUp = DC.readWriteHisto(fST, "PileupPlus/"+histSubDir, histName, sf_stop, fout, fTT, "stop_PileupUp", true);
@@ -183,21 +185,21 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_stop_ExL = 1.0;
   double unc_stop_ExM = 1.0;
   if(isExL){
-    TH1F* stop_yLyMyT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* stop_yLyMnT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* stop_yLnMyT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* stop_yLnMnT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* stop_yLyMyT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
+    TH1F* stop_yLyMnT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
+    TH1F* stop_yLnMyT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
+    TH1F* stop_yLnMnT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
     unc_stop_ExL = DC.getUncExL(stop_yLyMyT, stop_yLyMnT, stop_yLnMyT, stop_yLnMnT);
   }
   if(isExM){
-    TH1F* stop_yMyT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* stop_yMnT = DC.getHisto(fST, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* stop_yMyT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
+    TH1F* stop_yMnT = DC.getHisto(fST, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
     unc_stop_ExM = DC.getUncExM(stop_yMyT, stop_yMnT);
   }
 
   //Dibosons
   double sf_vv = 1;
-  TH1F* vv = DC.readWriteHisto(fVV, "base/"+histSubDir, histName, sf_vv, fout, fTT, "vv", true);
+  TH1F* vv = DC.readWriteHisto(fVV, baseDir+"/"+histSubDir, histName, sf_vv, fout, fTT, "vv", true);
   TH1F* vv_JESUp = DC.readWriteHisto(fVV, "JESPlus/"+histSubDir, histName, sf_vv, fout, fTT, "vv_JESUp", true);
   TH1F* vv_JESDown = DC.readWriteHisto(fVV, "JESMinus/"+histSubDir, histName, sf_vv, fout, fTT, "vv_JESDown", true);
   TH1F* vv_PileupUp = DC.readWriteHisto(fVV, "PileupPlus/"+histSubDir, histName, sf_vv, fout, fTT, "vv_PileupUp", true);
@@ -213,22 +215,22 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_vv_ExL = 1.0;
   double unc_vv_ExM = 1.0;
   if(isExL){
-    TH1F* vv_yLyMyT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* vv_yLyMnT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* vv_yLnMyT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* vv_yLnMnT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* vv_yLyMyT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
+    TH1F* vv_yLyMnT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
+    TH1F* vv_yLnMyT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
+    TH1F* vv_yLnMnT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
     unc_vv_ExL = DC.getUncExL(vv_yLyMyT, vv_yLyMnT, vv_yLnMyT, vv_yLnMnT);
   }
   if(isExM){
-    TH1F* vv_yMyT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* vv_yMnT = DC.getHisto(fVV, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* vv_yMyT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
+    TH1F* vv_yMnT = DC.getHisto(fVV, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
     unc_vv_ExM = DC.getUncExM(vv_yMyT, vv_yMnT);
   }
 
   //QCD MC
-  double sf_qcd = 1;
+  double sf_qcd = 1.0;
   /*
-  TH1F* qcd = DC.readWriteHisto(fQCD, "base/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd", true);
+  TH1F* qcd = DC.readWriteHisto(fQCD, baseDir+"/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd", true);
   TH1F* qcd_JESUp = DC.readWriteHisto(fQCD, "JESPlus/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd_JESUp", true);
   TH1F* qcd_JESDown = DC.readWriteHisto(fQCD, "JESMinus/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd_JESDown", true);
   TH1F* qcd_PileupUp = DC.readWriteHisto(fQCD, "PileupPlus/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd_PileupUp", true);
@@ -243,16 +245,22 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   TH1F* qcd_bcTag3Down = DC.readWriteHisto(fQCD, "bcTagMinus3/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd_bcTag3Down", true);
   */
   //QCD data driven
-  //cout<<"base/"+histSubDir+"/"+histName<<endl;
-  TH1F* qcd_dd = DC.readWriteHisto(fQCD_dd, "base/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd", true);
+  //cout<<baseDir+"/"+histSubDir+"/"+histName<<endl;
+  TH1F* qcd_dd = DC.readWriteHisto(fQCD_dd, baseDir+"/"+histSubDir, histName, sf_qcd, fout, fTT, "qcd", true);
+  double stat_unc_qcd = DC.getStatUnc(qcd_dd, 0);
+  cout<<"qcd stat unc: "<<stat_unc_qcd<<endl;
+  cout<<"qcd = "<<qcd_dd->Integral()<<endl;
+  double qcd_unc = DC.getSysUncQcd(fData, fTT, fST, fWJ, fDY,  fVV, histSubDir_+"/", histName, false);
+
   //Data
   double sf_data = 1.0; //should be 1, always
-  TH1F* data_obs = DC.readWriteHisto(fData, "base/"+histSubDir, histName, sf_data, fout, fTT, "data_obs", true);
-
+  TH1F* data_obs = DC.readWriteHisto(fData, baseDir+"/"+histSubDir, histName, sf_data, fout, fTT, "data_obs", true);
+  cout<<"================: "<<data_obs->Integral()<<endl;
 
   //wh
-  double sf_wh = 1.0; 
-  TH1F* wh = DC.readWriteHisto(fWH, "base/"+histSubDir, histName, sf_wh, fout, fTT, label, true);
+  //double sf_wh = 1.0;
+  double sf_wh = 1.0/0.12155; //2*0.065*(1-0.065) 
+  TH1F* wh = DC.readWriteHisto(fWH, baseDir+"/"+histSubDir, histName, sf_wh, fout, fTT, label, true);
   TH1F* wh_JESUp = DC.readWriteHisto(fWH, "JESPlus/"+histSubDir, histName, sf_wh, fout, fTT, label+"_JESUp", true);
   TH1F* wh_JESDown = DC.readWriteHisto(fWH, "JESMinus/"+histSubDir, histName, sf_wh, fout, fTT, label+"_JESDown", true);
   TH1F* wh_PileupUp = DC.readWriteHisto(fWH, "PileupPlus/"+histSubDir, histName, sf_wh, fout, fTT, label+"_PileupUp", true);
@@ -270,15 +278,15 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
   double unc_wh_ExL = 1.0;
   double unc_wh_ExM = 1.0;
   if(isExL){
-    TH1F* wh_yLyMyT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT);
-    TH1F* wh_yLyMnT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT);
-    TH1F* wh_yLnMyT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT);
-    TH1F* wh_yLnMnT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT);
+    TH1F* wh_yLyMyT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMyT_wt", fTT, sf_wh);
+    TH1F* wh_yLyMnT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yLyMnT_wt", fTT, sf_wh);
+    TH1F* wh_yLnMyT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMyT_wt", fTT, sf_wh);
+    TH1F* wh_yLnMnT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yLnMnT_wt", fTT, sf_wh);
     unc_wh_ExL = DC.getUncExL(wh_yLyMyT, wh_yLyMnT, wh_yLnMyT, wh_yLnMnT);
   }
   if(isExM){
-    TH1F* wh_yMyT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT);
-    TH1F* wh_yMnT = DC.getHisto(fWH, "base/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT);
+    TH1F* wh_yMyT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yMyT_wt", fTT, sf_wh);
+    TH1F* wh_yMnT = DC.getHisto(fWH, baseDir+"/Iso/ExCTag/", "sf_CTag_yMnT_wt", fTT, sf_wh);
     unc_wh_ExM = DC.getUncExM(wh_yMyT, wh_yMnT);
   }
   //open input template data card
@@ -463,8 +471,9 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
         out << line << endl;
       }
       else if(line.find("CMS_norm_qcd")!=string::npos){  
-        if(isMuChannel) line.replace( line.find("QQQQ") , 4 , string(Form("%.3f", 1.72)));   
-        else line.replace( line.find("QQQQ") , 4 , string(Form("%.3f", 1.40)));   
+        //line.replace( line.find("QQQQ") , 4 , string(Form("%.3f", qcd_unc)));   
+        if(isMuChannel) line.replace( line.find("QQQQ") , 4 , string(Form("%.4f", 1.10)));   
+        else line.replace(line.find("QQQQ") , 4 , string(Form("%.4f", 1.19)));   
         out << line << endl;  
       }
       else if(line.find("CMS_topPtReweight")!=string::npos){
@@ -482,12 +491,12 @@ void MyHPlusDataCardMaker(TString inFileDir="stack_20180418_Mu_Sys_PreAppComent"
       }
       else if(line.find("hDamp_tt")!=string::npos){
         float matchUnc_ttbar = (ttbar->Integral() > 0) ? DC.getBTagUnc(ttbar, ttbar_matchingUp, ttbar_matchingDown) : 1.00; 
-        line.replace( line.find("TTTT") , 4 , string(Form("%.2f", matchUnc_ttbar)) ); 
+        line.replace( line.find("TTTT") , 4 , string(Form("%.3f", matchUnc_ttbar)) ); 
         out << line << endl;
       }
       else if(line.find("topMass_tt")!=string::npos){
         float mtopUnc_ttbar = (ttbar->Integral() > 0) ? DC.getBTagUnc(ttbar, ttbar_mtop1735, ttbar_mtop1715) : 1.00; 
-        line.replace( line.find("TTTT") , 4 , string(Form("%.2f", mtopUnc_ttbar)) ); 
+        line.replace( line.find("TTTT") , 4 , string(Form("%.3f", mtopUnc_ttbar)) ); 
         out << line << endl;
       }
       else{ //default without changes

@@ -1,15 +1,15 @@
-#ifndef __SAMPLEINFO_H__
-#define __SAMPLEINFO_H__
+#ifndef __MYSAMPLEINFO_H__
+#define __MYSAMPLEINFO_H__
 
 #include "TROOT.h"
 #include <string>
 #include <vector>
 
-class SampleInfo
+class MySampleInfo
 {
  public:
-  SampleInfo();
-  ~SampleInfo();
+  MySampleInfo();
+  ~MySampleInfo();
   
   std::string sampleName;
   int mcEvtType;

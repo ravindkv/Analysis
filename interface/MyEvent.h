@@ -34,7 +34,7 @@
 #include "interface/MyMuon.h"
 //#include interface/MyTau.h"
 #include "interface/MyMCParticle.h"
-#include "interface/SampleInfo.h"
+#include "interface/MySampleInfo.h"
 #include "interface/MyKineFitParticle.h"
 
 class MyEvent
@@ -65,7 +65,7 @@ class MyEvent
   std::vector<MyMCParticle> mcParticles;
   std::vector<MyKineFitParticle> KineFitParticles;
   MyMET mcMET;
-  SampleInfo sampleInfo;
+  MySampleInfo sampleInfo;
   
   // ---- Monte Carlo information
   bool isData;

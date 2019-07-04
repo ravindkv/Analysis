@@ -105,80 +105,43 @@ Long64_t Reader::LoadTree(Long64_t entry)
 
 vector<MyElectron> Reader::getElectrons(MyEvent* ev, string algo)
 {
- 
   vector<MyElectron> selElectrons;
   selElectrons.clear();
   vector<MyElectron> allElectrons = ev->Electrons;
   for(size_t iele=0; iele < allElectrons.size(); ++iele){
-    if(algo.find("PFlow") != std::string::npos){
-      if(allElectrons[iele].GetName().find(algo) != std::string::npos){
-	selElectrons.push_back(allElectrons[iele]);
-      }
-    }
-    else if(allElectrons[iele].GetName() == algo ){
       selElectrons.push_back(allElectrons[iele]);
-    }
   }
-
   return selElectrons;
 }
 
 vector<MyMuon> Reader::getMuons(MyEvent* ev, string algo)
 {
-
   vector<MyMuon> selMuons;
   selMuons.clear();
-  
   vector<MyMuon> allMuons = ev->Muons;
   for(size_t imu=0; imu < allMuons.size(); ++imu){
-    if(algo.find("PFlow") != std::string::npos){
-      if(allMuons[imu].GetName().find(algo) != std::string::npos){
-	selMuons.push_back(allMuons[imu]);
-      }
-    }
-    else if(allMuons[imu].GetName() == algo ){
       selMuons.push_back(allMuons[imu]);
-    }
   }
-
   return selMuons;
 }
 
 vector<MyJet> Reader::getJets(MyEvent* ev, string algo)
 {
-
   vector<MyJet> selJets;
   selJets.clear();
-
   vector<MyJet> allJets = ev->Jets;
   for(size_t ijet=0; ijet < allJets.size(); ++ijet){
-    if(algo.find("PFlow") != std::string::npos){
-      if(allJets[ijet].GetName().find(algo) != std::string::npos){
-	selJets.push_back(allJets[ijet]);
-      }
-    }
-    else if(allJets[ijet].GetName() == algo ){
       selJets.push_back(allJets[ijet]);
-    }
   }
-
   return selJets;
 }
 
 MyMET Reader::getMET(MyEvent* ev, string algo) 
 { 
- 
   MyMET selmet;
   vector<MyMET> allMETs = ev->mets; 
   for(size_t imet=0; imet < allMETs.size(); ++imet){ 
-    if(algo.find("PFlow") != std::string::npos){ 
-      if(allMETs[imet].metName.find(algo) != std::string::npos){ 
-        selmet = allMETs[imet]; 
-      } 
-    } 
-    else if(allMETs[imet].metName == algo ){ 
       selmet = allMETs[imet];
-    } 
   }
   return selmet; 
 } 

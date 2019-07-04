@@ -16,9 +16,10 @@ bool isEleChannel = false;
 void example_plot(TString process, TString unctype, TString histName, TString leg_input, int bin, bool axisrange=false, double xmin=1, double xmax=100 ){
   TString inFile("$PWD/");
   gStyle->SetOptStat(0);
-  gStyle->SetFrameLineWidth(3);
+  gStyle->SetFrameLineWidth(2);
   const float xpad[2] = {0.,1};
   const float ypad[4] = {0.,0.40,0.40,0.98};
+
   TCanvas *c1 = new TCanvas();
   c1->Divide(1, 2);
   //c1->cd(postion);
@@ -29,10 +30,9 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   double scale_factor = 1; 
-  if(process.Contains("WH120")){
+  TLegend* leg = new TLegend(0.70,0.50,0.80,0.85,NULL,"brNDC");
+  if(histName.Contains("WH120")){
    TLegend* leg = new TLegend(0.75,0.50,0.90,0.85,NULL,"brNDC");
-  }else{
-   TLegend* leg = new TLegend(0.70,0.60,0.80,0.85,NULL,"brNDC");
   }
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
@@ -63,16 +63,16 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   h2->SetLineColor(kBlue);
   h2->SetLineWidth(3);
   h2->SetTitle("");
-  h2->GetYaxis()->SetTitle("Events");
+  h2->GetYaxis()->SetTitle("Events / 5 GeV");
   h2->GetYaxis()->SetRangeUser(1, 1.1* h2->GetMaximum());
-  h2->GetXaxis()->SetNdivisions(5);
+  //h2->GetXaxis()->SetNdivisions(5);
   h2->GetYaxis()->SetNdivisions(5);
-  h2->GetYaxis()->SetTitleOffset(0.90);
+  h2->GetYaxis()->SetTitleOffset(0.60);
   h2->GetXaxis()->SetTitleOffset(1.00);
-  h2->GetYaxis()->SetTitleSize(0.08);   
+  h2->GetYaxis()->SetTitleSize(0.10);   
   h2->GetXaxis()->SetTitleSize(0.06);
   h2->GetXaxis()->SetLabelSize(0.06);   
-  h2->GetYaxis()->SetLabelSize(0.06);   
+  h2->GetYaxis()->SetLabelSize(0.10);   
   h2->GetXaxis()->SetTickLength(0.03); 
   h2->GetYaxis()->SetTickLength(0.03); 
   h2->Rebin(bin);
@@ -80,6 +80,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
     h2->GetXaxis()->SetRangeUser(xmin,xmax);
   }
   
+  TGaxis::SetMaxDigits(3);
   //TH1F* h3 = (f->Get(process+"_"+unctype+"Down"))->Clone("h3");
   TH1F* h3 = (TH1F*)(f->Get(histName+"_"+unctype+"Down"))->Clone("h3");
   h3->GetXaxis()->SetRangeUser(0, 200);
@@ -107,18 +108,18 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   pt->SetTextSize(0.078);
  
   // Header
-  TPaveText *header = new TPaveText(0.15,0.91,0.9,0.95, "brNDC");
+  TPaveText *header = new TPaveText(0.72,0.91,0.90,0.95, "brNDC");
   header->SetBorderSize(1);
   header->SetFillColor(19);
   header->SetFillStyle(0);
   header->SetLineColor(0);
   header->SetTextFont(132);
   header->SetTextSize(0.08);
-  TText *text = header->AddText("CMS Simulation,    #sqrt{s} = 13 TeV, 35.9 fb^{-1}");
+  TText *text = header->AddText("35.9 fb^{-1} (13 TeV)");
   text->SetTextAlign(11);
 
   // channel specifiction
-  TPaveText *ch = new TPaveText(0.82,0.9154898,0.9210067,0.9762187,"brNDC");
+  TPaveText *ch = new TPaveText(0.50,0.9154898,0.60,0.9762187,"brNDC");
   ch->SetFillColor(19);
   ch->SetFillStyle(0);
   ch->SetLineColor(0);
@@ -131,7 +132,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   //  pt->AddText(cat);
 
   //  h2->SetTitle(channel+"  "+category+"  "+sample);
-  h2->GetXaxis()->SetTitle("M_{jj} [GeV]");
+  h2->GetXaxis()->SetTitle("m_{jj} (GeV)");
   //h2->SetAxisRange(0.0, (h2->GetMaximum())*1.3 ,"Y");
   //  h1->GetYaxis()->SetTitle("Normalized to Unity");
   //  h1->GetYaxis()->SetRangeUser(0.00, 0.20);
@@ -147,24 +148,24 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   
   TText TMean1;
   TMean1.SetTextColor(kGreen);
-  TMean1.SetTextSize(.06);
+  TMean1.SetTextSize(.07);
   char mean1[100];
   sprintf(mean1,"Mean = %.2f",h1->GetMean());
-  TMean1.DrawTextNDC(.18,.750,mean1);
+  TMean1.DrawTextNDC(.18,.650,mean1);
 
   TText TMean2;
   TMean2.SetTextColor(kBlue);
-  TMean2.SetTextSize(.06);
+  TMean2.SetTextSize(.07);
   char mean2[100];
   sprintf(mean2,"Mean = %.2f",h2->GetMean());
-  TMean2.DrawTextNDC(.18,.650,mean2);
+  TMean2.DrawTextNDC(.18,.550,mean2);
 
   TText TMean3;
   TMean3.SetTextColor(kRed);
-  TMean3.SetTextSize(.06);
+  TMean3.SetTextSize(.07);
   char mean3[100];
   sprintf(mean3,"Mean = %.2f",h3->GetMean());
-  TMean3.DrawTextNDC(.18,.550,mean3);
+  TMean3.DrawTextNDC(.18,.450,mean3);
 
   leg->Draw();
   pt->Draw();
@@ -175,7 +176,7 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   ////////////////////////////// Ratio //////////////////////////// 
   c1->cd(2);
   gPad->SetPad(xpad[0],ypad[0],xpad[1],ypad[1]);
-  gPad->SetTopMargin(0); gPad->SetBottomMargin(0.5); gPad->SetGridy();
+  gPad->SetTopMargin(0); gPad->SetBottomMargin(0.4); gPad->SetGridy();
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   TH1F *hRatio_Up = (TH1F*)h2->Clone("hRatio_Up");
@@ -187,12 +188,12 @@ void example_plot(TString process, TString unctype, TString histName, TString le
   //hRatio_Up->GetXaxis()->SetRangeUser(xmin, xmax);
   hRatio_Up->GetXaxis()->SetTickLength(0.13); 
   hRatio_Up->GetYaxis()->SetTickLength(0.04); 
-  hRatio_Up->GetXaxis()->SetTitle("M_{jj} [GeV]"); 
+  hRatio_Up->GetXaxis()->SetTitle("m_{jj} (GeV)"); 
   hRatio_Up->GetYaxis()->SetTitleOffset(0.40);
-  hRatio_Up->GetXaxis()->SetTitleOffset(1.10);
+  hRatio_Up->GetXaxis()->SetTitleOffset(0.90);
   hRatio_Up->GetYaxis()->SetTitle("#frac{Nominal}{Unc}"); hRatio_Up->GetYaxis()->CenterTitle();
   hRatio_Up->GetYaxis()->SetTitleSize(0.15); hRatio_Up->GetXaxis()->SetTitleSize(0.20);
-  hRatio_Up->GetXaxis()->SetLabelSize(0.20); 
+  hRatio_Up->GetXaxis()->SetLabelSize(0.15); 
   hRatio_Up->GetYaxis()->SetLabelSize(0.15); 
   hRatio_Up->Draw("E"); // use "P" or "AP"
   
@@ -263,12 +264,12 @@ void compareMjj_13TeV(){
   plotSeparate( "t#bar{t} + jets", "ttbar", "topMass_tt");
   plotSeparate( "t#bar{t} + jets", "ttbar", "hDamp_tt");
 
-  plotSeparate( "WH120", "WH120", "Pileup");
-  plotSeparate( "WH120", "WH120", "JER");
-  plotSeparate( "WH120", "WH120", "JES");
-  plotSeparate( "WH120", "WH120", "topPt");
-  plotSeparate( "WH120", "WH120", "bcTag1");
-  plotSeparate( "WH120", "WH120", "bcTag2");
-  plotSeparate( "WH120", "WH120", "bcTag3");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "Pileup");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "JER");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "JES");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "topPt");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "bcTag1");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "bcTag2");
+  plotSeparate( "m_{H^{+}} = 120 GeV", "WH120", "bcTag3");
 }
 

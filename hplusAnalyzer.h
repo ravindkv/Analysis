@@ -63,14 +63,15 @@ public :
     //signal samples
     //BR(W->ev) = 10.75± 0.3, BR(W->mv) = 10.57± 0.5
     //http://pdg.lbl.gov/2012/listings/rpp2012-list-w-boson.pdf
-    xss["HplusM100"]         =  831.76*0.2132;   evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  831.76*0.2132;   evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  831.76*0.2132;   evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  831.76*0.2132;   evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  831.76*0.2132;   evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  831.76*0.2132;   evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  831.76*0.2132;   evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  831.76*0.2132;   evtDBS["HplusM90"]          =  988480;
+    //0.12155 = 2*0.065*(1-0.065), where 6.5% is the observed limit for 90 GeV at 8 TeV
+    xss["HplusM100"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM100"]         =  996170; 
+    xss["HplusM120"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM120"]         =  994498; 
+    xss["HplusM140"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM150"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM150"]         =  990645;
+    xss["HplusM155"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM155"]         =  952984;
+    xss["HplusM160"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM160"]         =  992264;
+    xss["HplusM80"]          =  831.76*0.2132*0.12155;   evtDBS["HplusM80"]          =  976710;
+    xss["HplusM90"]          =  831.76*0.2132*0.12155;   evtDBS["HplusM90"]          =  988480;
 
     //qcd muon enriched
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
@@ -108,23 +109,16 @@ public :
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
 
     //DY + jets and W + jets 
-    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62079400;
-    //xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
+    xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  48103700;
-    //xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
-    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  44813600;
-    //xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
+    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
-    // mu channel 
-    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  18707700;
-    // ele channel 
-    ///xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
+    xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29181900;
-    //xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
 
     //VV fusion
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
@@ -229,7 +223,6 @@ private :
 };
 
 float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
-
   int nJets = hepNUP-5;
   if(nJets==0)      return 2.11;
   else if(nJets==1) return 0.23;
@@ -240,7 +233,6 @@ float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
 }
 
 float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
-
   int nJets = hepNUP-5;
   if(nJets==0)      return 0.120;
   else if(nJets==1) return 0.0164;
@@ -265,7 +257,6 @@ BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, cons
 }
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
 Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
-  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   //since the Pt range of 2D histo is <120
@@ -288,7 +279,6 @@ Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
   }	  
 }
 Double_t hplusAnalyzer::getMuonTrigSF(TH2D *h2, double eta, double pt){
-  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   //since the Pt range of 2D histo is <120
@@ -312,7 +302,6 @@ Double_t hplusAnalyzer::getMuonTrigSF(TH2D *h2, double eta, double pt){
 }
 
 Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
- 
   Double_t *eta_array = tg->GetX();
   Double_t *sf_array = tg->GetY();
   Int_t n_points = tg->GetN();
@@ -331,7 +320,6 @@ Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
 }
 
 Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
-  
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   //since the Pt range of 2D histo is <500
@@ -405,18 +393,18 @@ TFile *f_trigSF_GH 		= new TFile("stack/muonSF/triggreSF_GH.root");
 TH2D *h2_trigSF_BCDEF 	= (TH2D*)f_trigSF_BCDEF->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
 TH2D *h2_trigSF_GH 		= (TH2D*)f_trigSF_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/abseta_pt_ratio");
 //Identification SF
-TFile *f_idSF_BCDEF 		= new TFile("stack/muonSF/idSF_BCDEF.root");
+TFile *f_idSF_BCDEF 	= new TFile("stack/muonSF/idSF_BCDEF.root");
 TFile *f_idSF_GH 		= new TFile("stack/muonSF/idSF_GH.root");
-TH2D *h2_idSF_BCDEF 		= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
 TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
 //Isolation SF
-TFile *f_isoSF_BCDEF 		= new TFile("stack/muonSF/isoSF_BCDEF.root");
+TFile *f_isoSF_BCDEF	= new TFile("stack/muonSF/isoSF_BCDEF.root");
 TFile *f_isoSF_GH 		= new TFile("stack/muonSF/isoSF_GH.root");
-TH2D *h2_isoSF_BCDEF 		= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
 TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
 //Tracking SF
 TFile *f_trackSF_BCDEF 	= new TFile("stack/muonSF/trackingSF_BCDEF.root");
-TFile *f_trackSF_GH 		= new TFile("stack/muonSF/trackingSF_GH.root");
+TFile *f_trackSF_GH 	= new TFile("stack/muonSF/trackingSF_GH.root");
 TGraphAsymmErrors *tg_trackSF_BCDEF 	= (TGraphAsymmErrors*)f_trackSF_BCDEF->Get("ratio_eff_aeta_dr030e030_corr");
 TGraphAsymmErrors *tg_trackSF_GH 	= (TGraphAsymmErrors*)f_trackSF_GH->Get("ratio_eff_aeta_dr030e030_corr");
 
@@ -428,8 +416,8 @@ TGraphAsymmErrors *tg_trackSF_GH 	= (TGraphAsymmErrors*)f_trackSF_GH->Get("ratio
 TFile *f_ele_recoSF 	  	= new TFile("stack/eleSF/ele_recoSF.root");
 TH2D *h2_ele_recoSF 		= (TH2D*)f_ele_recoSF->Get("EGamma_SF2D");
 //Identification SF
-TFile *f_ele_veto_idSF 	= new TFile("stack/eleSF/ele_veto_idSF.root");
-TH2D *h2_ele_veto_idSF 	= (TH2D*)f_ele_veto_idSF->Get("EGamma_SF2D");
+TFile *f_ele_veto_idSF      = new TFile("stack/eleSF/ele_veto_idSF.root");
+TH2D *h2_ele_veto_idSF      = (TH2D*)f_ele_veto_idSF->Get("EGamma_SF2D");
 TFile *f_ele_loose_idSF 	= new TFile("stack/eleSF/ele_loose_idSF.root");
 TH2D *h2_ele_loose_idSF 	= (TH2D*)f_ele_loose_idSF->Get("EGamma_SF2D");
 TFile *f_ele_medium_idSF 	= new TFile("stack/eleSF/ele_medium_idSF.root");

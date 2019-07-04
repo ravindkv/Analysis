@@ -58,8 +58,6 @@ class MyMuon
   double pfRelIso;
   double PhotonIso;  
   double PileupIso;
-  double trigger_mu_pt;
-  int quality;
  private :
 
 };

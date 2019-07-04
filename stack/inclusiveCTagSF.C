@@ -2,6 +2,7 @@ TH1F* decorateHisto(TH1F *hist, TString xTitle, TString yTitle,  double xMin, do
   hist->GetXaxis()->SetTitle(xTitle);
   hist->GetXaxis()->SetTitleSize(0.05);
   hist->GetXaxis()->SetLabelSize(0.045);
+  hist->GetXaxis()->SetRangeUser(0.3, 3);
   hist->GetYaxis()->SetTitle(yTitle);
   hist->GetYaxis()->SetTitleSize(0.05);
   hist->GetYaxis()->SetLabelSize(0.045);
@@ -31,18 +32,19 @@ void funcVoidOneHist(TFile *f, TString histName, TString xLable, int color){
     decorateHisto(h, xLable, "", 0.4, 1.8, color);
     h->SetTitle(histName);
     gPad->SetLogy(true);
+    h->GetXaxis()->SetRangeUser(0.3, 3);
     h->Draw("HIST");
     //h->Draw("EP");
     TString outHist(f->GetName());
-    TPaveText *pt = new TPaveText(0.20,0.82,0.38,0.87,"brNDC");
-    pt->AddText("ttbar, e + jets");
+    TPaveText *pt = new TPaveText(0.20,0.75,0.25,0.87,"brNDC");
+    pt->AddText("#splitline{SM t#bar{t}}{#mu + jets}");
     pt->SetFillColor(19);
     pt->SetFillStyle(0);
     pt->SetLineColor(0);
     pt->SetBorderSize(1);
     pt->SetTextSize(0.06);
     pt->Draw("same");
-    //h->SaveAs("CTag/eleExtraNP.pdf");
+    //h->SaveAs("CTag/muExtraNP.pdf");
 }
 
 void funcVoidOneFile(TFile *f){
@@ -61,14 +63,14 @@ void funcVoidOneFile(TFile *f){
   funcVoidOneHist(f, "yMyT", "medium c-tag event weight",kOrange +1); 
   can->cd(6);
   funcVoidOneHist(f, "yMnT", "medium c-tag event weight", 6); 
-  can->SaveAs("CTag/eleExtraNP.pdf");
+  can->SaveAs("CTag/muExtraNP.pdf");
 }
 
 void inclusiveCTagSF(){
   gStyle->SetOptStat("rmei");
   gStyle->SetFrameLineWidth(1);
   gStyle->SetStatH(0.4);
-  gStyle->SetStatW(0.3);
+  gStyle->SetStatW(0.4);
   TFile *fTT = new TFile("all_TTJetsP.root");
   cout<<"-----------"<<fTT->GetName()<<"-----------"<<endl;
   funcVoidOneFile(fTT);

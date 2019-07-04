@@ -25,6 +25,7 @@ using namespace std;
 
 bool isMuChannel = true;
 bool isEleChannel = false;
+bool isBTag = false;
 //-------------------------------------------//
 ///INPUT FILES
 //-------------------------------------------//
@@ -55,7 +56,6 @@ TFile *fWH160     = TFile::Open("all_Hplus160.root");
 //histogram name and range
 TString histName = "pt_bjet" ;
 Float_t xMin_ = 0.0 ;
-//Float_t xMax_ = 200.0 ;
 Float_t xMax_ = 400.0 ;
 //bool isSaveHisto = false;
 bool isSaveHisto = true;
@@ -69,8 +69,8 @@ TH1F* getHisto(TFile *file, TString histName, int histColor, Float_t xMin_ = 0.0
     cout << "Cannot open file "<< endl;
   }
   TH1F* h;
-  //h = (TH1F*)file->Get("base/Iso/BTag/"+histName);
   h = (TH1F*)file->Get("base/Iso/KinFit/"+histName);
+  if(isBTag) h = (TH1F*)file->Get("base/Iso/BTag/"+histName);
   //h->SetMarkerColor(kRed);
   cout<<h->GetNbinsX()<<endl;
   //h->Rebin();
@@ -83,19 +83,28 @@ TH1F* getHisto(TFile *file, TString histName, int histColor, Float_t xMin_ = 0.0
   h->GetXaxis()->SetRangeUser(xMin_, xMax_);
   //h->GetYaxis()->SetRangeUser(0, 40000);
   //h->GetXaxis()->SetTitle(histName);
-  h->GetXaxis()->SetTitle("M_{jj} [GeV]");
-  h->GetYaxis()->SetTitle("Events");
-  h->GetYaxis()->SetTitleOffset(1.60);
+  h->GetXaxis()->SetTitle("m_{jj} (GeV)");
+  h->GetYaxis()->SetTitle("Events / 5 GeV");
+  h->GetYaxis()->SetTitleOffset(1.20);
   h->GetXaxis()->SetTitleOffset(1.20);
-  h->GetYaxis()->SetTitleSize(0.06); 
-  h->GetXaxis()->SetTitleSize(0.06);
-  h->GetXaxis()->SetLabelSize(0.06); 
+  h->GetYaxis()->SetTitleSize(0.05); 
+  h->GetXaxis()->SetTitleSize(0.05);
+  h->GetXaxis()->SetLabelSize(0.05); 
   h->GetXaxis()->LabelsOption("u"); // extra
-  h->GetYaxis()->SetLabelSize(0.06);
+  h->GetYaxis()->SetLabelSize(0.05);
   h->GetXaxis()->SetNdivisions(5);
   h->GetYaxis()->SetNdivisions(5);
   h->SetTitle("");
   return h;
+}
+TPaveText * paveText(double minX, double minY, double maxX, double maxY, int lineColor, int fillColor, int size, int style, int font ){
+  TPaveText *pt = new TPaveText(minX, minY, maxX, maxY, "brNDC"); // good_v1
+  pt->SetBorderSize(size);
+  pt->SetFillColor(fillColor);
+  pt->SetFillStyle(style);
+  pt->SetLineColor(lineColor);
+  pt->SetTextFont(font);
+  return pt;
 }
 
 TH1F* getRatio(TH1F* h1, TH1F* h2, TString histName, int my_color){
@@ -364,43 +373,42 @@ void overLapHistos(){
 
 void overLapHistos_13TeV(){
 
-  //TString histName = "mjj_kfit";
-  TString histName = "mjj";
+  TString dirName = "KinFit";
+  TString histName = "mjj_kfit";
+  if (isBTag){
+    dirName = "BTag";
+    histName = "mjj";
+  }
 
-  gStyle->SetFrameLineWidth(3);
-  // Header
-  TPaveText *header = new TPaveText(0.15,0.90,0.9,0.90, "brNDC");
-  header->SetBorderSize(1);
-  header->SetFillColor(19);
-  header->SetFillStyle(0);
-  header->SetLineColor(0);
-  header->SetTextFont(132);
-  header->SetTextSize(0.060);
-  TText *text = header->AddText("CMS Simulation, #sqrt{s} = 13 TeV, 35.9 fb^{-1}");
+  gStyle->SetFrameLineWidth(2);
+  //pave text CMS box
+  TPaveText *pt = new TPaveText(0.60,0.9054,0.90,0.9362, "brNDC"); 
+  pt->SetBorderSize(1); pt->SetFillColor(19);
+  pt->SetFillStyle(0); pt->SetTextSize(0.05);
+  pt->SetLineColor(0); pt->SetTextFont(132);
+  TText *text = pt->AddText("35.9 fb^{-1} (13 TeV)");
   text->SetTextAlign(11);
-
-  // channel specifiction
-  TPaveText *ch = new TPaveText(0.75,0.80,0.80,0.85,"brNDC");
-  ch->SetFillColor(19);
-  ch->SetFillStyle(0);
-  ch->SetLineColor(0);
-  ch->SetBorderSize(1);
-  ch->SetTextSize(0.060);
-  if(isMuChannel) ch->AddText("#mu + jets");
-  if(isEleChannel) ch->AddText("e + jets");
+  
+  //channel
+  TPaveText *ch = paveText(0.50,0.75,0.55,0.80, 0, 19, 1, 0, 132);
+  ch->SetTextSize(0.05);
+  if(isMuChannel) ch->AddText("#splitline{#mu + jets}{"+ dirName+ "}");
+  if(isEleChannel) ch->AddText("#splitline{e + jets}{" + dirName + "}");
      
   gStyle->SetOptStat(0);
-  TCanvas *c1 = new TCanvas();
-  TLegend* leg = new TLegend(0.75,0.35,0.80,0.70,NULL,"brNDC");
+  TCanvas *c1 = new TCanvas(histName, histName, 800, 800);
+  TLegend* leg = new TLegend(0.65,0.25,0.80,0.70,NULL,"brNDC");
   leg->SetBorderSize(0);
-  leg->SetTextSize(0.05);
+  leg->SetTextSize(0.04);
   leg->SetFillColor(0);
   
+  TGaxis::SetMaxDigits(3);
   //overlay
   c1->cd();
-  gPad->SetLeftMargin(0.18);
-  gPad->SetBottomMargin(0.16); 
-  gPad->SetTopMargin(0.11);
+  gPad->SetLeftMargin(0.13);
+  gPad->SetRightMargin(0.05);
+  gPad->SetBottomMargin(0.13); 
+  //gPad->SetTopMargin(0.11);
  
   cout<<"ttbar"<<endl;
   TH1F* hTT = getHisto(fTT,       histName, 1, xMin_, xMax_);
@@ -432,21 +440,21 @@ void overLapHistos_13TeV(){
   hWH155->Draw("HISTSAME");
   hWH160->Draw("HISTSAME");
   //leg->AddEntry(hTT, "ttbar","PL");
-  leg->AddEntry(hWH80 , "WH80 ","PL");
-  leg->AddEntry(hWH90 , "WH90 ","PL");
-  leg->AddEntry(hWH100, "WH100","PL");
-  leg->AddEntry(hWH120, "WH120","PL");
-  leg->AddEntry(hWH140, "WH140","PL");
-  leg->AddEntry(hWH150, "WH150","PL");
-  leg->AddEntry(hWH155, "WH155","PL");
-  leg->AddEntry(hWH160, "WH160","PL");
+  leg->AddEntry(hWH80 , "m_{H^{+}} = 80 GeV","PL");
+  leg->AddEntry(hWH90 , "m_{H^{+}} = 90 GeV","PL");
+  leg->AddEntry(hWH100, "m_{H^{+}} = 100 GeV","PL");
+  leg->AddEntry(hWH120, "m_{H^{+}} = 120 GeV","PL");
+  leg->AddEntry(hWH140, "m_{H^{+}} = 140 GeV","PL");
+  leg->AddEntry(hWH150, "m_{H^{+}} = 150 GeV","PL");
+  leg->AddEntry(hWH155, "m_{H^{+}} = 155 GeV","PL");
+  leg->AddEntry(hWH160, "m_{H^{+}} = 160 GeV","PL");
   leg->Draw();
   ch->Draw();
-  header->Draw();
+  pt->Draw();
   if(isSaveHisto){
     TString outFile("$PWD/");
-    if(isMuChannel) outFile += histName+"_mu.pdf";
-    if(isEleChannel) outFile += histName+"_ele.pdf";
+    if(isMuChannel) outFile += "sig_"+dirName+"_"+histName+"_mu.pdf";
+    if(isEleChannel) outFile += "sig_"+dirName+"_"+histName+"_ele.pdf";
     c1->SaveAs(outFile);
     //c1->Close();
   }

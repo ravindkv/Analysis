@@ -13,14 +13,13 @@ using namespace std;
  
 ///////////////////////////////////////////  
 //CHANNEL
-bool isMuChannel = false;
-bool isEleChannel = true;
+bool isMuChannel = true;
+bool isEleChannel = false;
 TString baseIsoDir = "baseLowMET";
 //TString baseIsoDir = "baseIso20LowMET";
 
 //INPUT FILES
-TFile* fData = TFile::Open("all_EleData.root");
-//TFile *fData  = TFile::Open("all_muData.root");
+TFile* fData = TFile::Open("all_Data.root");
 
 TFile* fVV	= TFile::Open("all_VV.root");
 TFile* fDY	= TFile::Open("all_DY.root");
@@ -52,6 +51,25 @@ TH1F* getHisto(TFile *histFile, TString dirBase, TString dirIso, TString dirBTag
   return hist;
 }
 
+void makeHistoPositive(TH1F* hist, bool setErrorZero = false){
+  for(int ibin=1; ibin<hist->GetNbinsX(); ibin++){
+    double binCont = hist->GetBinContent(ibin);
+    if(binCont<0){
+      hist->SetBinContent(ibin, 0);
+      if(setErrorZero) hist->SetBinError(ibin, 0);
+    }
+  }
+}
+TPaveText * paveText(double minX, double minY, double maxX, double maxY, int lineColor, int fillColor, int size, int style, int font ){
+  TPaveText *pt = new TPaveText(minX, minY, maxX, maxY, "brNDC"); // good_v1
+  pt->SetBorderSize(size);
+  pt->SetFillColor(fillColor);
+  pt->SetFillStyle(style);
+  pt->SetLineColor(lineColor);
+  pt->SetTextFont(font);
+  return pt;
+}
+
 //*-------------------------------
 //* function for (Data -nonQCDBkg)
 //*-------------------------------
@@ -81,6 +99,7 @@ TH1F * dataMCdiff(TString dirIso, TString dirBTag, TString histname, TString xax
   hDiff->GetYaxis()->SetLabelSize(0.05); hDiff->GetYaxis()->LabelsOption("u"); // extra
   ///hDiff->Draw("e1"); // use "P" or "AP"
   //hDiff->Draw("E same");
+  makeHistoPositive(hDiff, false);
   return hDiff;
 }
 
@@ -90,7 +109,7 @@ TH1F * dataMCdiff(TString dirIso, TString dirBTag, TString histname, TString xax
 
 void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TString histname, TString xaxis_title, double xmin=0, double xmax = 100){
   gStyle->SetOptStat(0);
-  gStyle->SetFrameLineWidth(3);
+  gStyle->SetFrameLineWidth(2);
   const float xpad[2] = {0.0, 1.0};
   const float ypad[3] = {0.0, 0.30,0.98};
   TCanvas *canv = new TCanvas();
@@ -109,21 +128,19 @@ void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TStri
   leg->SetFillColor(10); leg->SetTextSize(0.07);
 
   //pave text CMS box
-  TPaveText *pt = new TPaveText(0.11,0.9354,0.90,0.9362, "brNDC"); // good_v1
+  TPaveText *pt = new TPaveText(0.65,0.9354,0.90,0.9362, "brNDC"); 
   pt->SetBorderSize(1); pt->SetFillColor(19);
   pt->SetFillStyle(0); pt->SetTextSize(0.08);
   pt->SetLineColor(0); pt->SetTextFont(132);
-  TText *text = pt->AddText(dirBTag+": #sqrt{s}=13 TeV, 35.9 fb^{-1}; ");
+  TText *text = pt->AddText("35.9 fb^{-1} (13 TeV)");
   text->SetTextAlign(11);
   
-  //pave text channel box
-  TPaveText *ch = new TPaveText(1.00,0.9154898,0.7510067,0.9762187,"brNDC");
-  ch->SetFillColor(19); ch->SetFillStyle(0);
-  ch->SetLineColor(0); ch->SetTextSize(0.08);
-  ch->SetBorderSize(1);
-  if(isMuChannel) ch->AddText("#mu + jets");
-  if(isEleChannel) ch->AddText("e + jets");
-  
+  //channel
+  TPaveText *ch = paveText(0.50,0.75,0.55,0.80, 0, 19, 1, 0, 132);
+  ch->SetTextSize(0.08);
+  if(isMuChannel) ch->AddText("#splitline{#mu + jets}{"+ dirBTag+ "}");
+  if(isEleChannel) ch->AddText("#splitline{e + jets}{" + dirBTag + "}");
+
   //data-MC from isolated region
   TH1F *hDiff = dataMCdiff(dirIso, dirBTag, histname, xaxis_title, 1, true, true, xmin, xmax);
   leg->AddEntry(hDiff,"Iso","P");
@@ -131,7 +148,7 @@ void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TStri
   hDiff->SetLineColor(kRed);
   hDiff->Scale(1/hDiff->Integral());
   cout<<hDiff->GetMaximum()<<endl;
-  hDiff->GetYaxis()->SetRangeUser(-0.05,  1.2*hDiff->GetMaximum());
+  hDiff->GetYaxis()->SetRangeUser(-0.05,  1.5*hDiff->GetMaximum());
   hDiff->GetYaxis()->SetTitleOffset(1.00);
   hDiff->GetYaxis()->SetTitleSize(0.08);   
   hDiff->GetYaxis()->SetLabelSize(0.08);   
@@ -160,7 +177,7 @@ void dataMCdiffOverlap(TString dirIso, TString dirNoniso, TString dirBTag, TStri
   hRatio->Reset();
   hRatio->Add(hDiff);
   hRatio->Divide(hDiff_NonIso); hRatio->SetMarkerStyle(20); hRatio->SetMarkerSize(0.8);
-  hRatio->SetMarkerColor(kBlack); hRatio->SetLineColor(kBlack); hRatio->GetYaxis()->SetRangeUser(-10, 10);
+  hRatio->SetMarkerColor(kBlack); hRatio->SetLineColor(kBlack); hRatio->GetYaxis()->SetRangeUser(-5, 5);
   //hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
   hRatio->GetXaxis()->SetTickLength(0.13); 
   hRatio->GetYaxis()->SetTickLength(0.04); 

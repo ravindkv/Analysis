@@ -41,6 +41,7 @@ TGraphAsymmErrors* getLimit( TString dir, TString file, TString comment1, int hi
   g1->SetLineColor(histColor);
   g1->SetLineWidth(3);
   g1->GetYaxis()->SetNdivisions(10);
+  g1->GetYaxis()->SetMoreLogLabels(true);
   //g1->SetTitle(comment1);
   g1->GetXaxis()->SetLimits(75,165);
   g1->GetYaxis()->SetTitleOffset(1.53);
@@ -48,11 +49,11 @@ TGraphAsymmErrors* getLimit( TString dir, TString file, TString comment1, int hi
   g1->SetMinimum(yMin_);
   //g1->GetYaxis()->SetRangeUser(0.5, 3);
   g1->SetMaximum(yMax_);
-  g1->GetXaxis()->SetTitle("M_{H^{+}} (GeV)");
+  g1->GetXaxis()->SetTitle("m_{H^{+}} (GeV)");
   g1->GetXaxis()->SetTitleSize(0.05);
   g1->GetYaxis()->SetTitleSize(0.05);
   //g1->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{#pm})");
-  g1->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{+})");
+  g1->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow H^{+}b)");
   cout<<comment1<<endl;
   return g1;
 }
@@ -75,7 +76,7 @@ void compareLimit_13TeV(bool isObs=true){
   TGraphAsymmErrors* g_mu2 = getLimit("limit/mu/Cat2_cTagInc","limit_mu_Cat2_cTagInc.root", "mu+jets", 2, true, isObs, 0.0, 0.1);
   TGraphAsymmErrors* g_mu3 = getLimit("limit/mu/Cat3_cTagEx","limit_mu_Cat3_cTagEx.root", "mu+jets", 3, true, isObs, 0.0, 0.1);
   c1->cd(1);
-  g_mu1->GetXaxis()->SetTitle("M_{H^{#pm}} (GeV)");
+  g_mu1->GetXaxis()->SetTitle("m_{H^{#pm}} (GeV)");
   //g_mu1->GetYaxis()->SetTitle("95% CL limit for BR(t#rightarrow bH^{#pm})"); 
   gStyle->SetFrameLineWidth(3);
   g_mu1->GetXaxis()->SetLimits(85,165);
@@ -89,6 +90,7 @@ void compareLimit_13TeV(bool isObs=true){
   g_mu1->GetXaxis()->SetTickLength(0.07);
   g_mu1->GetYaxis()->SetTickLength(0.04);
   g_mu1->GetYaxis()->SetTitleOffset(1.73);
+  g_mu1->GetYaxis()->SetMoreLogLabels(true);
   if(isObs){
     g_mu1->Draw("ALP3");
     g_mu2->Draw("ALP3same");
@@ -100,9 +102,9 @@ void compareLimit_13TeV(bool isObs=true){
     g_mu3->Draw("LPsame");
   }
   gPad->Modified();
-  leg_mu->AddEntry(g_mu1,"mu+jets: M_{jj}^{Inc}","PL");
-  leg_mu->AddEntry(g_mu2,"mu+jets: M_{jj}^{Inc_CTagL}","PL");
-  leg_mu->AddEntry(g_mu3,"mu+jets: M_{jj}^{Ex_CTag}","PL");
+  leg_mu->AddEntry(g_mu1,"mu+jets: m_{jj}^{Inc}","PL");
+  leg_mu->AddEntry(g_mu2,"mu+jets: m_{jj}^{Inc_CTagL}","PL");
+  leg_mu->AddEntry(g_mu3,"mu+jets: m_{jj}^{Ex_CTag}","PL");
   leg_mu->Draw();
   
   //electron channel 
@@ -136,9 +138,9 @@ void compareLimit_13TeV(bool isObs=true){
     g_ele3->Draw("LPsame");
   }
   gPad->Modified();
-  leg_ele->AddEntry(g_ele1,"ele+jets: M_{jj}^{Inc}","PL");
-  leg_ele->AddEntry(g_ele2,"ele+jets: M_{jj}^{Inc_CTagL}","PL");
-  leg_ele->AddEntry(g_ele3,"ele+jets: M_{jj}^{Ex_CTag}","PL");
+  leg_ele->AddEntry(g_ele1,"ele+jets: m_{jj}^{Inc}","PL");
+  leg_ele->AddEntry(g_ele2,"ele+jets: m_{jj}^{Inc_CTagL}","PL");
+  leg_ele->AddEntry(g_ele3,"ele+jets: m_{jj}^{Ex_CTag}","PL");
   leg_ele->Draw();
 
   
@@ -173,9 +175,9 @@ void compareLimit_13TeV(bool isObs=true){
     g_lep3->Draw("LPsame");
   }
   gPad->Modified();
-  leg_lep->AddEntry(g_lep1,"lep+jets: M_{jj}^{Inc}","PL");
-  leg_lep->AddEntry(g_lep2,"lep+jets: M_{jj}^{Inc_CTagL}","PL");
-  leg_lep->AddEntry(g_lep3,"lep+jets: M_{jj}^{Ex_CTag}","PL");
+  leg_lep->AddEntry(g_lep1,"lep+jets: m_{jj}^{Inc}","PL");
+  leg_lep->AddEntry(g_lep2,"lep+jets: m_{jj}^{Inc_CTagL}","PL");
+  leg_lep->AddEntry(g_lep3,"lep+jets: m_{jj}^{Ex_CTag}","PL");
   leg_lep->Draw();
   
   TLegend* leg_comb = new TLegend(0.30,0.32,0.60,0.90,NULL,"brNDC");
@@ -207,26 +209,26 @@ void compareLimit_13TeV(bool isObs=true){
   }
   gPad->Modified();
   if(isObs){
-    leg_comb->AddEntry(g_mu1,"mu+jets: M_{jj}^{Inc}","ALP");
-    leg_comb->AddEntry(g_mu2,"mu+jets: M_{jj}^{Inc_CTagL}","ALP");
-    leg_comb->AddEntry(g_mu3,"mu+jets: M_{jj}^{Ex_CTag}","ALP");
-    leg_comb->AddEntry(g_ele1,"ele+jets: M_{jj}^{Inc}","ALP");
-    leg_comb->AddEntry(g_ele2,"ele+jets: M_{jj}^{Inc_CTagL}","ALP");
-    leg_comb->AddEntry(g_ele3,"ele+jets: M_{jj}^{Ex_CTag}","ALP");
-    leg_comb->AddEntry(g_lep1,"lep+jets: M_{jj}^{Inc}","ALP");
-    leg_comb->AddEntry(g_lep2,"lep+jets: M_{jj}^{Inc_CTagL}","ALP");
-    leg_comb->AddEntry(g_lep3,"lep+jets: M_{jj}^{Ex_CTag}","ALP");
+    leg_comb->AddEntry(g_mu1,"mu+jets: m_{jj}^{Inc}","ALP");
+    leg_comb->AddEntry(g_mu2,"mu+jets: m_{jj}^{Inc_CTagL}","ALP");
+    leg_comb->AddEntry(g_mu3,"mu+jets: m_{jj}^{Ex_CTag}","ALP");
+    leg_comb->AddEntry(g_ele1,"ele+jets  m_{jj}^{Inc}","ALP");
+    leg_comb->AddEntry(g_ele2,"ele+jets: m_{jj}^{Inc_CTagL}","ALP");
+    leg_comb->AddEntry(g_ele3,"ele+jets: m_{jj}^{Ex_CTag}","ALP");
+    leg_comb->AddEntry(g_lep1,"lep+jets: m_{jj}^{Inc}","ALP");
+    leg_comb->AddEntry(g_lep2,"lep+jets: m_{jj}^{Inc_CTagL}","ALP");
+    leg_comb->AddEntry(g_lep3,"lep+jets: m_{jj}^{Ex_CTag}","ALP");
   }
   else{
-    leg_comb->AddEntry(g_mu1,"mu+jets: M_{jj}^{Inc}","PL");
-    leg_comb->AddEntry(g_mu2,"mu+jets: M_{jj}^{Inc_CTagL}","PL");
-    leg_comb->AddEntry(g_mu3,"mu+jets: M_{jj}^{Ex_CTag}","PL");
-    leg_comb->AddEntry(g_ele1,"ele+jets: M_{jj}^{Inc}","PL");
-    leg_comb->AddEntry(g_ele2,"ele+jets: M_{jj}^{Inc_CTagL}","PL");
-    leg_comb->AddEntry(g_ele3,"ele+jets: M_{jj}^{Ex_CTag}","PL");
-    leg_comb->AddEntry(g_lep1,"lep+jets: M_{jj}^{Inc}","PL");
-    leg_comb->AddEntry(g_lep2,"lep+jets: M_{jj}^{Inc_CTagL}","PL");
-    leg_comb->AddEntry(g_lep3,"lep+jets: M_{jj}^{Ex_CTag}","PL");
+    leg_comb->AddEntry(g_mu1,"mu+jets: m_{jj}^{Inc}","PL");
+    leg_comb->AddEntry(g_mu2,"mu+jets: m_{jj}^{Inc_CTagL}","PL");
+    leg_comb->AddEntry(g_mu3,"mu+jets: m_{jj}^{Ex_CTag}","PL");
+    leg_comb->AddEntry(g_ele1,"ele+jets: m_{jj}^{Inc}","PL");
+    leg_comb->AddEntry(g_ele2,"ele+jets: m_{jj}^{Inc_CTagL}","PL");
+    leg_comb->AddEntry(g_ele3,"ele+jets: m_{jj}^{Ex_CTag}","PL");
+    leg_comb->AddEntry(g_lep1,"lep+jets: m_{jj}^{Inc}","PL");
+    leg_comb->AddEntry(g_lep2,"lep+jets: m_{jj}^{Inc_CTagL}","PL");
+    leg_comb->AddEntry(g_lep3,"lep+jets: m_{jj}^{Ex_CTag}","PL");
   }
   leg_comb->Draw();
   
@@ -246,7 +248,7 @@ void compareLimit_13TeV(bool isObs=true){
   //c1->Close();
 }
 
-void MyCompareLimits(bool isObs=true){
+void MyCompareLimits(bool isObs=false){
   gStyle->SetFrameLineWidth(3);
   TCanvas *c1 = new TCanvas("c1","",5,30,950,900);
   c1->SetGridy();
@@ -318,38 +320,38 @@ void MyCompareLimits(bool isObs=true){
     g_lep3->Draw("Lsame");
   }
 
-  TLegend* leg_comb = new TLegend(0.50,0.45,0.80,0.85,NULL,"brNDC");
+  TLegend* leg_comb = new TLegend(0.50,0.50,0.80,0.85,NULL,"brNDC");
   //TLegend* leg_comb = new TLegend(0.30,0.65,0.90,0.85,NULL,"brNDC");
   leg_comb->SetBorderSize(0);
   leg_comb->SetTextSize(0.03);
   leg_comb->SetFillColor(0);
   //leg_comb->SetNColumns(2);
   if(isObs){
-    leg_comb->AddEntry(g_mu1,"mu+jets: Cat1(Inc)","LP");
-    leg_comb->AddEntry(g_mu2,"mu+jets: Cat2(Inc CTagL)","LP");
-    leg_comb->AddEntry(g_mu3,"mu+jets: Cat3(Ex CTag)","LP");
-    leg_comb->AddEntry(g_ele1,"ele+jets: Cat1(Inc)","LP");
-    leg_comb->AddEntry(g_ele2,"ele+jets: Cat2(Inc CTagL)","LP");
-    leg_comb->AddEntry(g_ele3,"ele+jets: Cat3(Ex CTag)","LP");
-    leg_comb->AddEntry(g_lep1,"lep+jets: Cat1(Inc)","LP");
-    leg_comb->AddEntry(g_lep2,"lep+jets: Cat2(Inc CTagL)","LP");
-    leg_comb->AddEntry(g_lep3,"lep+jets: Cat3(Ex CTag)","LP");
+    leg_comb->AddEntry(g_mu1,"#mu+jets: Cat1(Inc)","LP");
+    leg_comb->AddEntry(g_mu2,"#mu+jets: Cat2(Inc CTagL)","LP");
+    leg_comb->AddEntry(g_mu3,"#mu+jets: Cat3(Ex CTag)","LP");
+    leg_comb->AddEntry(g_ele1,"e+jets: Cat1(Inc)","LP");
+    leg_comb->AddEntry(g_ele2,"e+jets: Cat2(Inc CTagL)","LP");
+    leg_comb->AddEntry(g_ele3,"e+jets: Cat3(Ex CTag)","LP");
+    leg_comb->AddEntry(g_lep1,"l+jets: Cat1(Inc)","LP");
+    leg_comb->AddEntry(g_lep2,"l+jets: Cat2(Inc CTagL)","LP");
+    leg_comb->AddEntry(g_lep3,"l+jets: Cat3(Ex CTag)","LP");
   }
   else{
-    leg_comb->AddEntry(g_mu1,"mu+jets: Cat1(Inc)","L");
-    leg_comb->AddEntry(g_mu2,"mu+jets: Cat2(Inc CTagL)","L");
-    leg_comb->AddEntry(g_mu3,"mu+jets: Cat3(Ex CTag)","L");
-    leg_comb->AddEntry(g_ele1,"ele+jets: Cat1(Inc)","L");
-    leg_comb->AddEntry(g_ele2,"ele+jets: Cat2(Inc CTagL)","L");
-    leg_comb->AddEntry(g_ele3,"ele+jets: Cat3(Ex CTag)","L");
-    leg_comb->AddEntry(g_lep1,"lep+jets: Cat1(Inc)","L");
-    leg_comb->AddEntry(g_lep2,"lep+jets: Cat2(Inc CTagL)","L");
-    leg_comb->AddEntry(g_lep3,"lep+jets: Cat3(Ex CTag)","L");
+    leg_comb->AddEntry(g_mu1,"#mu+jets: Cat1(Inc)","L");
+    leg_comb->AddEntry(g_mu2,"#mu+jets: Cat2(Inc CTagL)","L");
+    leg_comb->AddEntry(g_mu3,"#mu+jets: Cat3(Ex CTag)","L");
+    leg_comb->AddEntry(g_ele1,"e+jets: Cat1(Inc)","L");
+    leg_comb->AddEntry(g_ele2,"e+jets: Cat2(Inc CTagL)","L");
+    leg_comb->AddEntry(g_ele3,"e+jets: Cat3(Ex CTag)","L");
+    leg_comb->AddEntry(g_lep1,"l+jets: Cat1(Inc)","L");
+    leg_comb->AddEntry(g_lep2,"l+jets: Cat2(Inc CTagL)","L");
+    leg_comb->AddEntry(g_lep3,"l+jets: Cat3(Ex CTag)","L");
   }
   leg_comb->Draw();
 
   //pave text CMS box
-  TPaveText *pt = new TPaveText(0.15,0.9354,0.80,0.9362, "brNDC"); // good_v1
+  TPaveText *pt = new TPaveText(0.15,0.9154,0.80,0.9162, "brNDC"); // good_v1
   pt->SetBorderSize(1);
   pt->SetFillColor(19);
   pt->SetFillStyle(0);
@@ -357,7 +359,7 @@ void MyCompareLimits(bool isObs=true){
   pt->SetLineColor(0);
   pt->SetTextFont(132);
   //TText *text = pt->AddText("#sqrt{s}=13 TeV, 35.9 fb^{-1} ");
-  TText *text = pt->AddText("CMS Preliminary,    #sqrt{s} = 13 TeV,    35.9 fb^{-1}");
+  TText *text = pt->AddText("CMS Preliminary                              35.9 fb^{-1} (13 TeV)");
   text->SetTextAlign(11);
   pt->Draw();
   

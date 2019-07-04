@@ -92,7 +92,7 @@ void gofPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc", TString MASS="90"
   histData->SetLineColor(kOrange+7);
   histData->SetLineWidth(2);
   treeData->Draw("limit>>histData");
-  //histData->Draw("same");
+  histData->Draw("same");
 
   TLegend* leg = new TLegend(0.20,0.50,0.40,0.75,NULL,"brNDC");
   leg->SetBorderSize(0);
@@ -122,13 +122,13 @@ void gofPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc", TString MASS="90"
   cout << "histToy->GetMean():  " << histToy->GetMean() << endl;
  
   //Pavetext
-  TPaveText *pt = paveText(0.20,0.9554,0.82,0.9562, 0, 19, 1, 0, 132);
-  pt->SetTextSize(0.07);
-  TText *text = pt->AddText("#sqrt{s} = 13 TeV, 35.9 fb^{-1},        l + jets(Cat3)");
+  TPaveText *pt = paveText(0.50,0.9254,0.82,0.9562, 0, 19, 1, 0, 132);
+  pt->SetTextSize(0.06);
+  TText *text = pt->AddText("l + jets         35.9 fb^{-1} (13 TeV) ");
   pt->Draw();
   TPaveText *cct = paveText(0.25,0.85,0.45,0.85, 0, 19, 1, 0, 132);
-  cct->SetTextSize(0.06);
-  cct->AddText("M_{H^{+}} = "+MASS+" GeV");
+  cct->SetTextSize(0.05);
+  cct->AddText("m_{H^{+}} = "+MASS+" GeV");
   cct->Draw();
   
   TString outDir = "limit/"+CHANNEL+"/"+CAT+"/Mass"+MASS;

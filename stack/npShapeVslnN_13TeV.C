@@ -35,7 +35,7 @@ TH1F * getHisto(TFile *f, TString histName){
     if(!(f->Get(histName)))
        throw  exception_msg.c_str();
   }catch (const char *e){
-    //cout<<"WARNING : "<<e<<endl;
+    cout<<"WARNING : "<<e<<endl;
   }
   //exit(0);
   if(!(f->Get(histName))){
@@ -172,7 +172,7 @@ TCanvas * compareMjjOneSys(TH1F* hBase, TH1F* hUp, TH1F* hDown, TString process,
   pt->SetBorderSize(1);
   pt->SetTextSize(0.06);
 
-  hBase->GetXaxis()->SetTitle("M_{jj} [GeV]");
+  hBase->GetXaxis()->SetTitle("m_{jj} [GeV]");
   hBase->Draw("HIST");
   hUp->Draw("HISTSAME");
   hDown->Draw("HISTSAME");
@@ -195,7 +195,7 @@ TCanvas * compareMjjOneSys(TH1F* hBase, TH1F* hUp, TH1F* hDown, TString process,
   //hRatio_Up->GetXaxis()->SetRangeUser(xmin, xmax);
   hRatio_Up->GetXaxis()->SetTickLength(0.13); 
   hRatio_Up->GetYaxis()->SetTickLength(0.04); 
-  hRatio_Up->GetXaxis()->SetTitle("M_{jj} [GeV]"); 
+  hRatio_Up->GetXaxis()->SetTitle("m_{jj} [GeV]"); 
   hRatio_Up->GetYaxis()->SetTitleOffset(0.50);
   hRatio_Up->GetXaxis()->SetTitleOffset(1.10);
   hRatio_Up->GetYaxis()->SetTitle("Ratio"); hRatio_Up->GetYaxis()->CenterTitle();
@@ -282,7 +282,7 @@ TCanvas * compareRatioGraph(TH1F* hBase, TH1F* hUp, TH1F* hDown, TString process
   hRatio_Up->GetXaxis()->SetTickLength(0.04); 
   hRatio_Up->GetYaxis()->SetNdivisions(5);
   hRatio_Up->GetYaxis()->SetTickLength(0.04); 
-  hRatio_Up->GetXaxis()->SetTitle("M_{jj} [GeV]"); 
+  hRatio_Up->GetXaxis()->SetTitle("m_{jj} (GeV)"); 
   hRatio_Up->GetYaxis()->SetTitleOffset(0.90);
   hRatio_Up->GetXaxis()->SetTitleOffset(0.90);
   hRatio_Up->GetYaxis()->SetTitle("Ratio (Unc/Base)"); 
@@ -316,13 +316,13 @@ TCanvas * compareRatioGraph(TH1F* hBase, TH1F* hUp, TH1F* hDown, TString process
 }
 
 void npShapeVslnN_13TeV(){
-  bool isPrint = false;
+  bool isPrint = true;
   bool isSig = false;
   bool isBkg = true;
   bool isHist = false;
   bool isGraph = true;
   std::vector<std::string> mjjFiles;
-  string filePath = "/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_25/src/HiggsAnalysis/HplusTocs13TeVLimit/Limit/limit/mu_ele/";
+  string filePath = "/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_26/src/HiggsAnalysis/HplusTocs13TeVLimit/limit/mu_ele";
   mjjFiles.push_back(filePath+"/Cat3_cTagEx/Mass120/Shapes_hcs_13TeV_mu_KinFit_mjj_kfit_CTagExL_WH120.root"); 
   mjjFiles.push_back(filePath+"/Cat3_cTagEx/Mass120/Shapes_hcs_13TeV_mu_KinFit_mjj_kfit_CTagExM_WH120.root"); 
   mjjFiles.push_back(filePath+"/Cat3_cTagEx/Mass120/Shapes_hcs_13TeV_mu_KinFit_mjj_kfit_CTagExT_WH120.root"); 
@@ -370,12 +370,12 @@ void npShapeVslnN_13TeV(){
     TH1F* hBkgJESDown = getAllBkgHist(f, "_JESDown");
     TH1F* hBkgJERUp = getAllBkgHist(f, "_JERUp");
     TH1F* hBkgJERDown = getAllBkgHist(f, "_JERDown");
-    TH1F* hBkgbcTagUp2 = getAllBkgHist(f, "_bcTagUp2");
-    TH1F* hBkgbcTagDown2 = getAllBkgHist(f, "_bcTagDown2");
-    TH1F* hBkgbcTagUp1 = getAllBkgHist(f, "_bcTagUp1");
-    TH1F* hBkgbcTagDown1 = getAllBkgHist(f, "_bcTagDown1");
-    TH1F* hBkgbcTagUp3 = getAllBkgHist(f, "_bcTagUp3");
-    TH1F* hBkgbcTagDown3 = getAllBkgHist(f, "_bcTagDown3");
+    TH1F* hBkgbcTag2Up = getAllBkgHist(f, "_bcTag2Up");
+    TH1F* hBkgbcTag2Down = getAllBkgHist(f, "_bcTag2Down");
+    TH1F* hBkgbcTag1Up = getAllBkgHist(f, "_bcTag1Up");
+    TH1F* hBkgbcTag1Down = getAllBkgHist(f, "_bcTag1Down");
+    TH1F* hBkgbcTag3Up = getAllBkgHist(f, "_bcTag3Up");
+    TH1F* hBkgbcTag3Down = getAllBkgHist(f, "_bcTag3Down");
     TH1F* hTTbarmassUp = getHisto(f, "ttbar_topMass_ttUp");
     TH1F* hTTbarmassDown = getHisto(f, "ttbar_topMass_ttDown");
     TH1F* hTTbarscaleUp = getHisto(f, "ttbar_scaleRF_ttUp");
@@ -393,13 +393,13 @@ void npShapeVslnN_13TeV(){
       TCanvas * c_BkgJER =compareMjjOneSys(hBkg, hBkgJERUp, hBkgJERDown, "AllBkg", "JER", cat_);
       canBkg->cd(2);
       c_BkgJER->DrawClonePad();
-      TCanvas * c_BkgcTag = compareMjjOneSys(hBkg, hBkgbcTagUp2, hBkgbcTagDown2, "AllBkg", "bcTagInc2", cat_);
+      TCanvas * c_BkgcTag = compareMjjOneSys(hBkg, hBkgbcTag2Up, hBkgbcTag2Down, "AllBkg", "bcTagInc2", cat_);
       canBkg->cd(4);
       c_BkgcTag->DrawClonePad();
-      TCanvas * c_BkgbTag = compareMjjOneSys(hBkg, hBkgbcTagUp1, hBkgbcTagDown1, "AllBkg", "bcTagInc1", cat_);
+      TCanvas * c_BkgbTag = compareMjjOneSys(hBkg, hBkgbcTag1Up, hBkgbcTag1Down, "AllBkg", "bcTagInc1", cat_);
       canBkg->cd(3);
       c_BkgbTag->DrawClonePad();
-      TCanvas * c_BkgPileup = compareMjjOneSys(hBkg, hBkgbcTagUp3, hBkgbcTagDown3, "AllBkg", "bcTagInc3", cat_);
+      TCanvas * c_BkgPileup = compareMjjOneSys(hBkg, hBkgbcTag3Up, hBkgbcTag3Down, "AllBkg", "bcTagInc3", cat_);
       canBkg->cd(5);
       c_BkgPileup->DrawClonePad();
       TCanvas * c_TTbarmass = compareMjjOneSys(hTTbar, hTTbarmassUp, hTTbarmassDown, "ttbar", "mass", cat_);
@@ -428,13 +428,13 @@ void npShapeVslnN_13TeV(){
       TCanvas * c_GraphBkgJER =compareRatioGraph(hBkg, hBkgJERUp, hBkgJERDown, "AllBkg", "JER", cat_);
       canBkgGraph->cd(2);
       c_GraphBkgJER->DrawClonePad();
-      TCanvas * c_GraphBkgcTag = compareRatioGraph(hBkg, hBkgbcTagUp2, hBkgbcTagDown2, "AllBkg", "bcTagInc2", cat_);
+      TCanvas * c_GraphBkgcTag = compareRatioGraph(hBkg, hBkgbcTag2Up, hBkgbcTag2Down, "AllBkg", "bcTagInc2", cat_);
       canBkgGraph->cd(4);
       c_GraphBkgcTag->DrawClonePad();
-      TCanvas * c_GraphBkgbTag = compareRatioGraph(hBkg, hBkgbcTagUp1, hBkgbcTagDown1, "AllBkg", "bcTagInc1", cat_);
+      TCanvas * c_GraphBkgbTag = compareRatioGraph(hBkg, hBkgbcTag1Up, hBkgbcTag1Down, "AllBkg", "bcTagInc1", cat_);
       canBkgGraph->cd(3);
       c_GraphBkgbTag->DrawClonePad();
-      TCanvas * c_GraphBkgPileup = compareRatioGraph(hBkg, hBkgbcTagUp3, hBkgbcTagDown3, "AllBkg", "bcTagInc3", cat_);
+      TCanvas * c_GraphBkgPileup = compareRatioGraph(hBkg, hBkgbcTag3Up, hBkgbcTag3Down, "AllBkg", "bcTagInc3", cat_);
       canBkgGraph->cd(5);
       c_GraphBkgPileup->DrawClonePad();
       TCanvas * c_GraphTTbarmass = compareRatioGraph(hTTbar, hTTbarmassUp, hTTbarmassDown, "ttbar", "topMass", cat_);
@@ -462,12 +462,12 @@ void npShapeVslnN_13TeV(){
     TH1F* hSigJESDown = getHisto(f, "WH120_JESDown");
     TH1F* hSigJERUp = getHisto(f, "WH120_JERUp");
     TH1F* hSigJERDown = getHisto(f, "WH120_JERDown");
-    TH1F* hSigbcTagUp2 = getHisto(f, "WH120_bcTagUp2");
-    TH1F* hSigbcTagDown2 = getHisto(f, "WH120_bcTagDown2");
-    TH1F* hSigbcTagUp1 = getHisto(f, "WH120_bcTagUp1");
-    TH1F* hSigbcTagDown1 = getHisto(f, "WH120_bcTagDown1");
-    TH1F* hSigbcTagUp3 = getHisto(f, "WH120_bcTagUp3");
-    TH1F* hSigbcTagDown3 = getHisto(f, "WH120_bcTagDown3");
+    TH1F* hSigbcTag2Up = getHisto(f, "WH120_bcTag2Up");
+    TH1F* hSigbcTag2Down = getHisto(f, "WH120_bcTag2Down");
+    TH1F* hSigbcTag1Up = getHisto(f, "WH120_bcTag1Up");
+    TH1F* hSigbcTag1Down = getHisto(f, "WH120_bcTag1Down");
+    TH1F* hSigbcTag3Up = getHisto(f, "WH120_bcTag3Up");
+    TH1F* hSigbcTag3Down = getHisto(f, "WH120_bcTag3Down");
     TH1F* hSigtopPtUp = getHisto(f, "WH120_topPtUp");
     TH1F* hSigtopPtDown = getHisto(f, "WH120_topPtDown");
     if(isSig && isHist){//Histogram
@@ -479,13 +479,13 @@ void npShapeVslnN_13TeV(){
       TCanvas * c_SigJER =compareMjjOneSys(hSig, hSigJERUp, hSigJERDown, "WH120", "JER", cat_);
       canSig->cd(2);
       c_SigJER->DrawClonePad();
-      TCanvas * c_SigcTag = compareMjjOneSys(hSig, hSigbcTagUp2, hSigbcTagDown2, "WH120", "bcTagInc2", cat_);
+      TCanvas * c_SigcTag = compareMjjOneSys(hSig, hSigbcTag2Up, hSigbcTag2Down, "WH120", "bcTagInc2", cat_);
       canSig->cd(4);
       c_SigcTag->DrawClonePad();
-      TCanvas * c_SigbTag = compareMjjOneSys(hSig, hSigbcTagUp1, hSigbcTagDown1, "WH120", "bcTagInc1", cat_);
+      TCanvas * c_SigbTag = compareMjjOneSys(hSig, hSigbcTag1Up, hSigbcTag1Down, "WH120", "bcTagInc1", cat_);
       canSig->cd(3);
       c_SigbTag->DrawClonePad();
-      TCanvas * c_SigPileup = compareMjjOneSys(hSig, hSigbcTagUp3, hSigbcTagDown3, "WH120", "bcTagInc3", cat_);
+      TCanvas * c_SigPileup = compareMjjOneSys(hSig, hSigbcTag3Up, hSigbcTag3Down, "WH120", "bcTagInc3", cat_);
       canSig->cd(5);
       c_SigPileup->DrawClonePad();
       TCanvas * c_SigtopPt = compareMjjOneSys(hSig, hSigtopPtUp, hSigtopPtDown, "WH120", "topPt", cat_);
@@ -505,13 +505,13 @@ void npShapeVslnN_13TeV(){
       TCanvas * c_SigJER =compareRatioGraph(hSig, hSigJERUp, hSigJERDown, "WH120", "JER", cat_);
       canSigGraph->cd(2);
       c_SigJER->DrawClonePad();
-      TCanvas * c_SigcTag = compareRatioGraph(hSig, hSigbcTagUp2, hSigbcTagDown2, "WH120", "bcTagInc2", cat_);
+      TCanvas * c_SigcTag = compareRatioGraph(hSig, hSigbcTag2Up, hSigbcTag2Down, "WH120", "bcTagInc2", cat_);
       canSigGraph->cd(4);
       c_SigcTag->DrawClonePad();
-      TCanvas * c_SigbTag = compareRatioGraph(hSig, hSigbcTagUp1, hSigbcTagDown1, "WH120", "bcTagInc1", cat_);
+      TCanvas * c_SigbTag = compareRatioGraph(hSig, hSigbcTag1Up, hSigbcTag1Down, "WH120", "bcTagInc1", cat_);
       canSigGraph->cd(3);
       c_SigbTag->DrawClonePad();
-      TCanvas * c_SigPileup = compareRatioGraph(hSig, hSigbcTagUp3, hSigbcTagDown3, "WH120", "bcTagInc3", cat_);
+      TCanvas * c_SigPileup = compareRatioGraph(hSig, hSigbcTag3Up, hSigbcTag3Down, "WH120", "bcTagInc3", cat_);
       canSigGraph->cd(5);
       c_SigPileup->DrawClonePad();
       TCanvas * c_SigtopPt = compareRatioGraph(hSig, hSigtopPtUp, hSigtopPtDown, "WH120", "topPt", cat_);

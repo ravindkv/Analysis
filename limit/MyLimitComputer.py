@@ -18,10 +18,6 @@ def execme(command):
 #---------------------------------------------
 def makeDataCards(IN_FILE_DIR, HIST_DIR, HIST_NAME, CHANNEL_NAME, SIG_MASS, SIG_LABEL, SIG_FILE):
     execme('root -l -q -b \"MyHPlusDataCardMaker.C(\\\"'+IN_FILE_DIR+'\\\", \\\"'+HIST_DIR+'\\\",\\\"'+HIST_NAME+'\\\",\\\"'+CHANNEL_NAME+'\\\",'+str(SIG_MASS)+', \\\"'+SIG_LABEL+'\\\", \\\"'+SIG_FILE+'\\\")\"')
-    if(CHANNEL_NAME=="mu"):
-        execme('cp '+IN_FILE_DIR+'/all_muData.root '+IN_FILE_DIR+'/all_Data.root')
-    if(CHANNEL_NAME=="ele"):
-        execme('cp '+IN_FILE_DIR+'/all_EleData.root '+IN_FILE_DIR+'/all_Data.root')
 
 def moveDataCards(CHANNEL_NAME, HIST_ARRAY, MASS, CAT_DIR, LIMIT_DIR):
     execme('mkdir -p '+LIMIT_DIR)
@@ -38,6 +34,7 @@ def calcLimits(CHANNEL_NAME, COMB_DATACARD_NAME, CAT_DIR, MASS, isGOF):
     if(isGOF):
         execme('combine '+t2wDataCardName+' -M GoodnessOfFit --algo saturated -t 1000 -s -1 --mass '+str(MASS)+' --name _hcs_13TeV_toy_'+CHANNEL_NAME+'_'+CAT_DIR)
         execme('combine '+t2wDataCardName+' -M GoodnessOfFit --algo saturated --mass '+str(MASS)+' --name _hcs_13TeV_data_'+CHANNEL_NAME+'_'+CAT_DIR)
+        #pass
 
 #---------------------------------------------------
 #function to get datacards to be combined
@@ -100,9 +97,11 @@ if __name__=="__main__":
     #---------------------------------------------
     #USERS INPUTS
     #---------------------------------------------
-    path_file_dir="/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_26/src/HiggsAnalysis/HplusTocs13TeVLimit/"
-    muon_file_dir=path_file_dir+"stack_20180418_Mu_Sys_UnBlind"
-    ele_file_dir=path_file_dir+"stack_20180418_Ele_Sys_UnBlind"
+    path_file_dir="/home/rverma/t3store3/AN-18-061/ExclusionLimit/CMSSW_8_0_26/src/HiggsAnalysis/HplusTocs13TeVLimit/"
+    muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_ARC_JER"
+    ele_file_dir=path_file_dir+"stack_20190402_Ele_Sys_ARC_JER"   
+    #muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_ARC"
+    #ele_file_dir=path_file_dir+"stack_20190402_Ele_Sys_ARC"
 
     hist_array_Inc = []
     hist_array_Inc.append(["KinFit", "mjj_kfit"])

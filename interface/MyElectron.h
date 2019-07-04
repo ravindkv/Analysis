@@ -15,10 +15,8 @@ class MyElectron
   
   void Reset();
   
-  std::string GetName() { 
-      std::string name(eleName);
-      return name; 
-  };
+  ///std::string GetName() { return name; };
+ 
 //Variables : https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2  
 
   ///basic
@@ -44,7 +42,6 @@ class MyElectron
   ///ids
   int    isEE;
   int    isEB;
-  std::map<std::string, float>eidWPs;
   
   ///iso
   double ChHadIso; 
@@ -54,9 +51,11 @@ class MyElectron
   double relCombPFIsoEA;//Rel. comb. PF iso with EA corr
   double D0;
   double Dz;
-  double trigger_ele_pt;
-  int quality;
+
+  //conversion and IDs
+  bool passEleID;
   bool passConversionVeto;
+
  private :
 };
 #endif

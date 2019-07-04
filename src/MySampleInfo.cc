@@ -1,6 +1,6 @@
-#include "interface/SampleInfo.h"
+#include "interface/MySampleInfo.h"
 
-SampleInfo::SampleInfo()
+MySampleInfo::MySampleInfo()
 {
   sampleName="";
   mcEvtType = 0;
@@ -14,6 +14,6 @@ SampleInfo::SampleInfo()
   hepISTUP.clear();
 }
 
-SampleInfo::~SampleInfo()
+MySampleInfo::~MySampleInfo()
 {
 }

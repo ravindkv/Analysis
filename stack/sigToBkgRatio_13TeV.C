@@ -16,8 +16,7 @@
 bool isMuChannel = true;
 bool isEleChannel = false;
 //INPUT FILES
-TFile* fData = TFile::Open("all_muData.root");
-//TFile* fData = TFile::Open("all_EleData.root");
+TFile* fData = TFile::Open("all_Data.root");
 
 TFile* fVV	= TFile::Open("all_VV.root");
 TFile* fDY	= TFile::Open("all_DY.root");
@@ -98,15 +97,15 @@ TH1F * getSigBkgRatioHist(TH1F* hSig, TH1F* hBkg, int color){
   return hRatio;
 }
 
-void oneSigToBkgRatio(TFile *fSig, TString mass, int xMin, int yMax){
+void oneSigToBkgRatio(TFile *fSig, TString outName, TString mass, int xMin, int yMax){
   gStyle->SetOptStat(0);
   TH1F * hAllBkgInc = getAllBkgHist("base/", "Iso/", "KinFit/", "mjj_kfit");
   TH1F* hSigInc = getHisto(fSig, "base/", "Iso/", "KinFit/", "mjj_kfit");
   TH1F * hRatioInc = getSigBkgRatioHist(hSigInc, hAllBkgInc, 1);
   hRatioInc->SetTitle("");
-  hRatioInc->GetYaxis()->SetRangeUser(0.05, yMax);
+  hRatioInc->GetYaxis()->SetRangeUser(0.005, yMax);
   hRatioInc->GetXaxis()->SetRangeUser(xMin, 170);
-  hRatioInc->GetXaxis()->SetTitle("M_{jj} [GeV]"); 
+  hRatioInc->GetXaxis()->SetTitle("m_{jj} [GeV]"); 
   hRatioInc->GetYaxis()->SetTitleOffset(1.00);
   hRatioInc->GetXaxis()->SetTitleOffset(1.10);
   hRatioInc->GetYaxis()->SetTitle("Sig/Bkg"); 
@@ -144,27 +143,27 @@ void oneSigToBkgRatio(TFile *fSig, TString mass, int xMin, int yMax){
   
   //channel
   TPaveText *ch = paveText(0.40,0.9154898,0.9210067,0.9762187, 0, 19, 1, 0, 132);
-  ch->SetTextSize(0.08);
-  if(isMuChannel)  ch->AddText(mass+",       #mu + jets");
-  if(isEleChannel) ch->AddText(mass+",       e + jets");
+  ch->SetTextSize(0.07);
+  if(isMuChannel)  ch->AddText(mass+",  #mu + jets");
+  if(isEleChannel) ch->AddText(mass+",  e + jets");
   ch->Draw();
   legCTag->Draw();
 
   TString outFile("$PWD/CTag/");
-  if(isMuChannel) outFile += mass+ "_mu_ratioSB.pdf";
-  if(isEleChannel) outFile += mass+ "_ele_ratioSB.pdf";
+  if(isMuChannel) outFile += outName+ "_mu_ratioSB.pdf";
+  if(isEleChannel) outFile += outName+ "_ele_ratioSB.pdf";
   can->SaveAs(outFile);
 } 
 
 void sigToBkgRatio_13TeV(){
-  oneSigToBkgRatio(fSig80, "WH80", 20,  30);
-  oneSigToBkgRatio(fSig90, "WH90", 20,  10);
-  oneSigToBkgRatio(fSig100, "WH100",20,  10);
-  oneSigToBkgRatio(fSig120, "WH120",20,  10);
-  oneSigToBkgRatio(fSig140, "WH140",20,  20);
-  oneSigToBkgRatio(fSig150, "WH150",20,  60);
-  oneSigToBkgRatio(fSig155, "WH155",20,  100);
-  oneSigToBkgRatio(fSig160, "WH160",20,  250);
+  oneSigToBkgRatio(fSig80, "WH80", "m_{H^{+}} = 80 GeV", 20,  1);
+  oneSigToBkgRatio(fSig90, "WH90", "m_{H^{+}} = 90 GeV", 20,  1);
+  oneSigToBkgRatio(fSig100,"WH100", "m_{H^{+}} = 100 GeV",20,  1);
+  oneSigToBkgRatio(fSig120,"WH120", "m_{H^{+}} = 120 GeV",20,  1);
+  oneSigToBkgRatio(fSig140,"WH140", "m_{H^{+}} = 140 GeV",20,  2);
+  oneSigToBkgRatio(fSig150,"WH150", "m_{H^{+}} = 150 GeV",20,  6);
+  oneSigToBkgRatio(fSig155,"WH155", "m_{H^{+}} = 155 GeV",20,  10);
+  oneSigToBkgRatio(fSig160,"WH160", "m_{H^{+}} = 160 GeV",20,  25);
 }
 
 

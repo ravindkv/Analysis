@@ -12,7 +12,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class SampleInfo+;
+#pragma link C++ class MySampleInfo+;
 //#pragma link C++ class LorentzVector+;
 //#pragma link C++ class Point3D+;
 #pragma link C++ class MyMCParticle+;

@@ -5,7 +5,7 @@
 string doubleToStr(double val){
      ostringstream convert;
      string result("");
-     convert <<std::setprecision(6)<<val;
+     convert <<std::setprecision(4)<<val;
      result = convert.str();
   return result;
 }
@@ -48,6 +48,7 @@ string getValue(TString CHANNEL="mu", TString CAT= "Cat1_Inc", TString MASS="90"
   string legData = doubleToStr(histData->GetMean());
   cout<<inFileDir<<": \t"<<meanToy+" & "+legData<<endl;
   return meanToy+" & "+legData;
+  //return meanToy+" & -";
 }
 
 void MyMakeGOFTable(){  
@@ -69,46 +70,50 @@ void MyMakeGOFTable(){
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
+  outFile<<"\\footnotesize{"<<endl; 
+  outFile<<"\\begin{tabular}{ ccccccc}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"\\hline "<<endl;
+  outFile<<"\\multicolumn{1}{c}{{\\bf{$m_{H^\\pm}$}}} & \\multicolumn{2}{c}{$m_{jj}(Inc)$} & \\multicolumn{2}{c}{$m_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{c}{$m_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"  "<<endl;
   outFile<<"(GeV)"<<" & "<< "from toys & from data & from toys & from data & from toys & from data "<< " \\\\ "<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<" \\hline "<<endl;
+  outFile<<"\\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getValue("mu","Cat1_Inc","80")<<" & "<<getValue("mu","Cat2_cTagInc","80")<<" & "<<getValue("mu","Cat3_cTagEx","80")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getValue("mu","Cat1_Inc","90")<<" & "<<getValue("mu","Cat2_cTagInc","90")<<" & "<<getValue("mu","Cat3_cTagEx","90")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getValue("mu","Cat1_Inc","100")<<" & "<<getValue("mu","Cat2_cTagInc","100")<<" & "<<getValue("mu","Cat3_cTagEx","100")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getValue("mu","Cat1_Inc","120")<<" & "<<getValue("mu","Cat2_cTagInc","120")<<" & "<<getValue("mu","Cat3_cTagEx","120")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getValue("mu","Cat1_Inc","140")<<" & "<<getValue("mu","Cat2_cTagInc","140")<<" & "<<getValue("mu","Cat3_cTagEx","140")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getValue("mu","Cat1_Inc","150")<<" & "<<getValue("mu","Cat2_cTagInc","150")<<" & "<<getValue("mu","Cat3_cTagEx","150")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getValue("mu","Cat1_Inc","155")<<" & "<<getValue("mu","Cat2_cTagInc","155")<<" & "<<getValue("mu","Cat3_cTagEx","155")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getValue("mu","Cat1_Inc","160")<<" & "<<getValue("mu","Cat2_cTagInc","160")<<" & "<<getValue("mu","Cat3_cTagEx","160")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{Goodness of fit for muon + jets channel.}"<<endl; 
+  outFile<<"}"<<endl; 
+  outFile<<"\\caption{Goodness of fit for muon + jets channel, from different event categories.}"<<endl; 
   outFile<<"\\label{tab:gofMu}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
@@ -119,46 +124,50 @@ void MyMakeGOFTable(){
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
+  outFile<<"\\footnotesize{"<<endl; 
+  outFile<<"\\begin{tabular}{ ccccccc}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"\\hline "<<endl;
+  outFile<<"\\multicolumn{1}{c}{{\\bf{$m_{H^\\pm}$}}} & \\multicolumn{2}{c}{$m_{jj}(Inc)$} & \\multicolumn{2}{c}{$m_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{c}{$m_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"  "<<endl;
   outFile<<"(GeV)"<<" & "<< "from toys & from data & from toys & from data & from toys & from data "<< " \\\\ "<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<" \\hline "<<endl;
+  outFile<<"\\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getValue("ele","Cat1_Inc","80")<<" & "<<getValue("ele","Cat2_cTagInc","80")<<" & "<<getValue("ele","Cat3_cTagEx","80")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getValue("ele","Cat1_Inc","90")<<" & "<<getValue("ele","Cat2_cTagInc","90")<<" & "<<getValue("ele","Cat3_cTagEx","90")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getValue("ele","Cat1_Inc","100")<<" & "<<getValue("ele","Cat2_cTagInc","100")<<" & "<<getValue("ele","Cat3_cTagEx","100")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getValue("ele","Cat1_Inc","120")<<" & "<<getValue("ele","Cat2_cTagInc","120")<<" & "<<getValue("ele","Cat3_cTagEx","120")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getValue("ele","Cat1_Inc","140")<<" & "<<getValue("ele","Cat2_cTagInc","140")<<" & "<<getValue("ele","Cat3_cTagEx","140")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getValue("ele","Cat1_Inc","150")<<" & "<<getValue("ele","Cat2_cTagInc","150")<<" & "<<getValue("ele","Cat3_cTagEx","150")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getValue("ele","Cat1_Inc","155")<<" & "<<getValue("ele","Cat2_cTagInc","155")<<" & "<<getValue("ele","Cat3_cTagEx","155")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getValue("ele","Cat1_Inc","160")<<" & "<<getValue("ele","Cat2_cTagInc","160")<<" & "<<getValue("ele","Cat3_cTagEx","160")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{Goodness of fit for electron + jets channel}"<<endl; 
+  outFile<<"}"<<endl; 
+  outFile<<"\\caption{Goodness of fit for electron + jets channel, from different event categories.}"<<endl; 
   outFile<<"\\label{tab:gofEle}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
@@ -169,46 +178,50 @@ void MyMakeGOFTable(){
   cout<<"=============================="<<endl;
   outFile<<"\\begin{table}"<<endl; 
   outFile<<"\\begin{center}"<<endl; 
-  outFile<<"\\begin{tabular}{ |c|c|c|c|c|c|c|}"<<endl; 
+  outFile<<"\\footnotesize{"<<endl; 
+  outFile<<"\\begin{tabular}{ ccccccc}"<<endl; 
   outFile<<"\\hline "<<endl;
-  outFile<<"\\multicolumn{1}{|c}{{\\bf{$M_{H^\\pm}$}}} & \\multicolumn{2}{|c}{$M_{jj}(Inc)$} & \\multicolumn{2}{|c}{$M_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{|c}{$M_{jj}(Ex ~CTag)$} \\\\"<<endl; 
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"\\hline "<<endl;
+  outFile<<"\\multicolumn{1}{c}{{\\bf{$m_{H^\\pm}$}}} & \\multicolumn{2}{c}{$m_{jj}(Inc)$} & \\multicolumn{2}{c}{$m_{jj}(Inc ~CTagL)$} & \\multicolumn{2}{c}{$m_{jj}(Ex ~CTag)$} \\\\"<<endl; 
+  outFile<<"  "<<endl;
   outFile<<"(GeV)"<<" & "<< "from toys & from data & from toys & from data & from toys & from data "<< " \\\\ "<<endl;
-  outFile<<"[0.1cm] \\hline "<<endl;
+  outFile<<" \\hline "<<endl;
+  outFile<<"\\hline "<<endl;
   cout<<endl; cout<<"                                    Mass: 80 GeV        "<<endl;
   outFile<< "80  & "<<getValue("mu_ele","Cat1_Inc","80")<<" & "<<getValue("mu_ele","Cat2_cTagInc","80")<<" & "<<getValue("mu_ele","Cat3_cTagEx","80")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 90 GeV        "<<endl;
   outFile<< "90  & "<<getValue("mu_ele","Cat1_Inc","90")<<" & "<<getValue("mu_ele","Cat2_cTagInc","90")<<" & "<<getValue("mu_ele","Cat3_cTagEx","90")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                    Mass: 100 GeV        "<<endl;
   outFile<< "100  & "<<getValue("mu_ele","Cat1_Inc","100")<<" & "<<getValue("mu_ele","Cat2_cTagInc","100")<<" & "<<getValue("mu_ele","Cat3_cTagEx","100")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 120 GeV        "<<endl;
   outFile<< "120  & "<<getValue("mu_ele","Cat1_Inc","120")<<" & "<<getValue("mu_ele","Cat2_cTagInc","120")<<" & "<<getValue("mu_ele","Cat3_cTagEx","120")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 140 GeV        "<<endl;
   outFile<< "140  & "<<getValue("mu_ele","Cat1_Inc","140")<<" & "<<getValue("mu_ele","Cat2_cTagInc","140")<<" & "<<getValue("mu_ele","Cat3_cTagEx","140")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 150 GeV        "<<endl;
   outFile<< "150  & "<<getValue("mu_ele","Cat1_Inc","150")<<" & "<<getValue("mu_ele","Cat2_cTagInc","150")<<" & "<<getValue("mu_ele","Cat3_cTagEx","150")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 155 GeV        "<<endl;
   outFile<< "155  & "<<getValue("mu_ele","Cat1_Inc","155")<<" & "<<getValue("mu_ele","Cat2_cTagInc","155")<<" & "<<getValue("mu_ele","Cat3_cTagEx","155")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
 
   cout<<endl; cout<<"                                 Mass: 160 GeV        "<<endl;
   outFile<< "160  & "<<getValue("mu_ele","Cat1_Inc","160")<<" & "<<getValue("mu_ele","Cat2_cTagInc","160")<<" & "<<getValue("mu_ele","Cat3_cTagEx","160")<< "\\\\"<<endl;
-  outFile<<"[0.1cm]  "<<endl;
+  outFile<<"  "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl; 
-  outFile<<"\\caption{Goodness of fit for lepton + jets channel}"<<endl; 
+  outFile<<"}"<<endl; 
+  outFile<<"\\caption{Goodness of fit for lepton + jets channel, from different event categories.}"<<endl; 
   outFile<<"\\label{tab:gofLep}"<<endl;
   outFile<<"\\end{center}"<<endl; 
   outFile<<"\\end{table}"<<endl; 
