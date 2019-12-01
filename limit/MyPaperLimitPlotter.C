@@ -23,6 +23,7 @@
 
 using namespace std;
 
+bool draw8TeV = false;
 //-----------------------
 // CMS guidelines for fig
 // https://twiki.cern.ch/twiki/bin/view/CMS/Internal/FigGuidelines
@@ -399,6 +400,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   //-------------------------------------------
   // 8 TeV limits
   //-------------------------------------------
+  float X8TeV[]        = {90, 100,120, 140, 150, 155, 160};
   float limit8TeV_obsY[]     = {6.5, 1.4, 1.2, 1.5, 2.1, 1.9, 2.0};
   float limit8TeV_expY2sL[]  = {1.9, 0.9, 0.6, 0.6, 0.5, 0.7, 0.6};
   float limit8TeV_expY1sL[]  = {2.6, 1.2, 0.8, 0.7, 0.7, 0.9, 1.0};
@@ -411,10 +413,10 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
     limit8TeV_expY2sH[i1] = TMath::Abs(limit8TeV_expY2sH[i1]-limit8TeV_expY[i1]);
     limit8TeV_expY2sL[i1] = TMath::Abs(limit8TeV_expY2sL[i1]-limit8TeV_expY[i1]);
   }
-  TGraphAsymmErrors* limit8TeV_exp = new TGraphAsymmErrors(7, X, limit8TeV_expY, expX1sL ,expX1sL , expX1sL, expX1sL);
-  TGraphAsymmErrors* limit8TeV_1s = new TGraphAsymmErrors(7, X, limit8TeV_expY,  expX1sL, expX1sL,  limit8TeV_expY1sL, limit8TeV_expY1sH);
-  TGraphAsymmErrors* limit8TeV_2s = new TGraphAsymmErrors(7, X, limit8TeV_expY,  expX2sL, expX2sL,  limit8TeV_expY2sL, limit8TeV_expY2sH);
-  TGraphAsymmErrors* limit8TeV_obs = new TGraphAsymmErrors(7, X, limit8TeV_obsY, expX1sL ,expX1sL , expX1sL, expX1sL);
+  TGraphAsymmErrors* limit8TeV_exp = new TGraphAsymmErrors(7, X8TeV, limit8TeV_expY, expX1sL ,expX1sL , expX1sL, expX1sL);
+  TGraphAsymmErrors* limit8TeV_1s = new TGraphAsymmErrors(7,  X8TeV, limit8TeV_expY,  expX1sL, expX1sL,  limit8TeV_expY1sL, limit8TeV_expY1sH);
+  TGraphAsymmErrors* limit8TeV_2s = new TGraphAsymmErrors(7,  X8TeV, limit8TeV_expY,  expX2sL, expX2sL,  limit8TeV_expY2sL, limit8TeV_expY2sH);
+  TGraphAsymmErrors* limit8TeV_obs = new TGraphAsymmErrors(7, X8TeV, limit8TeV_obsY, expX1sL ,expX1sL , expX1sL, expX1sL);
   //1s
   limit8TeV_1s->SetFillColor(kGreen+1);
   limit8TeV_1s->SetFillStyle(1001);
@@ -422,7 +424,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   limit8TeV_2s->SetFillColor(kOrange);
   limit8TeV_2s->SetFillStyle(1001);
   //median
-  limit8TeV_exp->SetLineColor(kBlue);
+  limit8TeV_exp->SetLineColor(kBlue+1);
   limit8TeV_exp->SetLineWidth(2);
   limit8TeV_exp->SetLineStyle(2);
   limit8TeV_exp->SetLineWidth(4);
@@ -507,26 +509,31 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
 
   //add graphs from 8 and 13 TeV
   TMultiGraph *mg = new TMultiGraph();
-  mg->SetMaximum(30);
+  mg->SetMaximum(50);
+  if(draw8TeV) mg->SetMaximum(100);
+  
   //add all in one
-  //mg->Add(limit8TeV_2s);
-  //mg->Add(limit8TeV_1s);
-  //mg->Add(limit8TeV_exp);
-  //mg->Add(limit8TeV_obs);
+  //
   mg->Add(twoSigma);
   mg->Add(oneSigma);
   mg->Add(expected);
+  if(CHANNEL=="mu_ele" && CAT=="Cat3_cTagEx" && draw8TeV){
+    //mg->Add(limit8TeV_2s);
+    //mg->Add(limit8TeV_1s);
+    mg->Add(limit8TeV_exp);
+    mg->Add(limit8TeV_obs);
+  }
   if(obs) mg->Add(observed);
 
   mg->Draw("ALP3");
   //decorate graph
   mg->GetXaxis()->SetLimits(75,165);
   mg->GetYaxis()->SetTitleOffset(1);
-  mg->GetXaxis()->SetNdivisions(6,5,0);
+  //if(!draw8TeV) mg->GetXaxis()->SetNdivisions(6,5,0);
   mg->GetYaxis()->SetNdivisions(6,5,0);
   mg->GetXaxis()->SetTitleOffset(1.00);
   mg->GetXaxis()->SetTitle("m_{H^{+}} (GeV)");
-  mg->GetYaxis()->SetTitle("BR(t#rightarrow H^{+}b)"); 
+  mg->GetYaxis()->SetTitle("B(t#rightarrow H^{+}b)"); 
   mg->GetYaxis()->SetMoreLogLabels(true);
 
   //Legends
@@ -544,13 +551,30 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
   leg->AddEntry(twoSigma, "95% expected","F");
 
   TString chName = "";
-  if(CHANNEL=="mu")     chName = "#mu + jets";
-  if(CHANNEL=="ele")    chName = "e + jets";
-  if(CHANNEL=="mu_ele") chName = "l + jets";
+  TString catName = "";
+  if(CAT=="Cat3_cTagExL") catName = ", loose";
+  if(CAT=="Cat3_cTagExM") catName = ", medium";
+  if(CAT=="Cat3_cTagExT") catName = ", tight";
+  if(CHANNEL=="mu")     chName = "#mu + jets"+catName;
+  if(CHANNEL=="ele")    chName = "e + jets"+catName;
+  if(CHANNEL=="mu_ele") chName = "l + jets"+catName;
+  if(CHANNEL=="mu_ele" && CAT=="Cat3_cTagEx" && draw8TeV){
+    chName = "#splitline{l + jets}{8 TeV}";
+  }
   leg->AddEntry((TObject*)0, "","");
   leg->AddEntry((TObject*)0, chName,"");
   leg->Draw();
-  
+
+   //pave text channel box
+  TPaveText *ch = new TPaveText(0.33,0.60,0.53,0.70,"brNDC");
+  ch->SetFillColor(19);
+  ch->SetFillStyle(0);
+  ch->SetLineColor(0);
+  ch->SetTextSize(0.03);
+  ch->SetBorderSize(1);
+  ch->AddText("#splitline{t#rightarrow H^{+} b, H^{+} #rightarrow c#bar{s}}{B(H^{+} #rightarrow c#bar{s}) = 100%}");
+  ch->Draw();
+ 
   CMS_lumi(c1, 4, 10);
   gPad->RedrawAxis();
   TString outFile = "limit_"+CHANNEL+"_"+CAT;
@@ -560,6 +584,7 @@ void LimitPlotter(TString CHANNEL="mu", TString CAT= "Cat1_Inc",
 
 void MyPaperLimitPlotter(){
   bool isObserved = true;
+  /*
   LimitPlotter("mu", "Cat1_Inc",     isObserved, true );
   LimitPlotter("mu", "Cat2_cTagInc", isObserved, true );
   LimitPlotter("mu", "Cat3_cTagEx",  isObserved, true );
@@ -571,4 +596,12 @@ void MyPaperLimitPlotter(){
   LimitPlotter("mu_ele", "Cat1_Inc",     isObserved, true );
   LimitPlotter("mu_ele", "Cat2_cTagInc", isObserved, true );
   LimitPlotter("mu_ele", "Cat3_cTagEx",  isObserved, true );
+  */
+
+  LimitPlotter("mu", "Cat3_cTagExL",  isObserved, true );
+  LimitPlotter("mu", "Cat3_cTagExM",  isObserved, true );
+  LimitPlotter("mu", "Cat3_cTagExT",  isObserved, true );
+  LimitPlotter("ele", "Cat3_cTagExL",  isObserved, true );
+  LimitPlotter("ele", "Cat3_cTagExM",  isObserved, true );
+  LimitPlotter("ele", "Cat3_cTagExT",  isObserved, true );
 }

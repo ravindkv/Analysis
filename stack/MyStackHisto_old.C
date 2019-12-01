@@ -118,7 +118,6 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //UncBand->SetFillColor(17);
   UncBand->SetFillColor(kSpring +9);
   UncBand->SetFillStyle(3008);
-    c1->Update();
   UncBand->Draw(" E2 same");
   }
 
@@ -130,20 +129,71 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   hData->SetFillColor(kBlack);
   hData->SetMarkerStyle(20); 
   hData->SetMarkerSize(1.2);
-    c1->Update();
   if(isData)hData->Draw("Esame");
 
   //-------------------------------
   //Signal
   //-------------------------------
-  TH1F* hSig = MyS.getHisto(fSig, baseDir, isoDir, histDir, histName);
-  hSig->SetLineColor(kRed); hSig->SetLineStyle(2);
-  hSig->SetLineWidth(3); hSig->SetFillColor(0);
-    c1->Update();
-  if(isSig)hSig->Draw("HISTSAME");
+  TH1F* hSig80 = MyS.getHisto(fSig80, baseDir, isoDir, histDir, histName);
+  hSig80->SetLineColor(1); 
+  hSig80->SetLineStyle(2);
+  hSig80->SetLineWidth(3); hSig80->SetFillColor(0);
+  double thelo = 5;
+  hSig80->Scale(thelo);
+  hSig80->Draw("HISTSAME");
+
+  TH1F* hSig90 = MyS.getHisto(fSig90, baseDir, isoDir, histDir, histName);
+  hSig90->SetLineColor(2); 
+  hSig90->SetLineStyle(2);
+  hSig90->SetLineWidth(3); hSig90->SetFillColor(0);
+  hSig90->Scale(thelo);
+  hSig90->Draw("HISTSAME");
+
+  TH1F* hSig100 = MyS.getHisto(fSig100, baseDir, isoDir, histDir, histName);
+  hSig100->SetLineColor(3); 
+  hSig100->SetLineStyle(2);
+  hSig100->SetLineWidth(3); hSig100->SetFillColor(0);
+  hSig100->Scale(thelo);
+  hSig100->Draw("HISTSAME");
+
+  TH1F* hSig120 = MyS.getHisto(fSig120, baseDir, isoDir, histDir, histName);
+  hSig120->SetLineColor(4); 
+  hSig120->SetLineStyle(2);
+  hSig120->SetLineWidth(3); hSig120->SetFillColor(0);
+  hSig120->Scale(thelo);
+  hSig120->Draw("HISTSAME");
+
+  TH1F* hSig140 = MyS.getHisto(fSig140, baseDir, isoDir, histDir, histName);
+  hSig140->SetLineColor(5); 
+  hSig140->SetLineStyle(2);
+  hSig140->SetLineWidth(3); hSig140->SetFillColor(0);
+  hSig140->Scale(thelo);
+  hSig140->Draw("HISTSAME");
+
+  TH1F* hSig150 = MyS.getHisto(fSig150, baseDir, isoDir, histDir, histName);
+  hSig150->SetLineColor(6); 
+  hSig150->SetLineStyle(2);
+  hSig150->SetLineWidth(3); hSig150->SetFillColor(0);
+  hSig150->Scale(thelo);
+  hSig150->Draw("HISTSAME");
+
+  TH1F* hSig155 = MyS.getHisto(fSig155, baseDir, isoDir, histDir, histName);
+  hSig155->SetLineColor(7); 
+  hSig155->SetLineStyle(2);
+  hSig155->SetLineWidth(3); hSig155->SetFillColor(0);
+  hSig155->Scale(thelo);
+  hSig155->Draw("HISTSAME");
+
+  TH1F* hSig160 = MyS.getHisto(fSig160, baseDir, isoDir, histDir, histName);
+  hSig160->SetLineColor(8); 
+  hSig160->SetLineStyle(2);
+  hSig160->SetLineWidth(3); hSig160->SetFillColor(0);
+  hSig160->Scale(thelo);
+  hSig160->Draw("HISTSAME");
+
   double yMax = 0;
-  if(hData->GetMaximum() > hSig->GetMaximum()) yMax = hData->GetMaximum();
-  else yMax = hSig->GetMaximum();
+  if(hData->GetMaximum() > hSig80->GetMaximum()) yMax = hData->GetMaximum();
+  else yMax = hSig80->GetMaximum();
   if(yMax < hMC->GetMaximum()) yMax = hMC->GetMaximum();
 
   if(isData && !histName.Contains("mjj")) hStack->SetMaximum(30*hStack->GetMaximum());
@@ -153,6 +203,13 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //-------------------------------------///
   //  Draw Pave Text
   //-------------------------------------///
+  TPaveText *catLabel = MyS.paveText(0.80,0.40,0.85,0.50, 0, 19, 1, 0, 132);
+  catLabel->SetTextSize(0.04);
+  catLabel->AddText(" ");
+  if(histName.Contains("ExL")) catLabel->AddText("Loose");
+  if(histName.Contains("ExM")) catLabel->AddText("Medium");
+  if(histName.Contains("ExT")) catLabel->AddText("Tight");
+
   //channel
   TPaveText *ch = MyS.paveText(0.50,0.85,0.55,0.90, 0, 19, 1, 0, 132);
   ch->SetTextSize(0.04);
@@ -161,18 +218,9 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     dirName = "#splitline{"+histDir_+"}{E_{T}^{miss} < 20 GeV}";
     gPad->SetTickx(0);
   }
-  if(isForPaper && histDir=="KinFit/") dirName = "After KF";
-  TString charmCat = "";
-  if(histName.Contains("ExL") || histName.Contains("ExM") || histName.Contains("ExT")){
-    ch = MyS.paveText(0.20,0.60,0.35,0.70, 0, 19, 1, 0, 132);
-    ch->SetTextSize(0.035);
-    if(histName.Contains("ExL")) charmCat = "Loose";
-    if(histName.Contains("ExM")) charmCat = "Medium";
-    if(histName.Contains("ExT")) charmCat = "Tight";
-  }
-  if(isEleChannel) ch->AddText("#splitline{#splitline{e + jets}{"+dirName+"}}{"+charmCat+"}");
-  if(isMuChannel) ch->AddText("#splitline{#splitline{#mu + jets}{"+dirName+"}}{"+charmCat+"}");
-      
+  if(isForPaper) dirName = "";
+  if(isMuChannel) ch->AddText("#splitline{#mu + jets}{"+ dirName+ "}");
+  if(isEleChannel) ch->AddText("#splitline{e + jets}{"+ dirName + "}");
   //hLable->Draw();
   gPad->RedrawAxis();
   c1->Update();
@@ -180,10 +228,10 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   //-------------------------------
   //Legends
   //-------------------------------
-  TLegend* leg = new TLegend(0.7018792,0.3061504,0.9012081,0.8798861,NULL,"brNDC");
+  TLegend* leg = new TLegend(0.7218792,0.3061504,0.9212081,0.8798861,NULL,"brNDC");
   //TLegend* leg = new TLegend(0.7618792,0.3061504,0.9712081,0.8798861,NULL,"brNDC");
   if(hist_name.find("pt") != string::npos || hist_name.find("mt") != string::npos || hist_name.find("Fit") != string::npos ||hist_name.find("RelIso") != string::npos){
-    leg = new TLegend(0.6018792,0.6061504,0.9212081,0.8898861,NULL,"brNDC");
+    leg = new TLegend(0.6018792,0.6061504,0.9512081,0.8898861,NULL,"brNDC");
     leg->SetNColumns(2);
   }
   leg->SetFillStyle(0);
@@ -191,8 +239,7 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   leg->SetFillColor(kBlack);
   leg->SetTextFont(42);
   leg->SetTextAngle(0);
-  if(isDDqcd)leg->SetTextSize(0.04);
-  else leg->SetTextSize(0.03);
+  leg->SetTextSize(0.04);
   leg->SetTextAlign(12);
   //leg->AddEntry(hSig, "#splitline{Signal}{M_{H^{+}} = 120 GeV}","L");
   if(isData)leg->AddEntry(hData,"Data","PE");
@@ -203,11 +250,19 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
   leg->AddEntry(hDY,"Z/#gamma + jets","F");
   leg->AddEntry(hVV,"VV","F");
   //if(isSig)leg->AddEntry(hSig, "Signal","L");
-  if(unc)leg->AddEntry(UncBand, "Pre-fit unc.","F");
-  if(isSig)leg->AddEntry(hSig, "m_{H^{+}} = 100 GeV","L");
-  //if(isSig)leg->AddEntry((TObject*)0, "","");
-  if(isSig)leg->AddEntry((TObject*)0, "B(t#rightarrow H^{+}b)=0.065","");
-    c1->Update();
+  if(unc)leg->AddEntry(UncBand, "Uncertainty","F");
+  //if(isSig)leg->AddEntry(hSig, "Signal","L");
+  //if(isSig)leg->AddEntry((TObject*)0, "(m_{H^{+}}=120 GeV)","");
+
+
+  leg->AddEntry(hSig80, "m_{H^{+}}  = 80 GeV","L");
+  leg->AddEntry(hSig90, "m_{H^{+}}  = 90 GeV","L");
+  leg->AddEntry(hSig100, "m_{H^{+}} = 100 GeV","L");
+  leg->AddEntry(hSig120, "m_{H^{+}} = 120 GeV","L");
+  leg->AddEntry(hSig140, "m_{H^{+}} = 140 GeV","L");
+  leg->AddEntry(hSig150, "m_{H^{+}} = 150 GeV","L");
+  leg->AddEntry(hSig155, "m_{H^{+}} = 155 GeV","L");
+  leg->AddEntry(hSig160, "m_{H^{+}} = 160 GeV","L");
   leg->Draw();
 
   //-------------------------------------///
@@ -289,7 +344,6 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
       hRatio->GetYaxis()->SetRangeUser(0.8, 1.2);
     }
     //unc band
-    c1->Update();
     hRatio->Draw("E"); // use "P" or "AP"
     if(unc){
     TGraphAsymmErrors *UncBand_Ratio;
@@ -311,21 +365,18 @@ void plotStackedHisto(TString baseDir, TString isoDir, TString histDir, TString 
     //UncBand_Ratio->SetFillColor(17);
     UncBand_Ratio->SetFillColor(kSpring +9);
     //UncBand_Ratio->SetFillStyle(3008);
-    c1->Update();
-    UncBand_Ratio->Draw(" E2 same ");
+    UncBand_Ratio->Draw("E2 same");
     }
-    c1->Update();
     hRatio->Draw("E same"); // use "P" or "AP"
     //base line at 1
     TF1 *baseLine = new TF1("baseLine","1", -100, 2000);
     baseLine->SetLineColor(kBlack);
-    c1->Update();
     baseLine->Draw("SAME");
     c1->Update();
   }
   MyS.CMS_lumi(c1, iPeriod, iPosX);
-    c1->Update();
   ch->Draw();
+  if(histName.Contains("Ex")) catLabel->Draw("SAME");
   if(isSaveHisto){
     mkdir(histDir_, S_IRWXU);
     TString outFile("$PWD/");
@@ -349,7 +400,7 @@ void MyStackHisto(){
   bool isUnc = true;
   bool isMCqcd = false;
   if(isMuChannel && isMCqcd){
-   plotStackedHisto(baseDir, "", "", "RelIso_1Mu","I_{rel}^{#mu}", isData,  isSig,  0.0, 1.0,  false);
+   plotStackedHisto(baseDir, "", "", "RelIso_1Mu","I_{rel}^{e}", isData,  isSig,  0.0, 1.0,  false);
    plotStackedHisto(baseDir, "", "", "pt_met_1Mu","E_{T}^{miss} (GeV)", isData,  isSig,  0.0, 500.0, false);
   }
   if(isEleChannel && isMCqcd){
@@ -360,40 +411,42 @@ void MyStackHisto(){
 
  if(histDir=="BTag/"){
    plotStackedHisto(baseDir, isoDir, histDir, "mjj", "m_{jj} (GeV)", isDataOnMjj, isSig,  0, 400, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "pfCISV", "CSVv2", isData, isSig,  -0.1, 1.8, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "pfCISV", "pfCISV2BJetTags", isData, isSig,  -0.1, 1.5, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "chi2OfKinFit", "#chi^{2} of KF", isData, isSig,  0, 100, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "probOfKinFit", "prob of KF", isData, isSig,  0, 1, isUnc);
  }
  if(histDir=="KinFit/"){
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncL", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncM", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncT", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExO", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExL", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExM", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExT", "m_{jj} (GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsL", "CvsL (CSVv2)", isData, isSig,  -1.1, 3.0, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsB", "CvsB (CSVv2)", isData, isSig,  -1.1, 3.0, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit", "m_{jj} (GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncL", "m_{jj}(GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
+   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncM", "m_{jj}(GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
+   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagIncT", "m_{jj}(GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
+   //plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExO", "m_{jj}(GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExL", "m_{jj}(GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExM", "m_{jj}(GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "mjj_kfit_CTagExT", "m_{jj}(GeV)", isDataOnMjj, isSig,  20, 170, isUnc);
+   //plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsL", "pfCombinedCvsLJetTags", isData, isSig,  -1.1, 2.0, isUnc);
+   //plotStackedHisto(baseDir, isoDir, histDir, "pfCCvsB", "pfCombinedCvsBJetTags", isData, isSig,  -1.1, 2.0, isUnc);
    //plotStackedHisto(baseDir, isoDir, "nonKinFit/", "mjj_non_kfit", "m_{jj}(GeV)", isDataOnMjj, isSig,  0, 250, isUnc);
  }
+ /*
  if(histDir=="BTag/" ||histDir=="KinFit/"){
-   plotStackedHisto(baseDir, isoDir, histDir, "eta_jet", "#eta^{jets}", isData, isSig,  -3.0, 6.0, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "eta_jet", "#eta^{jets}", isData, isSig,  -3.0, 5.0, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "pt_jet", "p_{T}^{jets} (GeV)", isData, isSig,  0.0, 700.0, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "nvtx", "N^{vertex}", isData, isSig,  0, 70, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "rhoAll", "#rho", isData, isSig,  0, 70, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "final_multi_jet", "N^{jets} ", isData, isSig,  3, 15, isUnc);
-   plotStackedHisto(baseDir, isoDir, histDir, "CSVL_count", "N^{b jets}", isData, isSig,  1, 10, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "final_multi_jet", "N^{jets} (GeV)", isData, isSig,  3, 15, isUnc);
+   plotStackedHisto(baseDir, isoDir, histDir, "CSVL_count", "N^{b-jets}", isData, isSig,  1, 10, isUnc);
    if(baseDir=="baseLowMET/")plotStackedHisto(baseDir, isoDir, histDir, "final_pt_met", "E_{T}^{miss} (GeV)", isData, isSig,  0.0, 40.0, isUnc);
    else plotStackedHisto(baseDir, isoDir, histDir, "final_pt_met", "E_{T}^{miss} (GeV)", isData, isSig,  0.0, 500.0, isUnc);
    plotStackedHisto(baseDir, isoDir, histDir, "wmt", "m_{W^{+}}^{T} (GeV)", isData, isSig,  0.0, 200.0, isUnc);
    if(isMuChannel){
     plotStackedHisto(baseDir, isoDir, histDir, "pt_mu", "p_{T}^{#mu} (GeV)", isData, isSig,  0.0, 500.0, isUnc);
-    plotStackedHisto(baseDir, isoDir, histDir, "eta_mu", "#eta^{#mu}", isData, isSig,  -3.0, 6.0, isUnc);
+    plotStackedHisto(baseDir, isoDir, histDir, "eta_mu", "#eta^{#mu} (GeV)", isData, isSig,  -3.0, 5.0, isUnc);
    }
    if(isEleChannel){
      plotStackedHisto(baseDir, isoDir, histDir, "pt_ele", "p_{T}^{e} (GeV)", isData, isSig,  0.0, 500.0, isUnc);
-     plotStackedHisto(baseDir, isoDir, histDir, "eta_ele", "#eta^{e}", isData, isSig,  -3.0, 6.0, isUnc);
+     plotStackedHisto(baseDir, isoDir, histDir, "eta_ele", "#eta^{e} (GeV)", isData, isSig,  -3.0, 5.0, isUnc);
    }
   }
+  */
 }

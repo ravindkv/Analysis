@@ -64,7 +64,7 @@ double relSysUncJetMET( TH1F * h_JESPlus, TH1F * h_base, TH1F * h_JESMinus, TH1F
   return unc ;
 }
 
-double relSysUncTopPt( TH1F * h_base, TH1F * h_TopPtPlus, TH1F * h_TopPtMinus){
+double relSysUncTopPt(TH1F * h_TopPtPlus,  TH1F * h_base, TH1F * h_TopPtMinus){
   double uncTop = pow(TMath::Max(fabs(h_TopPtPlus->Integral() - h_base->Integral()), fabs(h_base->Integral() - h_TopPtMinus->Integral())), 2);
   double unc = 100*(sqrt(uncTop)/h_base->Integral());
   return unc ;
@@ -175,8 +175,8 @@ void makeSysRow(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString h
     TH1F* hElebcTagMinus3 = getHisto(inFileEle, "bcTagMinus3/", "Iso/", histDir, histName);
     string c1 = rowLable;
     string c2 = "2.5 (2.5)";
-    double pMu  = relSysUncBCTag(hMuBase,  hMuPileupPlus,  hMuPileupMinus);
-    double pEle = relSysUncBCTag(hEleBase, hElePileupPlus, hElePileupMinus);
+    double pMu  = relSysUncBCTag(hMuPileupPlus,  hMuBase,  hMuPileupMinus);
+    double pEle = relSysUncBCTag(hElePileupPlus, hEleBase, hElePileupMinus);
     string c3 = dToStr(pMu, pEle);
     string c4 = "3.0 (3.0)";
     double jMu  = relSysUncJetMET( hMuJESPlus, hMuBase, hMuJESMinus, hMuJERPlus, hMuJERMinus);
@@ -201,8 +201,8 @@ void makeSysRow(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString h
       //electron
       TH1F* hEleTopPtPlus   = getHisto(inFileEle, "TopPtPlus/", "Iso/", histDir, histName);
       TH1F* hEleTopPtMinus  = getHisto(inFileEle, "TopPtMinus/", "Iso/", histDir, histName);
-      double pMu = relSysUncTopPt(hMuBase, hMuTopPtPlus, hMuTopPtMinus);
-      double pEle = relSysUncTopPt(hEleBase, hEleTopPtPlus, hEleTopPtMinus);
+      double pMu  = relSysUncTopPt(hMuTopPtPlus, hMuBase,  hMuTopPtMinus);
+      double pEle = relSysUncTopPt(hEleTopPtPlus, hEleBase, hEleTopPtMinus);
       string c11 = dToStr(pMu, pEle);
       fillSysRow(outFile, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
     }
@@ -261,8 +261,9 @@ void makeSysRowEx(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString
     string c0 = catName;
     string c1 = rowLable;
     string c2 = "2.5 (2.5)";
-    double pMu  = relSysUncBCTag(hMuBase,  hMuPileupPlus,  hMuPileupMinus);
-    double pEle = relSysUncBCTag(hEleBase, hElePileupPlus, hElePileupMinus);
+    double pMu  = relSysUncBCTag(hMuPileupPlus,  hMuBase,  hMuPileupMinus);
+    double pEle = relSysUncBCTag(hElePileupPlus, hEleBase, hElePileupMinus);
+
     string c3 = dToStr(pMu, pEle);
     string c4 = "3.0 (3.0)";
     double jMu  = relSysUncJetMET( hMuJESPlus, hMuBase, hMuJESMinus, hMuJERPlus, hMuJERMinus);
@@ -290,8 +291,8 @@ void makeSysRowEx(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString
       //electron
       TH1F* hEleTopPtPlus   = getHisto(inFileEle, "TopPtPlus/", "Iso/", histDir, histName);
       TH1F* hEleTopPtMinus  = getHisto(inFileEle, "TopPtMinus/", "Iso/", histDir, histName);
-      double pMu = relSysUncTopPt(hMuBase, hMuTopPtPlus, hMuTopPtMinus);
-      double pEle = relSysUncTopPt(hEleBase, hEleTopPtPlus, hEleTopPtMinus);
+      double pMu  = relSysUncTopPt(hMuTopPtPlus, hMuBase,  hMuTopPtMinus);
+      double pEle = relSysUncTopPt(hEleTopPtPlus,hEleBase,  hEleTopPtMinus);
       string c11 = dToStr(pMu, pEle);
       if(forPaper)fillSysRowExPaper(outFile, c1, c3, c5, c6, c9, c10, c11, c0);
       else fillSysRow(outFile, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
@@ -339,7 +340,7 @@ void makeOneSysTable(ofstream & outFile, TString histDir, TString histName, TStr
 }
 
 void makeOneSysTableEx(ofstream & outFile, TString histDir, TString histName, string catName){
-  if(forPaper) makeSysRowEx(outFile, fMuWH120, fEleWH120,histDir, histName, "$m_{\\Hp}=120$ GeV", 6.1, true, false, catName);
+  if(forPaper) makeSysRowEx(outFile, fMuWH100, fEleWH100,histDir, histName, "$m_{\\Hp}=100$ GeV", 6.1, true, false, catName);
   else{
   makeSysRowEx(outFile, fMuWH80, fEleWH80,histDir, histName,   "$m_{H^+}=80$ GeV", 6.1, true, false, catName);
   makeSysRowEx(outFile, fMuWH90, fEleWH90,histDir, histName,   "$m_{H^+}=90$ GeV", 6.1, true, false, "");

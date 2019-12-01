@@ -36,7 +36,7 @@ TFile* fWJ	= TFile::Open("all_WJets.root");
 TFile* fQCD	= TFile::Open("all_QCD.root");
 TFile* fST	= TFile::Open("all_ST.root");
 TFile* fTT	= TFile::Open("all_TTJetsP.root");
-TFile *fSig     = TFile::Open("all_Hplus120.root");
+TFile *fSig     = TFile::Open("all_Hplus100.root");
 TString baseDir = "baseLowMET/";
 
 //-----------------------
@@ -194,12 +194,19 @@ TGraphAsymmErrors * MyStackHisto::UNCGRAPH(TH1F *hCentral, TH1F *hJESPlus, TH1F 
     }
     if(isRatioGraph){
     Yval[i]   = 1;
-    errorU[i] = errBandUp(i, hCentral, hJESPlus, hJERPlus, bcTagPlus1, bcTagPlus2, bcTagPlus3, PileupPlus, hQCD_dd);
-    errorD[i] = errBandDown(i, hCentral, hJESMinus, hJERMinus, bcTagMinus1, bcTagMinus2, bcTagMinus3, PileupMinus, hQCD_dd);
+    double errUp = errBandUp(i, hCentral, hJESPlus, hJERPlus, bcTagPlus1, bcTagPlus2, bcTagPlus3, PileupPlus, hQCD_dd);
+    double errDown = errBandDown(i, hCentral, hJESMinus, hJERMinus, bcTagMinus1, bcTagMinus2, bcTagMinus3, PileupMinus, hQCD_dd);
     //cout<<"bin = "<<i<<endl;
     //cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<hCentral->GetBinContent(i+1)<<endl;
-    errorU[i] = errorU[i]/hCentral->GetBinContent(i+1);
-    errorD[i] = errorD[i]/hCentral->GetBinContent(i+1);
+    double newBinCon = hCentral->GetBinContent(i+1);
+    if(newBinCon > 0){
+      errorU[i] = errUp/newBinCon;
+      errorD[i] = errDown/newBinCon;
+    }
+    else{
+      errorU[i] = 0.0;
+      errorD[i] = 0.0;
+    }
     //cout<<Yval[i]<<"\t"<<errorU[i]<<"\t"<<hCentral->GetBinContent(i+1)<<endl;
     }
     Xval[i]   = hCentral->GetBinCenter(i+1);

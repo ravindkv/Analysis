@@ -9,12 +9,13 @@
 #include <algorithm>
 
 using namespace std;
+double sysSF = 1.0;
 
 class MyHPlusDataCardMaker{
   public:
 
   TH1F* getHisto(TFile *inRootFile, TString histPath, TString histName, TFile* fTT, double sf=1.0);
-  TH1F* readWriteHisto(TFile *inFile, TString histPath, TString inHistName, double sf, TFile *outFile, TFile *fTT, TString outHistName,  bool isWrite = false, double min_thres = 0, bool isNeffThreshold = false);
+  TH1F* readWriteHisto(TFile *inFile, TString histPath, TString inHistName, double sf, TFile *outFile, TFile *fTT, TString outHistName,  bool isWrite = false, TString sigFile="Hplus120");
   double getBTagUnc(TH1F *hCentral, TH1F* hUp, TH1F* hDown);
   double getStatUnc(TH1F* hCentral, double sError = 0.0);
   double getUncExL(TH1F* yLyMyT, TH1F* yLyMnT, TH1F* yLnMyT, TH1F* yLnMnT);
@@ -57,22 +58,27 @@ TH1F*  MyHPlusDataCardMaker:: getHisto(TFile *inRootFile, TString histPath, TStr
 }
 
 //Read histos from input file. Write to another file.
-TH1F* MyHPlusDataCardMaker::readWriteHisto(TFile *inFile, TString histPath, TString inHistName, double sf, TFile *outFile, TFile *fTT, TString outHistName,  bool isWrite = false, double min_thres = 0, bool isNeffThreshold = false){
+TH1F* MyHPlusDataCardMaker::readWriteHisto(TFile *inFile, TString histPath, TString inHistName, double sf, TFile *outFile, TFile *fTT, TString outHistName,  bool isWrite = false, TString sigFile="Hplus120"){
   TH1F* hist = (TH1F*) getHisto(inFile, histPath, inHistName, fTT)->Clone(outHistName);
   hist->Scale(sf);
-  TH1F* trimmedHist = trimHisto(hist, outHistName, 5, 20, 170);
+  double mjjMax = 170;
+  if(sigFile.Contains("80"))  mjjMax = 110;
+  if(sigFile.Contains("90"))  mjjMax = 120;
+  if(sigFile.Contains("100")) mjjMax = 130;
+  if(sigFile.Contains("120")) mjjMax = 150;
+  //TH1F* trimmedHist = trimHisto(hist, outHistName, 5, 20, 170);
   if(isWrite){
     outFile->cd();
-    ///hist->Write(outHistName);
-    trimmedHist->Write(outHistName);
+    hist->Write(outHistName);
+    //trimmedHist->Write(outHistName);
   }
-  ///return hist;
-  return trimmedHist;
+  return hist;
+  //return trimmedHist;
 }
 
 //get normalised uncertainity
 double MyHPlusDataCardMaker::getBTagUnc(TH1F *hCentral, TH1F* hUp, TH1F* hDown){
-  return 1 + max(fabs(hUp->Integral() - hCentral->Integral()), fabs(hCentral->Integral() - hDown->Integral()))/hCentral->Integral();
+  return 1 + sysSF* max(fabs(hUp->Integral() - hCentral->Integral()), fabs(hCentral->Integral() - hDown->Integral()))/hCentral->Integral();
 }
 
 //get statistical uncertainity
@@ -220,7 +226,7 @@ double MyHPlusDataCardMaker::getSysUncQcd(TFile* fData, TFile* fTT, TFile* fST, 
   double sf_baseShiftedIsoDir = getQcdSF("baseIso20LowMET", fData, fTT, fST, fWJ, fDY, fVV, histDir, histName);
   double qcd_baseShiftedIsoDir = getQcdDD("baseIso20HighMET", fData, fTT, fST, fWJ, fDY, fVV, histDir, histName, sf_baseShiftedIsoDir);
   double sf_unc = abs(sf_baseIsoDir - sf_baseShiftedIsoDir)/sf_baseIsoDir;
-  double qcd_unc = abs(qcd_baseIsoDir - qcd_baseShiftedIsoDir)/qcd_baseIsoDir;
+  double qcd_unc = sysSF* abs(qcd_baseIsoDir - qcd_baseShiftedIsoDir)/qcd_baseIsoDir;
   cout<<"-------------------------------------"<<endl;
   cout<<"sf_baseIsoDir 	      = "<<sf_baseIsoDir<<endl;
   cout<<"sf_baseShiftedIsoDir = "<<sf_baseShiftedIsoDir<<endl;

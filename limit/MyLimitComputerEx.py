@@ -98,17 +98,13 @@ if __name__=="__main__":
     #USERS INPUTS
     #---------------------------------------------
     path_file_dir="/home/rverma/t3store/AN-18-061/ExclusionLimit/CMSSW_8_0_26/src/HiggsAnalysis/HplusTocs13TeVLimit/"
-    muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_TMVA_scan"
-    #muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_TMVA"
-    #muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_ARC_JER"
+    muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_ARC_JER"
     ele_file_dir=path_file_dir+"stack_20190402_Ele_Sys_ARC_JER"   
     #muon_file_dir=path_file_dir+"stack_20190402_Mu_Sys_ARC"
     #ele_file_dir=path_file_dir+"stack_20190402_Ele_Sys_ARC"
 
     hist_array_Inc = []
-    hist_array_Inc.append(["KinFit", "mva_output"])
-    #hist_array_Inc.append(["KinFit", "mjj_kfit_TMVA"])
-    #hist_array_Inc.append(["KinFit", "mjj_kfit"])
+    hist_array_Inc.append(["KinFit", "mjj_kfit"])
     #hist_array_Inc.append(["KinFit", "mjj_kfit_CTagExT"])
 
     hist_array_CTagL = []
@@ -128,7 +124,7 @@ if __name__=="__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ch", default="mu", help="The channel name e.g. mu or ele or mu_ele")
-    parser.add_argument("--cat", default=1, help="Type of event category")
+    parser.add_argument("--hist", default="mjj_kfit_CTagExL", help="Give the name of the histogram")
     parser.add_argument("--mass", default=120, help="Mass of the charged Higgs")
     parser.add_argument("--allMass", default=False, help="Mass of the charged Higgs")
     parser.add_argument("--batch", default=False, help="Want to submit condor jobs")
@@ -141,21 +137,17 @@ if __name__=="__main__":
     if(args.ch=="ele"):
         in_channel= ["ele"]
         in_file = [ele_file_dir]
-    if(args.ch=="mu_ele"):
-        in_channel= ["mu", "ele"]
-        in_file = [muon_file_dir, ele_file_dir]
- 
-    if(int(args.cat)==1):
-        in_hist = hist_array_Inc
-        cat_dir = "Cat1_Inc"
-    if(int(args.cat)==2):
-        in_hist = hist_array_CTagL
-        cat_dir = "Cat2_cTagInc"
-    if(int(args.cat)==3):
-        in_hist = hist_array_CTagCat
-        cat_dir = "Cat3_cTagEx"
  
     if(args.allMass): in_mass = mass_array
     else: in_mass = [args.mass]
-    calcCombinedLimit(in_channel, in_file, in_hist, cat_dir, in_mass, args.batch, args.isGOF)
+    #calcCombinedLimit(in_channel, in_file, in_hist, cat_dir, in_mass, args.batch, args.isGOF)
+    
+    ##For individual charm categories 
+    hist_array = []
+    hist_array.append(["KinFit", args.hist])
+    cat_dir = ""
+    if(args.hist=="mjj_kfit_CTagExL"):cat_dir = "Cat3_cTagExL"
+    if(args.hist=="mjj_kfit_CTagExM"):cat_dir = "Cat3_cTagExM"
+    if(args.hist=="mjj_kfit_CTagExT"):cat_dir = "Cat3_cTagExT"
+    calcCombinedLimit(in_channel, in_file, hist_array, cat_dir, in_mass, args.batch, args.isGOF)
 

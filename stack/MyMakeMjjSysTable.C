@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iomanip>
 
-bool forPaper = true;
+bool forPaper = false;
 ///INPUT FILES
 TString muDir = "stack_20190402_Mu_Sys_ARC_JER";
 TString eleDir = "stack_20190402_Ele_Sys_ARC_JER";
@@ -64,7 +64,7 @@ double relSysUncJetMET( TH1F * h_JESPlus, TH1F * h_base, TH1F * h_JESMinus, TH1F
   return unc ;
 }
 
-double relSysUncTopPt( TH1F * h_base, TH1F * h_TopPtPlus, TH1F * h_TopPtMinus){
+double relSysUncTopPt(TH1F * h_TopPtPlus,  TH1F * h_base, TH1F * h_TopPtMinus){
   double uncTop = pow(TMath::Max(fabs(h_TopPtPlus->Integral() - h_base->Integral()), fabs(h_base->Integral() - h_TopPtMinus->Integral())), 2);
   double unc = 100*(sqrt(uncTop)/h_base->Integral());
   return unc ;
@@ -175,8 +175,8 @@ void makeSysRow(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString h
     TH1F* hElebcTagMinus3 = getHisto(inFileEle, "bcTagMinus3/", "Iso/", histDir, histName);
     string c1 = rowLable;
     string c2 = "2.5 (2.5)";
-    double pMu  = relSysUncBCTag(hMuBase,  hMuPileupPlus,  hMuPileupMinus);
-    double pEle = relSysUncBCTag(hEleBase, hElePileupPlus, hElePileupMinus);
+    double pMu  = relSysUncBCTag(hMuPileupPlus,  hMuBase,  hMuPileupMinus);
+    double pEle = relSysUncBCTag(hElePileupPlus, hEleBase, hElePileupMinus);
     string c3 = dToStr(pMu, pEle);
     string c4 = "3.0 (3.0)";
     double jMu  = relSysUncJetMET( hMuJESPlus, hMuBase, hMuJESMinus, hMuJERPlus, hMuJERMinus);
@@ -201,8 +201,8 @@ void makeSysRow(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString h
       //electron
       TH1F* hEleTopPtPlus   = getHisto(inFileEle, "TopPtPlus/", "Iso/", histDir, histName);
       TH1F* hEleTopPtMinus  = getHisto(inFileEle, "TopPtMinus/", "Iso/", histDir, histName);
-      double pMu = relSysUncTopPt(hMuBase, hMuTopPtPlus, hMuTopPtMinus);
-      double pEle = relSysUncTopPt(hEleBase, hEleTopPtPlus, hEleTopPtMinus);
+      double pMu  = relSysUncTopPt(hMuTopPtPlus, hMuBase,  hMuTopPtMinus);
+      double pEle = relSysUncTopPt(hEleTopPtPlus, hEleBase, hEleTopPtMinus);
       string c11 = dToStr(pMu, pEle);
       fillSysRow(outFile, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
     }
@@ -261,8 +261,9 @@ void makeSysRowEx(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString
     string c0 = catName;
     string c1 = rowLable;
     string c2 = "2.5 (2.5)";
-    double pMu  = relSysUncBCTag(hMuBase,  hMuPileupPlus,  hMuPileupMinus);
-    double pEle = relSysUncBCTag(hEleBase, hElePileupPlus, hElePileupMinus);
+    double pMu  = relSysUncBCTag(hMuPileupPlus,  hMuBase,  hMuPileupMinus);
+    double pEle = relSysUncBCTag(hElePileupPlus, hEleBase, hElePileupMinus);
+
     string c3 = dToStr(pMu, pEle);
     string c4 = "3.0 (3.0)";
     double jMu  = relSysUncJetMET( hMuJESPlus, hMuBase, hMuJESMinus, hMuJERPlus, hMuJERMinus);
@@ -290,8 +291,8 @@ void makeSysRowEx(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString
       //electron
       TH1F* hEleTopPtPlus   = getHisto(inFileEle, "TopPtPlus/", "Iso/", histDir, histName);
       TH1F* hEleTopPtMinus  = getHisto(inFileEle, "TopPtMinus/", "Iso/", histDir, histName);
-      double pMu = relSysUncTopPt(hMuBase, hMuTopPtPlus, hMuTopPtMinus);
-      double pEle = relSysUncTopPt(hEleBase, hEleTopPtPlus, hEleTopPtMinus);
+      double pMu  = relSysUncTopPt(hMuTopPtPlus, hMuBase,  hMuTopPtMinus);
+      double pEle = relSysUncTopPt(hEleTopPtPlus,hEleBase,  hEleTopPtMinus);
       string c11 = dToStr(pMu, pEle);
       if(forPaper)fillSysRowExPaper(outFile, c1, c3, c5, c6, c9, c10, c11, c0);
       else fillSysRow(outFile, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
@@ -303,7 +304,7 @@ void makeSysRowEx(ofstream & outFile, TFile *inFileMu, TFile *inFileEle, TString
   }
 }
 void makeOneSysTable(ofstream & outFile, TString histDir, TString histName, TString catName){
-  string tableName = "Systematic and statistical uncertainties in \\%, "+ string(catName)+" for muon (electron) channel.";
+  string tableName = "Systematic and statistical uncertainties in \\%, "+ string(catName)+" for muon (electron) channel. The \"---\" indicates that the corresponding uncertainties are not considered for the given process.";
   outFile<<"\\begin{table}"<<endl;
   outFile<<"\\begin{center}"<<endl;
   outFile<<"\\scriptsize{"<<endl;
@@ -312,7 +313,7 @@ void makeOneSysTable(ofstream & outFile, TString histDir, TString histName, TStr
   outFile<<"\\multicolumn{5}{c}{ } \\\\"<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
-  outFile<<"Process &{\\rotatebox{90}{Luminosity}} & {\\rotatebox{90}{Pileup reweighting} } & {\\rotatebox{90}{Lepton selections}} & {\\rotatebox{90}{JES + JER + \\MET}} & { \\rotatebox{90}{b/c-jet tagging-1} }  & { \\rotatebox{90}{b/c-jet tagging-2} } & { \\rotatebox{90}{b/c-jet tagging-3}}& { \\rotatebox{90}{Normalization}  }& {\\rotatebox{90}{Statistical}  } & {\\rotatebox{90}{top-\\pt reweighting} }  \\\\ "<<endl;
+  outFile<<"Process &{\\rotatebox{90}{Luminosity}} & {\\rotatebox{90}{Pileup} } & {\\rotatebox{90}{Lepton }} & {\\rotatebox{90}{JES + JER + \\MET}} & { \\rotatebox{90}{b \\& c-jet tagging-1} }  & { \\rotatebox{90}{b \\& c-jet tagging-2} } & { \\rotatebox{90}{b \\& c-jet tagging-3}}& { \\rotatebox{90}{Normalization}  }& {\\rotatebox{90}{Statistical}  } & {\\rotatebox{90}{top \\pt } }  \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   makeSysRow(outFile, fMuWH80,  fEleWH80, histDir, histName, "$m_{H^+}=80$ GeV", 6.1, true, false);
@@ -339,7 +340,7 @@ void makeOneSysTable(ofstream & outFile, TString histDir, TString histName, TStr
 }
 
 void makeOneSysTableEx(ofstream & outFile, TString histDir, TString histName, string catName){
-  if(forPaper) makeSysRowEx(outFile, fMuWH120, fEleWH120,histDir, histName, "$m_{\\Hp}=120$ GeV", 6.1, true, false, catName);
+  if(forPaper) makeSysRowEx(outFile, fMuWH100, fEleWH100,histDir, histName, "$m_{\\Hp}=100$ GeV", 6.1, true, false, catName);
   else{
   makeSysRowEx(outFile, fMuWH80, fEleWH80,histDir, histName,   "$m_{H^+}=80$ GeV", 6.1, true, false, catName);
   makeSysRowEx(outFile, fMuWH90, fEleWH90,histDir, histName,   "$m_{H^+}=90$ GeV", 6.1, true, false, "");
@@ -347,6 +348,7 @@ void makeOneSysTableEx(ofstream & outFile, TString histDir, TString histName, st
   makeSysRowEx(outFile, fMuWH120, fEleWH120,histDir, histName, "$m_{H^+}=120$ GeV", 6.1, true, false, "");
   makeSysRowEx(outFile, fMuWH140, fEleWH140,histDir, histName, "$m_{H^+}=140$ GeV", 6.1, true, false, "");
   makeSysRowEx(outFile, fMuWH150, fEleWH150,histDir, histName, "$m_{H^+}=150$ GeV", 6.1, true, false, "");
+  makeSysRowEx(outFile, fMuWH155, fEleWH155,histDir, histName, "$m_{H^+}=155$ GeV", 6.1, true, false, "");
   makeSysRowEx(outFile, fMuWH160, fEleWH160,histDir, histName, "$m_{H^+}=160$ GeV", 6.1, true, false, "");
   }
   makeSysRowEx(outFile, fMuTT,  fEleTT, histDir, histName, "\\ttjets", 6.1, true, false, "");
@@ -369,7 +371,7 @@ void makeAllSysTableEx(ofstream & outFile){
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   if(forPaper) outFile<<"Category &Process& Pileup & jet \\& \\ptmiss & \\PQb \\& \\PQc-jet & Normalization& Statistical & top \\pt\\\\"<<endl;
-  else outFile<<"Process &{\\rotatebox{90}{Luminosity}} & {\\rotatebox{90}{Pileup reweighting} } & {\\rotatebox{90}{Lepton selections}} & {\\rotatebox{90}{JES + JER + \\MET}} & { \\rotatebox{90}{b/c-jet tagging-1} }  & { \\rotatebox{90}{b/c-jet tagging-2} } & { \\rotatebox{90}{b/c-jet tagging-3}}& { \\rotatebox{90}{Normalization}  }& {\\rotatebox{90}{Statistical}  } & {\\rotatebox{90}{top-\\pt reweighting} }  \\\\ "<<endl;
+  else outFile<<"Process &{\\rotatebox{90}{Luminosity}} & {\\rotatebox{90}{Pileup} } & {\\rotatebox{90}{Lepton }} & {\\rotatebox{90}{JES + JER + \\MET}} & { \\rotatebox{90}{b \\& c-jet tagging-1} }  & { \\rotatebox{90}{b \\& c-jet tagging-2} } & { \\rotatebox{90}{b \\& c-jet tagging-3}}& { \\rotatebox{90}{Normalization}  }& {\\rotatebox{90}{Statistical}  } & {\\rotatebox{90}{top \\pt } }  \\\\ "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   makeOneSysTableEx(outFile, "KinFit/", "mjj_kfit_CTagExL", " Loose ");

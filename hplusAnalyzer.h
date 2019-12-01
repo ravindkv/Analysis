@@ -64,14 +64,16 @@ public :
     //BR(W->ev) = 10.75± 0.3, BR(W->mv) = 10.57± 0.5
     //http://pdg.lbl.gov/2012/listings/rpp2012-list-w-boson.pdf
     //0.12155 = 2*0.065*(1-0.065), where 6.5% is the observed limit for 90 GeV at 8 TeV
-    xss["HplusM100"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM140"]         =  987730; 
-    xss["HplusM150"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM150"]         =  990645;
-    xss["HplusM155"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM155"]         =  952984;
-    xss["HplusM160"]         =  831.76*0.2132*0.12155;   evtDBS["HplusM160"]         =  992264;
-    xss["HplusM80"]          =  831.76*0.2132*0.12155;   evtDBS["HplusM80"]          =  976710;
-    xss["HplusM90"]          =  831.76*0.2132*0.12155;   evtDBS["HplusM90"]          =  988480;
+    double scaleSig = 0.12155;
+    //double scaleSig = 1.0;
+    xss["HplusM100"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM100"]         =  996170; 
+    xss["HplusM120"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM120"]         =  994498; 
+    xss["HplusM140"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM150"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM150"]         =  990645;
+    xss["HplusM155"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM155"]         =  952984;
+    xss["HplusM160"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM160"]         =  992264;
+    xss["HplusM80"]          =  831.76*0.2132*scaleSig;   evtDBS["HplusM80"]          =  976710;
+    xss["HplusM90"]          =  831.76*0.2132*scaleSig;   evtDBS["HplusM90"]          =  988480;
 
     //qcd muon enriched
     xss["QCD_Pt-15to20_Mu"]  =  3819570;       evtDBS["QCD_Pt-15to20_Mu"]  =  4141251;
@@ -325,7 +327,7 @@ Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
   //since the Pt range of 2D histo is <500
   //for Pt >500, we use SF of Pt = 500
   if(pt<=500){
-    Int_t binX = xaxis->FindBin(abs(etaSC));
+    Int_t binX = xaxis->FindBin(etaSC);
     Int_t binY = yaxis->FindBin(pt);
     double sf = h2->GetBinContent(binX, binY);
     double err = h2->GetBinError(binX, binY);
@@ -333,7 +335,7 @@ Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
     else return 1.0;
   }
   else{
-    Int_t binX = xaxis->FindBin(abs(etaSC));
+    Int_t binX = xaxis->FindBin(etaSC);
     Int_t binY = yaxis->FindBin(500);
     double sf = h2->GetBinContent(binX, binY);
     double err = h2->GetBinError(binX, binY);

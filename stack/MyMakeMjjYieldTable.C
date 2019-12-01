@@ -85,6 +85,7 @@ double getSysUnc(TH1F * hUp, TH1F * hBase, TH1F * hDown){
     double valBase  = hBase->Integral();
     double valDown  = hDown->Integral();
 	double uncTag = TMath::Max(fabs(valUp - valBase), fabs(valBase - valDown));
+    cout<<"uncTag = "<<uncTag<<endl;
 	return uncTag;
 	//return lround(uncTag*100/valBase);
 	//return uncTag*100/valBase;
@@ -97,7 +98,9 @@ double getAllSysUnc(TFile *inRootFile, TString histPath, TString histName){
     sysListPlus.push_back("PileupPlus");
     sysListPlus.push_back("JESPlus");
     sysListPlus.push_back("JERPlus");
-    sysListPlus.push_back("TopPtPlus");
+    TString fileName = inRootFile->GetName();
+    if(fileName.Contains("TTJets") || fileName.Contains("all_MC")) 
+        sysListPlus.push_back("TopPtPlus");
     sysListPlus.push_back("bcTagPlus1");
     sysListPlus.push_back("bcTagPlus2");
     sysListPlus.push_back("bcTagPlus3");
@@ -106,21 +109,59 @@ double getAllSysUnc(TFile *inRootFile, TString histPath, TString histName){
     sysListMinus.push_back("PileupMinus");
     sysListMinus.push_back("JESMinus");
     sysListMinus.push_back("JERMinus");
-    sysListMinus.push_back("TopPtMinus");
+    if(fileName.Contains("TTJets") || fileName.Contains("all_MC")) 
+        sysListMinus.push_back("TopPtMinus");
     sysListMinus.push_back("bcTagMinus1");
     sysListMinus.push_back("bcTagMinus2");
     sysListMinus.push_back("bcTagMinus3");
     //get all sys
     double allSys = 0.0;
     double valBase = 0.0;
-    TH1F * hBase = getHisto(inRootFile, "base/"+histPath, histName);
-    valBase = hBase->Integral();
     for(int i =0; i <sysListPlus.size(); i++){
+      TH1F * hBase = getHisto(inRootFile, "base/"+histPath, histName);
       TH1F* hUp = getHisto(inRootFile, TString(sysListPlus[i])+"/"+histPath, histName); 
       TH1F* hDown = getHisto(inRootFile, TString(sysListMinus[i])+"/"+histPath, histName); 
-      double sys = getSysUnc(hUp, hBase, hDown);
+      double valUp    = 0.0;
+      double valBase  = 0.0;
+      double valDown  = 0.0;
+      valUp    = hUp->Integral();
+      valBase  = hBase->Integral();
+      valDown  = hDown->Integral();
+      if(fileName.Contains("all_MC")&& fileName.Contains("Mu")){
+        TH1F * hMuQCD = getHisto(fMuQCD, "base/"+histPath, histName);
+        valUp = valUp + hMuQCD->Integral();
+        valDown = valDown + hMuQCD->Integral();
+      }
+      if(fileName.Contains("all_MC")&& fileName.Contains("Ele")){
+        TH1F * hEleQCD = getHisto(fEleQCD, "base/"+histPath, histName);
+        valUp = valUp + hEleQCD->Integral();
+        valDown = valDown + hEleQCD->Integral();
+      }
+      if(fileName.Contains("all_MC") && TString(sysListPlus[i]).Contains("TopPtPlus")){
+        if(fileName.Contains("Mu")){ 
+          hBase = getHisto(fMuTT, "base/"+histPath, histName); 
+          hUp = getHisto(fMuTT, TString(sysListPlus[i])+"/"+histPath, histName); 
+          hDown = getHisto(fMuTT, TString(sysListMinus[i])+"/"+histPath, histName); 
+        }
+        if(fileName.Contains("Ele")){ 
+          hBase = getHisto(fEleTT, "base/"+histPath, histName); 
+          hDown = getHisto(fEleTT, TString(sysListMinus[i])+"/"+histPath, histName); 
+          hUp = getHisto(fEleTT, TString(sysListPlus[i])+"/"+histPath, histName); 
+        }
+        valUp    = hUp->Integral();
+        valBase  = hBase->Integral();
+        valDown  = hDown->Integral();
+      }
+      double sys = TMath::Max(fabs(valUp - valBase), fabs(valBase - valDown));
+      //double sys = getSysUnc(hUp, hBase, hDown);
+      //cout<<"---------"<<endl;
+      //cout<<"valBase = "<<valBase<<endl;
+      //cout<<"valUp   = "<<valUp<<endl;
+      //cout<<"valDown = "<<valDown<<endl;
+      //cout<<sysListPlus[i]<<": "<<sys<<endl;
       allSys = allSys + sys*sys;
     }
+    cout<<"totalSys = "<<sqrt(allSys)<<endl;
     return sqrt(allSys);
     //return sqrt(allSys)*100/valBase;
 }
@@ -141,6 +182,10 @@ string getYieldWithUnc(string procName, TFile* inRootFile, TString histPath, TSt
     double yield = hBase->Integral();
     double errInit = 0;
     double statUnc = getStatUnc(hBase, errInit);
+    cout<<"-----------------------"<<endl;
+    cout<<histPath<<":"<<procName<<endl;
+    cout<<"nominal = "<<yield<<endl;
+    cout<<"statUnc = "<<statUnc<<endl;
     double sysUnc = getAllSysUnc(inRootFile, histPath, histName);
     //no sys on data and QCD
     TString procName_(procName);
@@ -174,6 +219,7 @@ string getRowEx(string procName, TFile *fMu, TFile *fEle){
       +"\\\\";
   cout<<combined<<endl;
   return combined;
+  return "";
 }
 
 void MyMakeMjjYieldTable(){
@@ -200,6 +246,7 @@ void MyMakeMjjYieldTable(){
   outFile<<"\\bf{Process}& "<<nEvents<<" & "<<nEvents<<"\\\\ "<<endl;
   outFile<<" & $\\mu$ + jets &  e + jets\\\\"<<endl;
   outFile<<"\\hline "<<endl;
+  outFile<<"\\hline "<<endl;
   outFile<<getRowInc("$m_{H^+}=80$ GeV", fMuWH80, fEleWH80, "mjj_kfit")<<endl;
   outFile<<getRowInc("$m_{H^+}=90$ GeV", fMuWH90, fEleWH90, "mjj_kfit")<<endl;
   outFile<<getRowInc("$m_{H^+}=100$ GeV", fMuWH100, fEleWH100, "mjj_kfit")<<endl;
@@ -220,7 +267,6 @@ void MyMakeMjjYieldTable(){
   outFile<<"\\hline "<<endl;
   outFile<<getRowInc("Data"                 , fMuData, fEleData, "mjj_kfit")<<endl;
   outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl;
   outFile<<"\\caption{Event yield for inclusive category.}"<<endl;
   outFile<<"\\label{tab:eventYieldInc}"<<endl;
@@ -237,6 +283,7 @@ void MyMakeMjjYieldTable(){
   outFile<<"\\hline "<<endl;
   outFile<<"\\bf{Process}& "<<nEvents<<" & "<<nEvents<<"\\\\"<<endl;
   outFile<<" & $\\mu$ + jets &  e + jets\\\\"<<endl;
+  outFile<<"\\hline "<<endl;
   outFile<<"\\hline "<<endl;
   outFile<<getRowInc("$m_{H^+}=80$ GeV", fMuWH80, fEleWH80, "mjj_kfit_CTagIncL")<<endl;
   outFile<<getRowInc("$m_{H^+}=90$ GeV", fMuWH90, fEleWH90, "mjj_kfit_CTagIncL")<<endl;
@@ -258,7 +305,6 @@ void MyMakeMjjYieldTable(){
   outFile<<"\\hline "<<endl;
   outFile<<getRowInc("Data"                 , fMuData, fEleData, "mjj_kfit_CTagIncL")<<endl;
   outFile<<"\\hline "<<endl;
-  outFile<<"\\hline "<<endl;
   outFile<<"\\end{tabular}"<<endl;
   outFile<<"\\caption{Event yield for inclusive loose charm category.}"<<endl;
   outFile<<"\\label{tab:eventYieldCTagInc}"<<endl;
@@ -266,7 +312,6 @@ void MyMakeMjjYieldTable(){
   outFile<<"\\end{table}"<<endl;
   outFile<<""<<endl;
   outFile<<""<<endl;
-
   //Mjj from exclusive categories
   outFile<<"\\begin{table}"<<endl;
   outFile<<"\\begin{center}"<<endl;

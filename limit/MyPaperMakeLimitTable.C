@@ -59,7 +59,8 @@ void makeLimitTable(TString CHANNEL, TString CAT,
     }
   }
   cout<<std::setprecision(4)<<endl;
-  cout<<"Mass:"<<setw(15)<<"base value"<<setw(15)<<"-2 #sigma"<<setw(15)<<"-1 #sigma"<<setw(15)<<"+1 #sigma"<<setw(15)<<"+2 #sigma"<<endl; 
+  cout<<CHANNEL<<": "<<CAT<<endl;
+  cout<<"Mass:"<<setw(10)<<"base value"<<setw(10)<<"-2 #sigma"<<setw(10)<<"-1 #sigma"<<setw(10)<<"+1 #sigma"<<setw(10)<<"+2 #sigma"<<setw(10)<<"Observed"<<endl; 
 
   //make table
   outFile<<"\\begin{table}"<<endl; 
@@ -71,7 +72,7 @@ void makeLimitTable(TString CHANNEL, TString CAT,
   outFile<<"&\\multicolumn{1}{c}{$-2\\sigma$} &\\multicolumn{1}{c}{$-1\\sigma$} &\\multicolumn{1}{c}{median} & \\multicolumn{1}{c}{$+1\\sigma$} & \\multicolumn{1}{c}{$+2\\sigma$}&\\\\ \\hline"<<endl;   
   outFile<<"\\hline "<<endl;
   for(int i1 = 0 ; i1 < nMassPoints ; i1++){
-  cout<<X[i1]<<setw(15)<<expY[i1]<<setw(15)<<expY2sL[i1]<<setw(15)<< expY1sL[i1]<<setw(15)<<expY1sH[i1]<<setw(15)<<expY2sH[i1]<<endl; 
+  cout<<X[i1]<<setw(10)<<expY[i1]<<setw(10)<<expY2sL[i1]<<setw(10)<< expY1sL[i1]<<setw(10)<<expY1sH[i1]<<setw(10)<<expY2sH[i1]<<setw(10)<<obsY[i1]<<endl; 
   if(isObs)outFile<<X[i1]<<std::setprecision(3)<<" & "<<expY2sL[i1]<<" & "<< expY1sL[i1]<<" & "<<expY[i1]<<" & "<<expY1sH[i1]<<" & "<<expY2sH[i1]<<" & "<<obsY[i1]<<"\\\\"<<endl; 
   else outFile<<X[i1]<<std::setprecision(3)<<" & "<<expY2sL[i1]<<" & "<< expY1sL[i1]<<" & "<<expY[i1]<<" & "<<expY1sH[i1]<<" & "<<expY2sH[i1]<<" & "<<"-"<<"\\\\"<<endl; 
   }
@@ -104,11 +105,18 @@ void MyPaperMakeLimitTable(){
   outFile<<""<<endl;
   //muon 
   bool isObs = true;
+  /*
   makeLimitTable("mu", "Cat3_cTagEx", isObs, true, outFile);
-  //electron 
   makeLimitTable("ele", "Cat3_cTagEx", isObs, true, outFile);
-  //lepton 
   makeLimitTable("mu_ele","Cat3_cTagEx", isObs, true, outFile);
+  */
+  makeLimitTable("mu", "Cat3_cTagExL", isObs, true, outFile);
+  makeLimitTable("mu", "Cat3_cTagExM", isObs, true, outFile);
+  makeLimitTable("mu", "Cat3_cTagExT", isObs, true, outFile);
+  makeLimitTable("ele", "Cat3_cTagExL", isObs, true, outFile);
+  makeLimitTable("ele", "Cat3_cTagExM", isObs, true, outFile);
+  makeLimitTable("ele", "Cat3_cTagExT", isObs, true, outFile);
+
   outFile<<"\\end{document}"<<endl;  
   outFile.close(); 
 }
