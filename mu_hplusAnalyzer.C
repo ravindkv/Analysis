@@ -333,8 +333,12 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 
     // preselect objects 
     vector<int> m_init; m_init.clear();
-    double u1 	= gRandom->Rndm();//used for rochester corrections
-    double u2 	= gRandom->Rndm();
+    //double u1 	= gRandom->Rndm();//used for rochester corrections
+    //double u2 	= gRandom->Rndm();
+    TRandom3* random1seed = new TRandom3(65509);
+    TRandom3* random2seed = new TRandom3(65507);
+    double u1 	= random1seed->Rndm();
+    double u2 	= random2seed->Rndm();
     preSelectMuons(url, &m_init, pfMuons, Vertices[0], ev->isData, u1, u2, 0, 0);
     vector<int> e_init; e_init.clear();
     preSelectElectrons(&e_init, pfElectrons, Vertices[0], isPFlow);
@@ -1133,10 +1137,10 @@ void hplusAnalyzer::processEvents(){
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190321/MuMC_20190321/HplusM140_MuMC_20190321/ChargedHiggsToCS_M140_13TeV-madgraph/HplusM140_MuMC_20190321/190321_172703/0000/HplusM140_MuMC_20190321_Ntuple_2.root", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

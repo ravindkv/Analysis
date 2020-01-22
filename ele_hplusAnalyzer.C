@@ -216,6 +216,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //---------------------------------------------------//
   //loop over each event, of the ntuple
   //---------------------------------------------------//
+  TRandom3* random1seed = new TRandom3(65509);
+  TRandom3* random2seed = new TRandom3(65507);
   int  kfCount = 0;
   for(int i=0; i<nEntries; ++i){
     Long64_t ientry = evR->LoadTree(i);
@@ -290,7 +292,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           //topPtWt = topptweights[0]; 
           if(cutflowType.Contains("TopPtPlus")){
             topPtWt = topptweights[0]; // only sys as recco by HIG convenors
-            topPtWt = topPtWt*topPtWt;
+            topPtWt = topPtWt;
           }
           else if(cutflowType.Contains("TopPtMinus"))
             topPtWt = 1.0;
@@ -331,8 +333,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
 
     // preselect objects 
     vector<int> m_init; m_init.clear();
-    double u1 	= gRandom->Rndm();//used for rochester corrections
-    double u2 	= gRandom->Rndm();
+    //double u1 	= gRandom->Rndm();//used for rochester corrections
+    //double u2 	= gRandom->Rndm();
+    double u1 	= random1seed->Rndm();
+    double u2 	= random2seed->Rndm();
     preSelectMuons(url, &m_init, pfMuons, Vertices[0], ev->isData, u1, u2, 0, 0);
     vector<int> e_init; e_init.clear();
     preSelectElectrons(&e_init, pfElectrons, Vertices[0], isPFlow);
@@ -484,6 +488,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     double eleSF =1.0;
     if(!ev->isData) eleSF = ele_recoSF*ele_medium_idSF*ele_trigSF;
     evtWeight *= eleSF;
+    fillHisto(outFile_, cutflowType, "", "recoSF", 1000, 0, 3, ele_recoSF, 1 );
+    fillHisto(outFile_, cutflowType, "", "idSF", 1000, 0, 3, ele_medium_idSF, 1 );
+    fillHisto(outFile_, cutflowType, "", "trigSF", 1000, 0, 3, ele_trigSF, 1 );
+    fillHisto(outFile_, cutflowType, "", "SF", 1000, 0, 3, eleSF, 1 );
     double metPt = 0; 
     metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, ev->isData);
     Float_t xBinIso_array[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
@@ -1107,12 +1115,11 @@ void hplusAnalyzer::processEvents(){
   //Data, MC sample from lxplus and T2
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   //CutFlowAnalysis("outFile_.root", "PF", "");
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20190403/EleMC_20190403/TTJetsP_EleMC_20190403/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20190403/190403_100750/0000/TTJetsP_EleMC_20190403_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20190403/EleMC_20190403/TTJetsP_EleMC_20190403/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20190403/190403_100750/0000/TTJetsP_EleMC_20190403_Ntuple_116.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleData_kfitM_20190403/EleData_20190403/EleRunBver2v2_EleData_20190403/SingleElectron/EleRunBver2v2_EleData_20190403/190403_101643/0000/EleRunBver2v2_EleData_20190403_Ntuple_1.root", "PF", "");
-
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 
