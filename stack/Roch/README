@@ -4,8 +4,6 @@ First version of muon calibration package for full 2016 dataset
 Data: 23Sep2016 re-reco (B-G) and Prompt-Reco(H)
 MC: RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6
 
-
-
 Example:
 -------------------------------------------------------------------------------------
 #include "RoccoR.cc"

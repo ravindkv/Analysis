@@ -23,6 +23,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
+  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -46,6 +47,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -116,7 +118,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   
   //---------------------------------------------------//
   //get initial number of events, from ntuples
-  //store initial informations, in a txt file
   //---------------------------------------------------//
   double lumiTotal = 35862;
   int nEntries = evR->AssignEventTreeFrom(f);
@@ -225,7 +226,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
-  
+    //if(i > 1000) break;
     //---------------------------------------------------//
     //apply lumi, k factor and pileup weight
     //---------------------------------------------------//
@@ -261,7 +262,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       double sampleWeight(1.0);
       sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
       evtWeight *= sampleWeight; 
-      fillHisto(outFile_, cutflowType, "", "LumiScaleFactor", 10, 0, 1000, sampleWeight, 1 );
+      fillHisto(outFile_, cutflowType, "SF", "Lumi", 1000, 0, 1000, sampleWeight, 1 );
       }
       //pileup weight
       vector<double>pu = ev->sampleInfo.truepileup;
@@ -275,7 +276,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       evtWeight *= weightPU;  
       }
     }
-    fillHisto(outFile_, cutflowType, "", "SF_PUWeights", 1000, 0, 5, weightPU, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Pileup", 100, 0, 2, weightPU, 1 );
     
     //---------------------------------------------------//
     // apply top re-weighting
@@ -299,7 +300,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
       }
     }
-    fillHisto(outFile_, cutflowType, "", "SF_topPtWeights", 1000, 0, 3, topPtWt, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "TopPt", 100, 0, 2, topPtWt, 1 );
     evtWeight *= topPtWt; //Multiply to the total weights
     
     //---------------------------------------------------//
@@ -441,10 +442,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //---------------------------------------------------//
     int nEle = e_final.size();
     double pri_vtxs = Vertices[0].totVtx;
-    //select only one electron
     if(nEle != 1)continue;
     int e_i = e_final[0];
-    //loose electron veto
+    //veto additional electron
     if(looseElectronVeto(e_final[0], pfElectrons, Vertices[0], isPFlow)) continue;
     //events should not have any muon
     if(looseMuonVeto( -1, pfMuons, isPFlow) ) continue;
@@ -480,18 +480,18 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     //apply Electron SF to eventWeights 
     //---------------------------------------------------//
     //Reco, ID, trigger	
-    double ele_recoSF 		= getEleSF(h2_ele_recoSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
-    double ele_medium_idSF  	= getEleSF(h2_ele_medium_idSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt());
-    double ele_trigSF 		= getEleTrigSF(h2_ele_trigSF, pfElectrons[e_i].p4.pt(), pfElectrons[e_i].eleSCEta);
-    
+    double ele_recoSF 		= getEleSF(h2_ele_recoSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt(), 499);
+    double ele_medium_idSF  	= getEleSF(h2_ele_medium_idSF, pfElectrons[e_i].eleSCEta, pfElectrons[e_i].p4.pt(), 499);
+    double ele_trigSF 		= getEleTrigSF(h2_ele_trigSF, pfElectrons[e_i].p4.pt(), pfElectrons[e_i].eleSCEta, 199);
     //combined SF
     double eleSF =1.0;
     if(!ev->isData) eleSF = ele_recoSF*ele_medium_idSF*ele_trigSF;
     evtWeight *= eleSF;
-    fillHisto(outFile_, cutflowType, "", "recoSF", 1000, 0, 3, ele_recoSF, 1 );
-    fillHisto(outFile_, cutflowType, "", "idSF", 1000, 0, 3, ele_medium_idSF, 1 );
-    fillHisto(outFile_, cutflowType, "", "trigSF", 1000, 0, 3, ele_trigSF, 1 );
-    fillHisto(outFile_, cutflowType, "", "SF", 1000, 0, 3, eleSF, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Reco", 100, 0, 2, ele_recoSF, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Id", 100, 0, 2, ele_medium_idSF, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Trig", 100, 0, 2, ele_trigSF, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Lepton", 100, 0, 2, eleSF, 1 );
+
     double metPt = 0; 
     metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, ev->isData);
     Float_t xBinIso_array[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
@@ -528,8 +528,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     double mt = sqrt (  2*elePt*metPt*(1 - cos(deltaPhi) ) ) ;
 
     //---------------------------------------------------//
-    //apply B-tagging, C-tagging
+    //apply B-tagging
     //---------------------------------------------------//
+    //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
     vector<int> j_final_nob; j_final_nob.clear();
     vector<int> j_final_b; j_final_b.clear();
     vector<double> bdiscr; bdiscr.clear();
@@ -542,17 +543,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       pfCMVA = pfJets[ind_jet].bDiscriminator["pfCombinedMVAV2BJetTags"];
       fillHisto(outFile_, cutflowType_, "BTag", "pfCISV", 100, -2, 2, pfCISV, evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag", "pfCMVA", 100, -2, 2, pfCMVA, evtWeight );
-      //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagMCTools
-      //////////////////////////////////////////////////
-      double pfCCvsL = pfJets[ind_jet].bDiscriminator["pfCombinedCvsLJetTags"];
-      double pfCCvsB = pfJets[ind_jet].bDiscriminator["pfCombinedCvsBJetTags"]; 
-      if(pfCISV > 0.8484 && pfCCvsL > -0.48  && pfCCvsB > -0.17)  
-        fillHisto(outFile_, cutflowType_, "BTag", "btagM_ctagL", 100, -5, 5, 1, evtWeight );
-      if(pfCISV > 0.8484 && pfCCvsL > -0.1   && pfCCvsB > 0.08)   
-        fillHisto(outFile_, cutflowType_, "BTag", "btagM_ctagM", 100, -5, 5, 2, evtWeight );
-      if(pfCISV > 0.8484 && pfCCvsL > 0.69   && pfCCvsB > -0.45)  
-        fillHisto(outFile_, cutflowType_, "BTag", "btagM_ctagT", 100, -5, 5, 3, evtWeight );
-      //////////////////////////////////////////////////
       if(pfCISV > 0.8484){
         count_CSVM_SF++; 
         double jetPt = jetPtWithJESJER(pfJets[ijet], jes, jer, ev->isData);
@@ -598,7 +588,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     evtWeight *= bTagWt;
     nCutPass++;
     fillHisto(outFile_, cutflowType_, "", "cutflow", 10, 0.5, 10.5, nCutPass, evtWeight);
-    fillHisto(outFile_, cutflowType, "", "bTagWeight", 100, 0, 2, bTagWt, 1);
+    fillHisto(outFile_, cutflowType, "SF", "BTag", 100, 0, 2, bTagWt, 1);
 
     //---------------------------------------------------//
     //invariant mass of c sbar
@@ -665,6 +655,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer, ev->isData);
+      double sfJESJER = jetPt/pfJets[ind_jet].p4.pt();
+      fillHisto(outFile_, cutflowType, "SF", "JESJER", 100, 0, 2, sfJESJER, 1 );
       fillHisto(outFile_, cutflowType_, "BTag","pt_jet", 100, 0, 1000, jetPt, evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
@@ -892,6 +884,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTag_yLnMnT_wt", 100, 0, 2, cTagWt_IncL, evtWeight);
           }
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncL", 100, 0, 2, cTagWt_IncL, 1);
+          fillHisto(outFile_, cutflowType, "SF", "CTagIncL", 100, 0, 2, cTagWt_IncL, 1);
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncL_wt", 100, 0, 2, cTagWt_IncL, evtWeight);
         }//Inc loose scale factor
         if(count_cJetsIncM > 0){
@@ -952,6 +945,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           }
           //////////////////////////////////////////////////////////////////////////////
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncM", 100, 0, 2, cTagWt_IncM, 1);
+          fillHisto(outFile_, cutflowType, "SF", "CTagIncM", 100, 0, 2, cTagWt_IncM, 1);
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncM_wt", 100, 0, 2, cTagWt_IncM, evtWeight);
         }//Inc medium scale factor
         if(count_cJetsIncT > 0){
@@ -990,6 +984,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           }
           cTagWt_IncT  = pData_IncT/pMC_IncT; 
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncT", 100, 0, 2, cTagWt_IncT, 1);
+          fillHisto(outFile_, cutflowType, "SF", "CTagIncT", 100, 0, 2, cTagWt_IncT, 1);
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncT_wt", 100, 0, 2, cTagWt_IncT, evtWeight);
         }//Inc tight scale factor
       }

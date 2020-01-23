@@ -34,9 +34,9 @@ public :
     DRMIN_JET = 0.4;
     DRMIN_ELE = 0.4;
     //---------------------------------------------------//
-    //Pileup reweigting 
+    //Pileup reweigting
     //---------------------------------------------------//
-    //PU info for Data: 
+    //PU info for Data:
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData
     //PU info for MC:
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Pileup_MC_Information
@@ -51,24 +51,24 @@ public :
             "stack/lumiRewgt/trueMinBiasPU_data_JSON_23Sep2016ReReco_66016_1000_6000.root", "pileup", "pileup");
     PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
     PShiftUp_ = reweight::PoissonMeanShifter(0.5);
-    
+
     //---------------------------------------------------//
-    //MC cross sections at 13 TeV 
+    //MC cross sections at 13 TeV
     //---------------------------------------------------//
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV.py
     //https://github.com/BristolTopGroup/AnalysisSoftware/blob/master/python/DataSetInfo_13TeV_25ns.py
     //https://indico.cern.ch/event/617002/contributions/2490586/attachments/1419016/2173704/update_27022017.pdf
     //evtDBS= event at Data Base Server i.e in DAS (https://cmsweb.cern.ch/das/).
-    
+
     //signal samples
     //BR(W->ev) = 10.75± 0.3, BR(W->mv) = 10.57± 0.5
     //http://pdg.lbl.gov/2012/listings/rpp2012-list-w-boson.pdf
     //0.12155 = 2*0.065*(1-0.065), where 6.5% is the observed limit for 90 GeV at 8 TeV
     double scaleSig = 0.12155;
     //double scaleSig = 1.0;
-    xss["HplusM100"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM100"]         =  996170; 
-    xss["HplusM120"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM120"]         =  994498; 
-    xss["HplusM140"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM140"]         =  987730; 
+    xss["HplusM100"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM100"]         =  996170;
+    xss["HplusM120"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM120"]         =  994498;
+    xss["HplusM140"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM140"]         =  987730;
     xss["HplusM150"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM150"]         =  990645;
     xss["HplusM155"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM155"]         =  952984;
     xss["HplusM160"]         =  831.76*0.2132*scaleSig;   evtDBS["HplusM160"]         =  992264;
@@ -84,7 +84,7 @@ public :
     xss["QCD_Pt-120to170_Mu"]=  25190;         evtDBS["QCD_Pt-120to170_Mu"]=  8042721;
     xss["QCD_Pt-170to300_Mu"]=  8654;          evtDBS["QCD_Pt-170to300_Mu"]=  7947159;
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
-    
+
     //qcd EM enriched
     xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
     xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
@@ -93,24 +93,24 @@ public :
     xss["QCD_Pt-80to120_EM"] =  350000;        evtDBS["QCD_Pt-80to120_EM"] =  35841783;
     xss["QCD_Pt-120to170_EM"]=  62964;         evtDBS["QCD_Pt-120to170_EM"]=  35817281;
     xss["QCD_Pt-170to300_EM"]=  18810;         evtDBS["QCD_Pt-170to300_EM"]=  11540163;
-    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;    
+    xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
 
     //single top and ttbar
     xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
     xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
     xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
-    xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;   
-    xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;   
+    xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;
+    xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;
 
     //for ttbar systematics
-    xss["TTJetsP_up"]        =  831.76;        evtDBS["TTJetsP_up"]        =  29310620;   
-    xss["TTJetsP_down"]      =  831.76;        evtDBS["TTJetsP_down"]      =  28354188;   
-    xss["TTJetsP_mtop1735"]  =  831.76;        evtDBS["TTJetsP_mtop1735"]  =  19419050;   
-    xss["TTJetsP_mtop1715"]  =  831.76;        evtDBS["TTJetsP_mtop1715"]  =  19578812;   
-    xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;   
-    xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;   
+    xss["TTJetsP_up"]        =  831.76;        evtDBS["TTJetsP_up"]        =  29310620;
+    xss["TTJetsP_down"]      =  831.76;        evtDBS["TTJetsP_down"]      =  28354188;
+    xss["TTJetsP_mtop1735"]  =  831.76;        evtDBS["TTJetsP_mtop1735"]  =  19419050;
+    xss["TTJetsP_mtop1715"]  =  831.76;        evtDBS["TTJetsP_mtop1715"]  =  19578812;
+    xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;
+    xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;
 
-    //DY + jets and W + jets 
+    //DY + jets and W + jets
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
@@ -125,7 +125,7 @@ public :
     //VV fusion
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
-    xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064; 
+    xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064;
 
     //Bkg from Higgs production
     //Gluon gluon fusion
@@ -184,14 +184,14 @@ public :
     xss["VBFHToGG"]               =   0.310    ; evtDBS["VBFHToGG"]               = 1000000 ;
     xss["VBFHToWWTo2L2Nu"]        =   0.085    ; evtDBS["VBFHToWWTo2L2Nu"]        = 486510  ;
     xss["VBFHToWWToLNuQQ"]        =   0.354    ; evtDBS["VBFHToWWToLNuQQ"]        = 198937  ;
-                                   
+
     //for default sample code
-    xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498; 
+    xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498;
   };
   ~hplusAnalyzer() {
     delete evR;
   };
-  
+
   void CutFlowAnalysis(TString url,  string myKey="PFlow", string evtType="data");
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", TFile *outFile_=0);
   //void CreateAnalHistos(TString flowType, TFile* outFile_);
@@ -201,25 +201,20 @@ public :
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
-  
+
   reweight::LumiReWeighting LumiWeights_;
   reweight::LumiReWeighting LumiWeights_Up;
   reweight::LumiReWeighting LumiWeights_Down;
   reweight::PoissonMeanShifter PShiftUp_;   //pileup syst up
-  reweight::PoissonMeanShifter PShiftDown_; //pileup syst down 
+  reweight::PoissonMeanShifter PShiftDown_; //pileup syst down
   std::map<string, double> xss;
   std::map<string, double> evtDBS;
-  std::map<string, double> muSF;
-  /*
-  BTagCalibrationReader myReadCSV(const std::string &tagger, const std::string &filename);
-  */
   ofstream outfile_;
   BTagCalibrationReader myReadCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
-  Double_t getMuonSF(TH2D *h2, double eta, double pt);
-  Double_t getMuonTrigSF(TH2D *h2, double eta, double pt);
+  Double_t getMuonSF(TH2D *h2, double eta, double pt, double maxPt);
   Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
-  Double_t getEleSF(TH2D *h2, double etaSC, double pt);
-  Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC);
+  Double_t getEleSF(TH2D *h2, double etaSC, double pt, double maxPt);
+  Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC, double maxPt);
   double deltaPhi12(double phi1, double phi2);
   double phi0to2pi(double phi);
 };
@@ -244,129 +239,77 @@ float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
   else return 1 ;
 }
 
-BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, const std::string &tagger,  
-		BTagEntry::OperatingPoint op, 
+BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, const std::string &tagger,
+		BTagEntry::OperatingPoint op,
 		const std::string & measurementType,
-		const std::string & sysType, 
-		const std::vector<std::string> & otherSysTypes, 
+		const std::string & sysType,
+		const std::vector<std::string> & otherSysTypes,
 		BTagEntry::JetFlavor jf
 		)
-{ 
+{
   BTagCalibration calib(tagger, filename);
-  BTagCalibrationReader reader(op, sysType, otherSysTypes);      
-  reader.load(calib, jf, measurementType); 
+  BTagCalibrationReader reader(op, sysType, otherSysTypes);
+  reader.load(calib, jf, measurementType);
   return reader;
 }
+
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
-Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt){
+Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt, double maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
-  //since the Pt range of 2D histo is <120
-  //for Pt >120, we use SF of Pt = 120
-  if(pt<=120){
-    Int_t binX = xaxis->FindBin(abs(eta));
-    Int_t binY = yaxis->FindBin(pt);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }
-  else{
-    Int_t binX = xaxis->FindBin(abs(eta));
-    Int_t binY = yaxis->FindBin(120);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }	  
-}
-Double_t hplusAnalyzer::getMuonTrigSF(TH2D *h2, double eta, double pt){
-  TAxis *xaxis = h2->GetXaxis();
-  TAxis *yaxis = h2->GetYaxis();
-  //since the Pt range of 2D histo is <120
-  //for Pt >120, we use SF of Pt = 120
-  if(pt<=500){
-    Int_t binX = xaxis->FindBin(abs(eta));
-    Int_t binY = yaxis->FindBin(pt);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }
-  else{
-    Int_t binX = xaxis->FindBin(abs(eta));
-    Int_t binY = yaxis->FindBin(500);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }	  
+  double sf = 1.0;
+  Int_t binX = xaxis->FindBin(abs(eta));
+  Int_t binY = 1.0;
+  //since the Pt range of 2D histo is <=maxPt
+  //for Pt >maxPt, we use SF of Pt = maxPt
+  if(pt<=maxPt) binY = yaxis->FindBin(pt);
+  else binY = yaxis->FindBin(maxPt);
+  sf = h2->GetBinContent(binX, binY);
+  //double err = 1.0;
+  //err = h2->GetBinError(binX, binY);
+  return sf;
 }
 
 Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
   Double_t *eta_array = tg->GetX();
   Double_t *sf_array = tg->GetY();
   Int_t n_points = tg->GetN();
-
   double SF = 1.0;
-  // eta < eta_array[0]
-  if(abs(eta)<eta_array[0]) SF = sf_array[0];
-  
-  // eta_array[0]<eta<eta_array[n_points -1]
-  for(Int_t i = 0; i < n_points-1; i++){
-    if(abs(eta) >= eta_array[i] && abs(eta) < eta_array[i+1]) SF = sf_array[i+1];
+  if(abs(eta)<eta_array[0]-0.10) SF = sf_array[0];//bin width is 0.20
+  for(Int_t i = 0; i < n_points; i++){
+    if(abs(eta)>=eta_array[i]-0.10 && abs(eta)< eta_array[i]+0.10) SF = sf_array[i];
   }
-  // eta > eta_array[n_points -]
-  if(abs(eta)>eta_array[n_points-1]) SF = sf_array[n_points -1];
+  if(abs(eta)>=eta_array[n_points-1]+0.10) SF = sf_array[n_points -1];
   return SF;
 }
 
-Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt){
+Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt, double maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
-  //since the Pt range of 2D histo is <500
-  //for Pt >500, we use SF of Pt = 500
-  if(pt<=500){
-    Int_t binX = xaxis->FindBin(etaSC);
-    Int_t binY = yaxis->FindBin(pt);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }
-  else{
-    Int_t binX = xaxis->FindBin(etaSC);
-    Int_t binY = yaxis->FindBin(500);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }	  
+  double sf = 1.0;
+  Int_t binX = xaxis->FindBin(etaSC);
+  Int_t binY = 1.0;
+  if(pt<=maxPt) binY = yaxis->FindBin(pt);
+  else binY = yaxis->FindBin(maxPt);
+  sf = h2->GetBinContent(binX, binY);
+  //double err = 1.0;
+  //err = h2->GetBinError(binX, binY);
+  return sf;
 }
 
-Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC){
+Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC, double maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
-  //since the Pt range of 2D histo is <120
-  //for Pt >120, we use SF of Pt = 120
-  if(pt<=200){
-    Int_t binX = xaxis->FindBin(pt);
-    Int_t binY = yaxis->FindBin(etaSC);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }
-  else{
-    Int_t binX = xaxis->FindBin(200);
-    Int_t binY = yaxis->FindBin(etaSC);
-    double sf = h2->GetBinContent(binX, binY);
-    double err = h2->GetBinError(binX, binY);
-    if(sf!=0) return sf;
-    else return 1.0;
-  }	  
+  double sf = 1.0;
+  Int_t binX = 1.0;
+  if(pt<=maxPt) binX = xaxis->FindBin(pt);
+  else binX = xaxis->FindBin(maxPt);
+  Int_t binY = yaxis->FindBin(etaSC);
+  sf = h2->GetBinContent(binX, binY);
+  //double err = 1.0;
+  //err = h2->GetBinError(binX, binY);
+  return sf;
 }
-
 double hplusAnalyzer::phi0to2pi(double phi){
     double pi = 3.1415926535;
     while (phi >= 2.*pi) phi -= 2.*pi;
@@ -385,10 +328,10 @@ double hplusAnalyzer::deltaPhi12(double phi1_, double phi2_){
 }
 
 //---------------------------------------------------//
-//muon scale factors from 2D histograms 
-//---------------------------------------------------//      
+//muon scale factors from 2D histograms
+//---------------------------------------------------//
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
-//https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffsRun2 
+//https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffsRun2
 //Trigger SF
 TFile *f_trigSF_BCDEF 	= new TFile("stack/muonSF/triggreSF_BCDEF.root");
 TFile *f_trigSF_GH 		= new TFile("stack/muonSF/triggreSF_GH.root");
@@ -411,8 +354,8 @@ TGraphAsymmErrors *tg_trackSF_BCDEF 	= (TGraphAsymmErrors*)f_trackSF_BCDEF->Get(
 TGraphAsymmErrors *tg_trackSF_GH 	= (TGraphAsymmErrors*)f_trackSF_GH->Get("ratio_eff_aeta_dr030e030_corr");
 
 //---------------------------------------------------//
-//Electron scale factors from 2D histograms 
-//---------------------------------------------------//      
+//Electron scale factors from 2D histograms
+//---------------------------------------------------//
 //https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Efficiencies_and_scale_factors
 //Reconstruction SF
 TFile *f_ele_recoSF 	  	= new TFile("stack/eleSF/ele_recoSF.root");

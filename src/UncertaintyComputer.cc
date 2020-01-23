@@ -9,14 +9,13 @@ ClassImp(UncertaintyComputer)
 using namespace std;
 RoccoR  rc("stack/Roch/rcdata.2016.v3");
 double UncertaintyComputer::muPtWithRochCorr(const MyMuon *mu, bool isData, double u1, double u2, int s, int m){
-  //double genPt  = mu.Genp4.pt();  
   double charge = mu->charge;
   double pt 	= mu->p4.pt();
   double eta 	= mu->p4.eta();
   double phi 	= mu->p4.phi();
   int nl 	= mu->nTrackerLayers;
   double dataSF = rc.kScaleDT(charge, pt, eta, phi, s, m); 
-  double mcSF 	= rc.kScaleFromGenMC(charge, pt, eta, phi, nl, u1, u2, s, m); 
+  double mcSF 	= rc.kScaleAndSmearMC(charge, pt, eta, phi, nl, u1, u2, s, m); 
   double SF = 1.0; 
   if(isData)SF = dataSF;
   else SF = mcSF;
