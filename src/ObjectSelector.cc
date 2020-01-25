@@ -176,7 +176,7 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
     double mEta     = TMath::Abs(m->p4.eta());
     double mPt      = TMath::Abs(m->p4.pt());
     double mRelIso  = m->pfRelIso;
-    //if(! isGlobalMuon) continue;
+    if(! isGlobalMuon) continue;
     if(mEta<2.4  && mPt> 15.0 && mRelIso < 0.25){ looseVeto = true; }
   }
   return looseVeto;

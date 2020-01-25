@@ -119,7 +119,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //---------------------------------------------------//
   //get initial number of events, from ntuples
   //---------------------------------------------------//
-  double lumiTotal = 35849;
+  double lumiData = 35849;
   int nEntries = evR->AssignEventTreeFrom(f);
   if(nEntries == 0) {return; }
   TH1F* inputcf = (TH1F*)(f->Get("allEventsFilter/totalEvents"));
@@ -228,65 +228,34 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
     //if(i > 1000) break;
     //---------------------------------------------------//
-    //apply lumi, k factor and pileup weight
+    //apply lumi, pileup and top pT weights
     //---------------------------------------------------//
     double evtWeight = 1.0;
-    double weightPU = 1.0;
+    double lumiWt = 1.0;
+    double pileupWt = 1.0;
+    double topPtWt = 1.0;
     if(!ev->isData){
       string sampleName = ev->sampleInfo.sampleName;
-      //k-factor weight (along with lumi weight) 
-      if(sampleName.find("WJetsToLNu") != string::npos || sampleName.find("W1JetsToLNu") != string::npos || sampleName.find("W2JetsToLNu") != string::npos || sampleName.find("W3JetsToLNu") != string::npos || sampleName.find("W4JetsToLNu") != string::npos){
-        int hepNUP = ev->sampleInfo.hepNUP;
-        double weightK = reweightHEPNUPWJets(hepNUP) * (lumiTotal/1000.0);
-        if(i < 1){
-        }
-        evtWeight *= weightK;  
-      }
-      else if(sampleName.find("DYJetsToLL") != string::npos || sampleName.find("DY1JetsToLL") != string::npos || sampleName.find("DY2JetsToLL") != string::npos || sampleName.find("DY3JetsToLL") != string::npos || sampleName.find("DY4JetsToLL") != string::npos){
-        int hepNUP = ev->sampleInfo.hepNUP;
-        std::vector<int> hepIDUP = ev->sampleInfo.hepIDUP;
-        std::vector<int> hepISTUP = ev->sampleInfo.hepISTUP;
-        int countZ = 0;
-        for(size_t p=0; p<hepIDUP.size(); p++){
-          if(hepIDUP[p]==23 && hepISTUP[p]==2)
-            countZ = countZ + 1;
-        }
-        if(countZ==0) hepNUP = hepNUP+1;
-        double weightK = reweightHEPNUPDYJets(hepNUP) * (lumiTotal/1000.0);
-        evtWeight *= weightK;  
-        if(i < 1){
-        }
-      }
+      TString sampleName_(sampleName);
       //lumi weight
-      else {
-      double sampleWeight(1.0);
-      sampleWeight = lumiTotal* xss[sampleName]/evtDBS[sampleName];
-      evtWeight *= sampleWeight; 
-      fillHisto(outFile_, cutflowType, "SF", "Lumi", 1000, 0, 1000, sampleWeight, 1 );
-      }
+      if(sampleName_.Contains("JetsToL")) lumiWt = lumiData/lumiMC[sampleName];
+      else lumiWt = lumiData* xss[sampleName]/evtDBS[sampleName];
+      evtWeight *= lumiWt; 
       //pileup weight
       vector<double>pu = ev->sampleInfo.truepileup;
       if(pu.size() > 0) {
         float npu = pu[0];
-        weightPU = LumiWeights_.weight(npu);
+        pileupWt = LumiWeights_.weight(npu);
         if(cutflowType.Contains("PileupPlus"))
-          weightPU = LumiWeights_Up.weight(npu);
+          pileupWt = LumiWeights_Up.weight(npu);
         else if(cutflowType.Contains("PileupMinus"))
-          weightPU = LumiWeights_Down.weight(npu);
-      evtWeight *= weightPU;  
+          pileupWt = LumiWeights_Down.weight(npu);
       }
-    }
-    fillHisto(outFile_, cutflowType, "SF", "Pileup", 100, 0, 2, weightPU, 1 );
-    //---------------------------------------------------//
-    // apply top re-weighting
-    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
-    //---------------------------------------------------//
-    double topPtWt = 1.0;
-    if(!ev->isData){
-      string sampleName = ev->sampleInfo.sampleName;
+      evtWeight *= pileupWt;  
+      // apply top re-weighting for sys
       if(sampleName.find("Hplus") != string::npos ||
-		      sampleName.find("TTJetsM") != string::npos || 
-		      sampleName.find("TTJetsP") != string::npos){
+              sampleName.find("TTJetsM") != string::npos || 
+              sampleName.find("TTJetsP") != string::npos){
         vector<double>topptweights = ev->sampleInfo.topPtWeights;
         if(topptweights.size() > 0){
           //topPtWt = topptweights[0]; 
@@ -298,9 +267,11 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             topPtWt = 1.0;
         }
       }
+      evtWeight *= topPtWt; //Multiply to the total weights
     }
+    fillHisto(outFile_, cutflowType, "SF", "Lumi", 1000, 0, 1000, lumiWt, 1 );
+    fillHisto(outFile_, cutflowType, "SF", "Pileup", 100, 0, 2, pileupWt, 1 );
     fillHisto(outFile_, cutflowType, "SF", "TopPt", 100, 0, 2, topPtWt, 1 );
-    evtWeight *= topPtWt; //Multiply to the total weights
     
     //---------------------------------------------------//
     //apply muon triggers
@@ -1122,14 +1093,14 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094/", "PF", "");
   //CutFlowAnalysis("outFile_.root", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190321/MuMC_20190321/HplusM140_MuMC_20190321/ChargedHiggsToCS_M140_13TeV-madgraph/HplusM140_MuMC_20190321/190321_172703/0000/HplusM140_MuMC_20190321_Ntuple_2.root", "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/WJetsToLNu_MuMC_20190402/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_MuMC_20190402/190402_161936/0000/WJetsToLNu_MuMC_20190402_Ntuple_1.root", "PF", "");
 
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitM_20190402/MuData_20190402/MuRunFv1_MuData_20190402/SingleMuon/MuRunFv1_MuData_20190402/190402_162414/0000/MuRunFv1_MuData_20190402_Ntuple_12.root", "PF", "");
 
   //====================================
   //condor submission
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

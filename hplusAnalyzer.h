@@ -110,17 +110,43 @@ public :
     xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;
 
-    //DY + jets and W + jets
+    //DY + jets
+    xss["DYJetsToLL"]        =  5765;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
+    //individual lumi
+    double lumiDY  = evtDBS["DYJetsToLL"]/xss["DYJetsToLL"];
+    double lumiDY1 = evtDBS["DY1JetsToLL"]/xss["DY1JetsToLL"];
+    double lumiDY2 = evtDBS["DY2JetsToLL"]/xss["DY2JetsToLL"];
+    double lumiDY3 = evtDBS["DY3JetsToLL"]/xss["DY3JetsToLL"];
+    double lumiDY4 = evtDBS["DY4JetsToLL"]/xss["DY4JetsToLL"];
+    //final lumi
+    lumiMC["DYJetsToLL"]        = lumiDY;
+    lumiMC["DY1JetsToLL"]       = lumiDY + lumiDY1;
+    lumiMC["DY2JetsToLL"]       = lumiDY + lumiDY2;
+    lumiMC["DY3JetsToLL"]       = lumiDY + lumiDY3;
+    lumiMC["DY4JetsToLL"]       = lumiDY + lumiDY4;
+
+    //W + jets
+    xss["WJetsToLNu"]        =  61526;         evtDBS["WJetsToLNu"]        =  29705748;
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
+    //individual lumi
+    double lumiWJ  = evtDBS["WJetsToLNu"]/ xss["WJetsToLNu"]; 
+    double lumiWJ1 = evtDBS["W1JetsToLNu"]/xss["W1JetsToLNu"];
+    double lumiWJ2 = evtDBS["W2JetsToLNu"]/xss["W2JetsToLNu"];
+    double lumiWJ3 = evtDBS["W3JetsToLNu"]/xss["W3JetsToLNu"];
+    double lumiWJ4 = evtDBS["W4JetsToLNu"]/xss["W4JetsToLNu"];
+    //final lumi
+    lumiMC["WJetsToLNu"]        =  lumiWJ;
+    lumiMC["W1JetsToLNu"]       =  lumiWJ + lumiWJ1;
+    lumiMC["W2JetsToLNu"]       =  lumiWJ + lumiWJ2;
+    lumiMC["W3JetsToLNu"]       =  lumiWJ + lumiWJ3;
+    lumiMC["W4JetsToLNu"]       =  lumiWJ + lumiWJ4;
 
     //VV fusion
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
@@ -196,8 +222,6 @@ public :
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", TFile *outFile_=0);
   //void CreateAnalHistos(TString flowType, TFile* outFile_);
   void processEvents();
-  float reweightHEPNUPWJets(int hepNUP);
-  float reweightHEPNUPDYJets(int hepNUP);
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
@@ -209,6 +233,7 @@ private :
   reweight::PoissonMeanShifter PShiftDown_; //pileup syst down
   std::map<string, double> xss;
   std::map<string, double> evtDBS;
+  std::map<string, double> lumiMC;
   ofstream outfile_;
   BTagCalibrationReader myReadCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
   Double_t getMuonSF(TH2D *h2, double eta, double pt, double maxPt);
@@ -218,26 +243,6 @@ private :
   double deltaPhi12(double phi1, double phi2);
   double phi0to2pi(double phi);
 };
-
-float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 2.11;
-  else if(nJets==1) return 0.23;
-  else if(nJets==2) return 0.119;
-  else if(nJets==3) return 0.0562;
-  else if(nJets>=4) return 0.0671;
-  else return 1 ;
-}
-
-float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
-  int nJets = hepNUP-5;
-  if(nJets==0)      return 0.120;
-  else if(nJets==1) return 0.0164;
-  else if(nJets==2) return 0.0168;
-  else if(nJets==3) return 0.0167;
-  else if(nJets>=4) return 0.0128;
-  else return 1 ;
-}
 
 BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, const std::string &tagger,
 		BTagEntry::OperatingPoint op,
