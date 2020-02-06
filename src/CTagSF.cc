@@ -3,10 +3,11 @@
 ClassImp(CTagSF)
 
 double CTagSF::getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, bool isCTag){
+  //double pMC = 1.0; 
   double pMC = 1.0; 
   if(isCTag) pMC = getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
   else pMC = 1 - getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
-  return (pMC >0)?pMC:1.0;
+  return pMC;
 }
 
 double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTag, int jetFlavor, int cTagSys){
@@ -23,7 +24,7 @@ double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_N
     eff = getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
     pData = 1.0 - sf*eff;
   }
-  return (pData>0)?pData:1.0;
+  return pData;
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
@@ -50,7 +51,7 @@ double CTagSF::getCTagSF(BTagCalibrationReader &reader, double eta, double pt, d
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
 double CTagSF::getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, double eta, double pt){
-  double eff = 0.0;
+  double eff = 1.0;
   double bin_num = h2_CTagEff_Num->FindBin(pt, double(eta));
   double bin_denom = h2_CTagEff_Denom->FindBin(pt, double(eta));
   double num = h2_CTagEff_Num->GetBinContent(bin_num); 

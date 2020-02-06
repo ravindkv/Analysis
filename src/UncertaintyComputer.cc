@@ -250,7 +250,8 @@ double UncertaintyComputer::getIncCTagPmcSys(TH2D *h2_qTagEff_Num, TH2D *h2_qTag
 }
 double UncertaintyComputer::getIncCTagPdataSys(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, MyJet jet, bool isCTag, int scale){
   double pData = 1.0;
-  double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; //which tagger should be used, pfCombinedCvsBJetTags?
+  //double csv =jet.bDiscriminator["pfCombinedCvsLJetTags"]; 
+  double csv =abs(jet.bDiscriminator["pfCombinedCvsBJetTags"]); //SF is calculated as a func of pT
   double eta = jet.p4.eta();
   double pt = jet.p4.pt();
   int flavor = abs(jet.partonFlavour);

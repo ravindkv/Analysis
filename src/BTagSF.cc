@@ -7,7 +7,7 @@ double BTagSF::getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double e
   double pMC = 1.0; 
   if(csv> csvM) pMC = getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
   else pMC = 1 - getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
-  return (pMC>0)?pMC:1.0;
+  return pMC;
 }
 
 double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int bTagSys){
@@ -26,7 +26,7 @@ double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num,
     eff = getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
     pData = 1.0 - sf*eff;
   }
-  return (pData>0)?pData:1.0;
+  return pData;
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
@@ -58,5 +58,5 @@ double BTagSF::getBTagEff(TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, double e
   double num = h2_BTagEff_Num->GetBinContent(bin_num); 
   double denom = h2_BTagEff_Denom->GetBinContent(bin_denom); 
   eff = num/denom;
-  return eff;  
+  return eff;
 }

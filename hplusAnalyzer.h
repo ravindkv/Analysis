@@ -110,106 +110,21 @@ public :
     xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;
 
-    //DY + jets
-    xss["DYJetsToLL"]        =  5765;          evtDBS["DYJetsToLL"]        =  49144274;
+    //DY + jets and W + jets 
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
     xss["DY4JetsToLL"]       =  51.4;          evtDBS["DY4JetsToLL"]       =  4197868;
-    //individual lumi
-    double lumiDY  = evtDBS["DYJetsToLL"]/xss["DYJetsToLL"];
-    double lumiDY1 = evtDBS["DY1JetsToLL"]/xss["DY1JetsToLL"];
-    double lumiDY2 = evtDBS["DY2JetsToLL"]/xss["DY2JetsToLL"];
-    double lumiDY3 = evtDBS["DY3JetsToLL"]/xss["DY3JetsToLL"];
-    double lumiDY4 = evtDBS["DY4JetsToLL"]/xss["DY4JetsToLL"];
-    //final lumi
-    lumiMC["DYJetsToLL"]        = lumiDY;
-    lumiMC["DY1JetsToLL"]       = lumiDY + lumiDY1;
-    lumiMC["DY2JetsToLL"]       = lumiDY + lumiDY2;
-    lumiMC["DY3JetsToLL"]       = lumiDY + lumiDY3;
-    lumiMC["DY4JetsToLL"]       = lumiDY + lumiDY4;
-
-    //W + jets
-    xss["WJetsToLNu"]        =  61526;         evtDBS["WJetsToLNu"]        =  29705748;
+    xss["DYJetsToLL"]        =  4895;          evtDBS["DYJetsToLL"]        =  49144274;
     xss["W1JetsToLNu"]       =  9493;          evtDBS["W1JetsToLNu"]       =  45367044;
     xss["W2JetsToLNu"]       =  3120;          evtDBS["W2JetsToLNu"]       =  29878415;
     xss["W3JetsToLNu"]       =  942.3;         evtDBS["W3JetsToLNu"]       =  19798117;
     xss["W4JetsToLNu"]       =  524.2;         evtDBS["W4JetsToLNu"]       =  9170576;
-    //individual lumi
-    double lumiWJ  = evtDBS["WJetsToLNu"]/ xss["WJetsToLNu"]; 
-    double lumiWJ1 = evtDBS["W1JetsToLNu"]/xss["W1JetsToLNu"];
-    double lumiWJ2 = evtDBS["W2JetsToLNu"]/xss["W2JetsToLNu"];
-    double lumiWJ3 = evtDBS["W3JetsToLNu"]/xss["W3JetsToLNu"];
-    double lumiWJ4 = evtDBS["W4JetsToLNu"]/xss["W4JetsToLNu"];
-    //final lumi
-    lumiMC["WJetsToLNu"]        =  lumiWJ;
-    lumiMC["W1JetsToLNu"]       =  lumiWJ + lumiWJ1;
-    lumiMC["W2JetsToLNu"]       =  lumiWJ + lumiWJ2;
-    lumiMC["W3JetsToLNu"]       =  lumiWJ + lumiWJ3;
-    lumiMC["W4JetsToLNu"]       =  lumiWJ + lumiWJ4;
-
+    xss["WJetsToLNu"]        =  50690;         evtDBS["WJetsToLNu"]        =  29705748;
     //VV fusion
     xss["WW"]                =  118.7;         evtDBS["WW"]                =  994012;
     xss["WZ"]                =  46.74;         evtDBS["WZ"]                =  1000000;
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064;
-
-    //Bkg from Higgs production
-    //Gluon gluon fusion
-    xss["GluGluHToBB"]            =   28.293   ; evtDBS["GluGluHToBB"]            = 4856192 ;
-    xss["GluGluHToTauTau"]        =   3.046    ; evtDBS["GluGluHToTauTau"]        = 1471061 ;
-    xss["GluGluHToCC"]            =   1.404    ; evtDBS["GluGluHToCC"]            = 9782840 ;
-    xss["GluGluHToGG"]            =   3.979    ; evtDBS["GluGluHToGG"]            = 998200  ;
-    xss["GluGluHToWWTo2L2Nu"]     =   1.090    ; evtDBS["GluGluHToWWTo2L2Nu"]     = 499473  ;
-    xss["GluGluHToWWToLNuQQ"]     =   4.548    ; evtDBS["GluGluHToWWToLNuQQ"]     = 198585  ;
-    xss["GluGluHToZZTo2L2Q"]      =   0.195    ; evtDBS["GluGluHToZZTo2L2Q"]      = 1000000 ;
-    xss["GluGluHToZZTo4L"]        =   0.015    ; evtDBS["GluGluHToZZTo4L"]        = 992224  ;
-    //W+H production
-    xss["WplusH_HToBB_WToLNu"]    =   0.158    ; evtDBS["WplusH_HToBB_WToLNu"]    = 999800  ;
-    xss["WplusH_HToBB_WToQQ"]     =   0.331    ; evtDBS["WplusH_HToBB_WToQQ"]     = 499093  ;
-    xss["WplusHToTauTau"]         =   0.053    ; evtDBS["WplusHToTauTau"]         = 428036  ;
-    xss["WplusH_HToCC_WToLNu"]    =   0.008    ; evtDBS["WplusH_HToCC_WToLNu"]    = 1482024 ;
-    xss["WplusH_HToCC_WToQQ"]     =   0.016    ; evtDBS["WplusH_HToCC_WToQQ"]     = 459565  ;
-    xss["WplusH_HToGG_WToAll"]    =   0.069    ; evtDBS["WplusH_HToGG_WToAll"]    = 300000  ;
-    //W-H production
-    xss["WminusH_HToBB_WToQQ"]    =   0.210    ; evtDBS["WminusH_HToBB_WToQQ"]    = 499994  ;
-    xss["WminusHToTauTau"]        =   0.033    ; evtDBS["WminusHToTauTau"]        = 445200  ;
-    xss["WminusH_HToCC_WToLNu"]   =   0.005    ; evtDBS["WminusH_HToCC_WToLNu"]   = 1477656 ;
-    xss["WminusH_HToCC_WToQQ"]    =   0.010    ; evtDBS["WminusH_HToCC_WToQQ"]    = 457517  ;
-    xss["WminusH_HToGG_WToAll"]   =   0.044    ; evtDBS["WminusH_HToGG_WToAll"]   = 300000  ;
-    xss["WminusH_HToZZTo2L2X"]    =   0.014    ; evtDBS["WminusH_HToZZTo2L2X"]    = 978136  ;
-    //ZH production
-    xss["ZH_HToBB_ZToNuNu"]       =   0.103    ; evtDBS["ZH_HToBB_ZToNuNu"]       = 2924580 ;
-    xss["ZH_HToBB_ZToLL"]         =   0.052    ; evtDBS["ZH_HToBB_ZToLL"]         = 1979860 ;
-    xss["ZH_HToBB_ZToQQ"]         =   0.360    ; evtDBS["ZH_HToBB_ZToQQ"]         = 499200  ;
-    xss["ZHToTauTau"]             =   0.055    ; evtDBS["ZHToTauTau"]             = 571597  ;
-    xss["ZH_HToCC_ZToNuNu"]       =   0.005    ; evtDBS["ZH_HToCC_ZToNuNu"]       = 1183744 ;
-    xss["ZH_HToCC_ZToLL"]         =   0.003    ; evtDBS["ZH_HToCC_ZToLL"]         = 4885552 ;
-    xss["ZH_HToCC_ZToQQ"]         =   0.018    ; evtDBS["ZH_HToCC_ZToQQ"]         = 499384  ;
-    xss["ZH_HToGG_ZToAll"]        =   0.072    ; evtDBS["ZH_HToGG_ZToAll"]        = 299739  ;
-    xss["ZH_HToZZ_2L"]            =   0.002    ; evtDBS["ZH_HToZZ_2L"]            = 942259  ;
-    //gg fusion to ZH
-    xss["ggZH_HToBB_ZToNuNu"]     =   0.014    ; evtDBS["ggZH_HToBB_ZToNuNu"]     = 250000  ;
-    xss["ggZH_HToBB_ZToLL"]       =   0.007    ; evtDBS["ggZH_HToBB_ZToLL"]       = 250000  ;
-    xss["ggZH_HToBB_ZToQQ"]       =   0.050    ; evtDBS["ggZH_HToBB_ZToQQ"]       = 499130  ;
-    xss["ggZH_HToCC_ZToNuNu"]     =   0.001    ; evtDBS["ggZH_HToCC_ZToNuNu"]     = 2457116 ;
-    xss["ggZH_HToCC_ZToLL"]       =   0.000    ; evtDBS["ggZH_HToCC_ZToLL"]       = 2921029 ;
-    xss["ggZH_HToCC_ZToQQ"]       =   0.002    ; evtDBS["ggZH_HToCC_ZToQQ"]       = 478600  ;
-    xss["GluGluZH_HToWW"]         =   0.026    ; evtDBS["GluGluZH_HToWW"]         = 148525  ;
-    //tt fusion
-    xss["ttHToCC"]                =   0.015    ; evtDBS["ttHToCC"]                = 4784344 ;
-    xss["ttHToGG"]                =   0.042    ; evtDBS["ttHToGG"]                = 768410  ;
-    //bb fusion
-    xss["bbHToBB"]                =   0.284    ; evtDBS["bbHToBB"]                = 749600  ;
-    xss["bbHToGG"]                =   0.040    ; evtDBS["bbHToGG"]                = 746400  ;
-    xss["bbHToWWTo2L2Nu"]         =   0.011    ; evtDBS["bbHToWWTo2L2Nu"]         = 749998  ;
-    xss["bbH_HToZZTo4L"]          =   0.000    ; evtDBS["bbH_HToZZTo4L"]          = 1000000 ;
-    //vector boson fustion
-    xss["VBFHToBB"]               =   2.203    ; evtDBS["VBFHToBB"]               = 1000000 ;
-    xss["VBFHToTauTau"]           =   0.237    ; evtDBS["VBFHToTauTau"]           = 1499400 ;
-    xss["VBFHToCC"]               =   0.109    ; evtDBS["VBFHToCC"]               = 4980094 ;
-    xss["VBFHToGG"]               =   0.310    ; evtDBS["VBFHToGG"]               = 1000000 ;
-    xss["VBFHToWWTo2L2Nu"]        =   0.085    ; evtDBS["VBFHToWWTo2L2Nu"]        = 486510  ;
-    xss["VBFHToWWToLNuQQ"]        =   0.354    ; evtDBS["VBFHToWWToLNuQQ"]        = 198937  ;
 
     //for default sample code
     xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498;
@@ -222,6 +137,8 @@ public :
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", TFile *outFile_=0);
   //void CreateAnalHistos(TString flowType, TFile* outFile_);
   void processEvents();
+  float reweightHEPNUPWJets(int hepNUP);
+  float reweightHEPNUPDYJets(int hepNUP);
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
@@ -243,6 +160,26 @@ private :
   double deltaPhi12(double phi1, double phi2);
   double phi0to2pi(double phi);
 };
+
+float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
+  int nJets = hepNUP-5;
+  if(nJets==0)      return 2.11;
+  else if(nJets==1) return 0.23;
+  else if(nJets==2) return 0.119;
+  else if(nJets==3) return 0.0562;
+  else if(nJets>=4) return 0.0671;
+  else return 1 ;
+}
+
+float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
+  int nJets = hepNUP-5;
+  if(nJets==0)      return 0.120;
+  else if(nJets==1) return 0.0164;
+  else if(nJets==2) return 0.0168;
+  else if(nJets==3) return 0.0167;
+  else if(nJets>=4) return 0.0128;
+  else return 1 ;
+}
 
 BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, const std::string &tagger,
 		BTagEntry::OperatingPoint op,
