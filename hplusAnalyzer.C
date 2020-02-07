@@ -23,8 +23,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
-  CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
-  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -48,7 +46,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
-  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -326,24 +323,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<int> t_final; t_final.clear();
     JetCleaning(pfJets, pfMuons, pfElectrons,  &j_init, &j_final, &m_init, &e_final, DRMIN_JET);
     
-    //Get MC partons
-    vector<MyLorentzVector> bquarks; bquarks.clear();
-    vector<MyLorentzVector> lquarks; lquarks.clear();
-    MyLorentzVector mcTop, mcAntiTop;
-    mcTop.SetPxPyPzE(0., 0., 0., 0.); mcAntiTop.SetPxPyPzE(0., 0., 0., 0.);
-    if(!ev->isData){
-      vector<MyMCParticle>allMCParticles = ev->mcParticles;
-      for(size_t imc=0; imc < allMCParticles.size(); ++imc){
-        if(abs(allMCParticles[imc].pid) == 5 && allMCParticles[imc].mother.size() > 0 && (abs(allMCParticles[imc].mother[0])==6) )
-          bquarks.push_back(allMCParticles[imc].p4Gen);
-        else if(abs(allMCParticles[imc].pid) <= 4 && allMCParticles[imc].mother.size() > 0 && (abs(allMCParticles[imc].mother[0])==24 || abs(allMCParticles[imc].mother[0])==37) )
-          lquarks.push_back(allMCParticles[imc].p4Gen); 
-        else if(allMCParticles[imc].pid == 6 && allMCParticles[imc].status == 3)
-          mcTop = allMCParticles[imc].p4Gen;
-        else if(allMCParticles[imc].pid == -6 && allMCParticles[imc].status == 3)
-          mcAntiTop = allMCParticles[imc].p4Gen;
-      }
-    }
     //---------------------------------------------------//
     //get KinFit objects
     //---------------------------------------------------//
@@ -886,7 +865,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
             //////////////////////////////////////////////////////////////////////////////
           }
           if(pMC_IncL>0)cTagWt_IncL  = pData_IncL/pMC_IncL; 
-          fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncL_1", 100, 0, 500, diJetKF.mass(), evtWeight*cTagWt_IncL);
           //////////////////////////////////////////////////////////////////////////////
           if(isIncL && isIncM && isIncT){
             fillHisto(outFile_, cutflowType_, "ExCTag", "mjj_kfit_CTag_yLyMyT", 100, 0, 500, diJetKF.mass(), cTagWt_IncL*evtWeight );
@@ -1010,6 +988,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
           fillHisto(outFile_, cutflowType_, "ExCTag", "sf_CTagIncT_wt", 100, 0, 2, cTagWt_IncT, evtWeight);
         }//Inc tight scale factor
       }
+
+      //Inclusive categorization
       double evtWtIncL = 1.0;
       double evtWtIncM = 1.0;
       double evtWtIncT = 1.0;
@@ -1028,9 +1008,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagIncT", 100, 0, 500, diJetKF.mass(), evtWtIncT);
       }
 
-      //---------------------------------------------------//
-      // b-jet pT categorization from exclusive events
-      //---------------------------------------------------//
+      //Exclusive categorization
       if(count_cJetsIncT> 0){
         evtWeight = evtWeight*cTagWt_IncT;
         fillHisto(outFile_, cutflowType, "SF", "CTagIncT", 100, 0, 2, cTagWt_IncT, 1);
@@ -1049,7 +1027,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       else{
         fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit_CTagExO", 100, 0, 500, diJetKF.mass(), evtWeight );
       }
-
     }//allKinFitSel
   else{
     std::map<double, int> bdiscr_sorted_bjets;
@@ -1135,12 +1112,12 @@ void hplusAnalyzer::processEvents(){
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/WJetsToLNu_MuMC_20190402/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_MuMC_20190402/190402_161936/0000/WJetsToLNu_MuMC_20190402_Ntuple_1.root", "PF", "");
 
- CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
+ //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitM_20190402/MuData_20190402/MuRunB2v2_MuData_20190402/SingleMuon/MuRunB2v2_MuData_20190402/190402_162204/0000/MuRunB2v2_MuData_20190402_Ntuple_102.root", "PF", "");
 
   //====================================
   //condor submission
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 
