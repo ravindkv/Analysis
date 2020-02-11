@@ -22,6 +22,8 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   MyEvent *ev_;
   ev_ = evR_->GetNewEvent(1);
 
+    CutFlowProcessor(url, myKey, "TopPtPlus", 	outFile_);
+  /*
   CutFlowProcessor(url, myKey, "base", outFile_);
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
@@ -46,6 +48,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
+  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -413,12 +416,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //SF function by fitting bottom left plot of Fig3 (TOP-17-014)
       double sfHad = exp(0.076 - 0.00076*ptHad);
       double sfLep = exp(0.076 - 0.00076*ptLep);
-      topWtParticle = sqrt(sfHad*sfLep);
+      if(ptHad>0 && ptLep>0)topWtParticle = sqrt(sfHad*sfLep);
       vector<double>topptweights = ev->sampleInfo.topPtWeights;
       if(topptweights.size() > 0)topWtParton = topptweights[0];
     }
-    fillHisto(outFile_, cutflowType, "SF", "TopPtParton", 100, 0, 2, topWtParton, 1 );
-    fillHisto(outFile_, cutflowType, "SF", "TopPtParticle", 100, 0, 2, topWtParticle, 1 );
     evtWeight *= topWtParticle; //Multiply to the total weights
 
     //---------------------------------------------------//
@@ -768,6 +769,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       MyLorentzVector tLep = kfJetsLepB[0]+kfLepton[0]+kfMet[0];
       double ptHad = tHad.pt();
       double ptLep = tLep.pt();
+      fillHisto(outFile_, cutflowType, "SF", "TopPtParton", 100, 0, 2, topWtParton, 1 );
+      fillHisto(outFile_, cutflowType, "SF", "TopPtParticle", 100, 0, 2, topWtParticle, 1 );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_tHad", 100, 0, 1000, ptHad, evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_tLep", 100, 0, 1000, ptLep, evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit", 100, 0, 500, diJetKF.mass(), evtWeight );
@@ -1112,12 +1115,12 @@ void hplusAnalyzer::processEvents(){
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/WJetsToLNu_MuMC_20190402/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_MuMC_20190402/190402_161936/0000/WJetsToLNu_MuMC_20190402_Ntuple_1.root", "PF", "");
 
- //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
+ CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_kfitM_20190402/MuMC_20190402/TTJetsP_MuMC_20190402/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20190402/190402_161228/0000/TTJetsP_MuMC_20190402_Ntuple_162.root", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitM_20190402/MuData_20190402/MuRunB2v2_MuData_20190402/SingleMuon/MuRunB2v2_MuData_20190402/190402_162204/0000/MuRunB2v2_MuData_20190402_Ntuple_102.root", "PF", "");
 
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 } 

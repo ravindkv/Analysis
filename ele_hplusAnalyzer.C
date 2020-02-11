@@ -415,12 +415,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //SF function by fitting bottom left plot of Fig3 (TOP-17-014)
       double sfHad = exp(0.076 - 0.00076*ptHad);
       double sfLep = exp(0.076 - 0.00076*ptLep);
-      topWtParticle = sqrt(sfHad*sfLep);
+      if(ptHad>0 && ptLept>0)topWtParticle = sqrt(sfHad*sfLep);
       vector<double>topptweights = ev->sampleInfo.topPtWeights;
       if(topptweights.size() > 0)topWtParton = topptweights[0];
     }
-    fillHisto(outFile_, cutflowType, "SF", "TopPtParton", 100, 0, 2, topWtParton, 1 );
-    fillHisto(outFile_, cutflowType, "SF", "TopPtParticle", 100, 0, 2, topWtParticle, 1 );
     evtWeight *= topWtParticle; //Multiply to the total weights
     
     //---------------------------------------------------//
@@ -757,6 +755,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       MyLorentzVector tLep = kfJetsLepB[0]+kfLepton[0]+kfMet[0];
       double ptHad = tHad.pt();
       double ptLep = tLep.pt();
+      fillHisto(outFile_, cutflowType, "SF", "TopPtParton", 100, 0, 2, topWtParton, 1 );
+      fillHisto(outFile_, cutflowType, "SF", "TopPtParticle", 100, 0, 2, topWtParticle, 1 );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_tHad", 100, 0, 1000, ptHad, evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit","pt_tLep", 100, 0, 1000, ptLep, evtWeight );
       fillHisto(outFile_, cutflowType_, "KinFit", "mjj_kfit", 100, 0, 500, diJetKF.mass(), evtWeight );
