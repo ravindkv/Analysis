@@ -23,7 +23,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
-  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd 
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -47,7 +46,6 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
-  */
   outFile_->Write(); 
   outFile_->Close();
   f_->Close();
@@ -415,7 +413,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       //SF function by fitting bottom left plot of Fig3 (TOP-17-014)
       double sfHad = exp(0.076 - 0.00076*ptHad);
       double sfLep = exp(0.076 - 0.00076*ptLep);
-      if(ptHad>0 && ptLept>0)topWtParticle = sqrt(sfHad*sfLep);
+      if(ptHad>0 && ptLep>0)topWtParticle = sqrt(sfHad*sfLep);
       vector<double>topptweights = ev->sampleInfo.topPtWeights;
       if(topptweights.size() > 0)topWtParton = topptweights[0];
     }
@@ -1101,6 +1099,8 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("outFile_.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_kfitM_20190403/EleMC_20190403/TTJetsP_EleMC_20190403/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20190403/190403_100750/0000/TTJetsP_EleMC_20190403_Ntuple_116.root", "PF", "");
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleData_kfitM_20190403/EleData_20190403/EleRunBver2v2_EleData_20190403/SingleElectron/EleRunBver2v2_EleData_20190403/190403_101643/0000/EleRunBver2v2_EleData_20190403_Ntuple_1.root", "PF", "");
+
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_EleMC_Hcs2016data13TeV_20200213/EleMC_20200213/TTJetsP_EleMC_20200213/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_EleMC_20200213/200213_090519/0000/TTJetsP_EleMC_20200213_Ntuple_1.root", "PF", "");
 
   //====================================
   //condor submission

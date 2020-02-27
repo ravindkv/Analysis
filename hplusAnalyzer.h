@@ -86,7 +86,7 @@ public :
     xss["QCD_Pt-300to470_Mu"]=  797;           evtDBS["QCD_Pt-300to470_Mu"]=  7937590;
 
     //qcd EM enriched
-    xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601;
+    //xss["QCD_Pt-15to20_EM"]  =  254600;        evtDBS["QCD_Pt-15to20_EM"]  =  5652601; //no longer exist
     xss["QCD_Pt-20to30_EM"]  =  5352960;       evtDBS["QCD_Pt-20to30_EM"]  =  9218954;
     xss["QCD_Pt-30to50_EM"]  =  9928000;       evtDBS["QCD_Pt-30to50_EM"]  =  4730195;
     xss["QCD_Pt-50to80_EM"]  =  2890800;       evtDBS["QCD_Pt-50to80_EM"]  =  22337070;
@@ -127,7 +127,7 @@ public :
     xss["ZZ"]                =  17.72;         evtDBS["ZZ"]                =  990064;
 
     //for default sample code
-    xss["sampCode_"]         =  831.76*0.2132; evtDBS["sampCode_"]         =  994498;
+    xss["sampCode_"]         =  831.76*0.2132*scaleSig; evtDBS["sampCode_"]         =  994498;
   };
   ~hplusAnalyzer() {
     delete evR;
