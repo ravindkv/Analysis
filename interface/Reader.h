@@ -39,8 +39,7 @@
 #endif
 
 using namespace std;
-
-class Reader
+class Reader 
 {
  public:
   Reader() { }
@@ -54,12 +53,14 @@ class Reader
   MyEvent *GetNewEventFromList(unsigned int ientry); //for more than one files
 
   Long64_t LoadTree(Long64_t entry);
-
-  vector<MyJet> getJets(MyEvent* ev, string algo);
+  vector<MyJet> getJets(MyEvent* ev, string algo, int jes, int jer, bool isData);
+  vector<MyJet> getJetsNoCorr(MyEvent* ev, string algo);
   vector<MyElectron> getElectrons(MyEvent* ev, string algo);
   vector<MyMuon> getMuons(MyEvent* ev, string algo);
   MyMET getMET(MyEvent* ev, string algo);
 
+  double getJERSF(double eta, int jer);
+  double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
  private :
   TTree *myTree;
   //TChain *chain;

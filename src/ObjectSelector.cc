@@ -133,10 +133,9 @@ void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector
 void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer, bool isData){
   //https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
   for(unsigned int i=0;i<vJ.size();i++){
-    const MyJet *jet = &vJ[i];
-    double jetEta     = TMath::Abs(jet->p4.eta());
-    //double jetPt    = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer, isData); 
+    const MyJet *jet= &vJ[i];
+    double jetEta   = TMath::Abs(jet->p4.eta());
+    double jetPt    = TMath::Abs(jet->p4.pt());
     double NHF      = jet->neutralHadronEnergyFraction;
     double NEMF     = jet->neutralEmEnergyFraction;
     double CHF      = jet->chargedHadronEnergyFraction;
@@ -147,26 +146,7 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     if(looseJetID && jetPt > 25.0) j_i->push_back(i);
   }
 }
-/*
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer){
-  for(unsigned int i=0;i<vJ.size();i++){
-    const MyJet *jet = &vJ[i];
-    double jetEta     = TMath::Abs(jet->p4.eta());
-    //double jetPt      = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer); 
-    double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
-    double neutralEmEnFrac = jet->neutralEmEnergyFraction;
-    double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
-    if(jetPt > 25.0000 && jetEta < 2.4000000
-      && neutralHadEnFrac < 0.990
-      && neutralEmEnFrac  < 0.990
-      && chargedHadEnFrac > 0.00
-      ){
-      j_i->push_back(i);
-    }
-  }
-}
-*/
+
 bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
   bool looseVeto(false);
   for(int i=0;i< (int)vM.size();i++){

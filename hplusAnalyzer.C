@@ -23,6 +23,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
   ev_ = evR_->GetNewEvent(1);
 
   CutFlowProcessor(url, myKey, "base", outFile_);
+  /*
   CutFlowProcessor(url, myKey, "baseLowMET", outFile_);
   //to estimate unc in the data-driven qcd
   CutFlowProcessor(url, myKey, "baseIso20HighMET", outFile_);
@@ -46,6 +47,7 @@ void hplusAnalyzer::CutFlowAnalysis(TString url, string myKey, string evtType){
     CutFlowProcessor(url, myKey, "bcTagMinus2", 	outFile_);
     CutFlowProcessor(url, myKey, "bcTagMinus3", 	outFile_);
   }
+  */
   outFile_->Write();
   outFile_->Close();
   f_->Close();
@@ -224,7 +226,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
-    //if(i > 1000) break;
+    if(i > 1000) break;
     //---------------------------------------------------//
     //apply lumi, k factor and pileup weight
     //---------------------------------------------------//
@@ -301,7 +303,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     }
     vector<MyMuon> pfMuons = evR->getMuons(ev, mAlgo);
     vector<MyElectron> pfElectrons = evR->getElectrons(ev, eAlgo);
-    vector<MyJet> pfJets = evR->getJets(ev, jAlgo);
+    vector<MyJet> pfJets = evR->getJets(ev, jAlgo, jes, jer, ev->isData);
+    vector<MyJet> pfJetsNoCorr = evR->getJetsNoCorr(ev, jAlgo);
     MyMET met = evR->getMET(ev, metAlgo);
 
     // preselect objects
@@ -315,13 +318,17 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     preSelectElectrons(&e_init, pfElectrons, Vertices[0], isPFlow);
     vector<int> j_init; j_init.clear();
     preSelectJets(jAlgo, &j_init, pfJets, jes, jer);
+    vector<int> jNoCorr_init; jNoCorr_init.clear();
+    preSelectJets(jAlgo, &jNoCorr_init, pfJets, jes, jer);
 
     // clean objects //
     vector<int> e_final; e_final.clear();
     ElectronCleaning( pfElectrons, pfMuons, &e_init, &e_final, &m_init, DRMIN_ELE);
     vector<int> j_final; j_final.clear();
+    vector<int> jNoCorr_final; jNoCorr_final.clear();
     vector<int> t_final; t_final.clear();
     JetCleaning(pfJets, pfMuons, pfElectrons,  &j_init, &j_final, &m_init, &e_final, DRMIN_JET);
+    JetCleaning(pfJetsNoCorr, pfMuons, pfElectrons,  &jNoCorr_init, &jNoCorr_final, &m_init, &e_final, DRMIN_JET);
 
     //---------------------------------------------------//
     //get KinFit objects
@@ -486,6 +493,10 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType, "SF", "Lepton", 100, 0, 2, muSF, 1 );
     double metPt = 0;
     metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, ev->isData);
+    double metPt2 = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData);
+    cout<<"Event ----------------: "<<i<<endl;
+    cout<<"MET1 = "<<metPt<<endl;
+    cout<<"MET2 = "<<metPt2<<endl;
     Float_t xBinIso_array[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
     fillHisto(outFile_, cutflowType, "", "RelIso_1Mu", 50, 0, 3, tmp_iso, evtWeight);
     fillHisto(outFile_, cutflowType, "", "pt_met_1Mu", 100, 0, 1000, metPt, evtWeight );
@@ -540,7 +551,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "BTag", "pfCMVA", 100, -2, 2, pfCMVA, evtWeight );
       if(pfCISV > 0.8484){
         count_CSVM_SF++;
-        double jetPt = jetPtWithJESJER(pfJets[ijet], jes, jer, ev->isData);
+        double jetPt = pfJets[ijet].p4.pt();
         fillHisto(outFile_, cutflowType_, "BTag", "pt_bjet", 100, 0, 1000, jetPt, evtWeight );
         fillHisto(outFile_, cutflowType_, "BTag", "eta_bjet", 50, -5, 5, pfJets[ijet].p4.eta(), evtWeight );
         j_final_b.push_back(ind_jet);
@@ -649,8 +660,8 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType_, "BTag","final_RelIso_mu", 100, 0, 3, mRelIso, evtWeight );
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
-      double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer, ev->isData);
-      double sfJESJER = jetPt/pfJets[ind_jet].p4.pt();
+      double jetPt = pfJets[ind_jet].p4.pt();
+      double sfJESJER = 1.0;
       fillHisto(outFile_, cutflowType, "SF", "JESJER", 100, 0, 2, sfJESJER, 1 );
       fillHisto(outFile_, cutflowType_, "BTag","pt_jet", 100, 0, 1000, jetPt, evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
@@ -777,7 +788,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "KinFit","final_RelIso_mu", 100, 0, 3, mRelIso, evtWeight );
       for(size_t ijet = 0; ijet < j_final.size(); ijet++){
         int ind_jet = j_final[ijet];
-        double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer, ev->isData);
+        double jetPt = pfJets[ind_jet].p4.pt();
         fillHisto(outFile_, cutflowType_, "KinFit","pt_jet", 100, 0, 1000, jetPt, evtWeight );
         fillHisto(outFile_, cutflowType_, "KinFit","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
         fillHisto(outFile_, cutflowType_, "KinFit","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
@@ -1084,7 +1095,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
       fillHisto(outFile_, cutflowType_, "nonKinFit","final_RelIso_mu", 100, 0, 3, mRelIso, evtWeight );
       for(size_t ijet = 0; ijet < j_final.size(); ijet++){
         int ind_jet = j_final[ijet];
-        double jetPt = jetPtWithJESJER(pfJets[ind_jet], jes, jer, ev->isData);
+        double jetPt = pfJets[ind_jet].p4.pt();
         fillHisto(outFile_, cutflowType_, "nonKinFit","pt_jet", 100, 0, 1000, jetPt, evtWeight );
         fillHisto(outFile_, cutflowType_, "nonKinFit","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
         fillHisto(outFile_, cutflowType_, "nonKinFit","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
@@ -1112,11 +1123,11 @@ void hplusAnalyzer::processEvents(){
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuMC_Hcs2016data13TeV_20200212/MuMC_20200212/TTJetsP_MuMC_20200212/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20200212/200212_183653/0000/TTJetsP_MuMC_20200212_Ntuple_1.root", "PF", "");
 
-  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200225_MuMC/MuMC_20200225/TTJetsP_MuMC_20200225/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20200225/200225_162435/0000/TTJetsP_MuMC_20200225_Ntuple_1.root", "PF", "");
+  CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200225_MuMC/MuMC_20200225/TTJetsP_MuMC_20200225/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20200225/200225_162435/0000/TTJetsP_MuMC_20200225_Ntuple_1.root", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/ntuple_MuData_kfitM_20190402/MuData_20190402/MuRunB2v2_MuData_20190402/SingleMuon/MuRunB2v2_MuData_20190402/190402_162204/0000/MuRunB2v2_MuData_20190402_Ntuple_102.root", "PF", "");
   //====================================
   //condor submission
-  CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094/inputFile", "PF", "outputFile");
   //====================================
 }
