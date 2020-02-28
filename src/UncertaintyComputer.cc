@@ -135,7 +135,7 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
     //apply JER uncert, scaling
     double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
     double rCone = 0.4;
-    if(isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+    if(!isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
     //if(gen_pt <= 0) continue; 
     MyLorentzVector rawJet = vJ[j_ind].p4; 
     metX += rawJet.px(); 
