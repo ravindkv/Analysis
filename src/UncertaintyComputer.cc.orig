@@ -86,6 +86,19 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
     double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
     double rCone = 0.4;
     if(!isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+<<<<<<< HEAD
+    //if(gen_pt <= 0) continue; 
+    MyLorentzVector rawJet = vJ[j_ind].p4; 
+    metX += rawJet.px(); 
+    metY += rawJet.py(); 
+    double jet_pt = vJ[j_ind].p4.pt(); 
+    double SF = getJERSF(vJ[j_ind].p4.eta(), jer); 
+    //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
+    double ptscale = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt); 
+    rawJet *= ptscale; 
+    metX -= rawJet.px(); 
+    metY -= rawJet.py();
+=======
       MyLorentzVector rawJet = vJ[j_ind].p4; 
       metX += rawJet.px(); 
       metY += rawJet.py(); 
@@ -99,6 +112,7 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
       double jesF = vJ[j_ind].JECUncertainty*double(jes);
       metX -= jesF*rawJet.px(); 
       metY -= jesF*rawJet.py();
+>>>>>>> JetP4JER_20200227
     } 
   }  
   return sqrt(metX*metX + metY*metY); 

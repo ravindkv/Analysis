@@ -25,11 +25,11 @@ public:
   ///~BTagSF() {delete randm;};
   //Event reweighting using scale factors and MC b-tagging efficiencies 
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
-  double getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv);
-  double getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int bTagSys);
+  double getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv);
+  double getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv, const int & jetFlavor, const int & bTagSys);
 
-  double getBTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int bTagSys);
-  double getBTagEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, double eta, double pt);
+  double getBTagSF(BTagCalibrationReader &reader, const double & eta, const double & pt, const double & csv, const double & jetFlavor, const int & bTagSys);
+  double getBTagEff(TH2D *h2_BTaggingEff_Num, TH2D *h2_BTaggingEff_Denom, const double & eta, const double & pt);
 
 private:
   TRandom3* randm;

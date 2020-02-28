@@ -39,27 +39,28 @@
 #endif
 
 using namespace std;
-
-class Reader
+class Reader 
 {
  public:
   Reader() { }
  virtual ~Reader() { }
  ///~Reader() { }
   
-  unsigned int AssignEventTreeFrom(TFile *f, TString path = "myMiniTreeProducer");
-  unsigned int AssignEventTreeFromList(const char *file_list_name, TString path = "myMiniTreeProducer"); //for more than one files
+  unsigned int AssignEventTreeFrom(TFile *f, const TString & path = "myMiniTreeProducer");
+  unsigned int AssignEventTreeFromList(const char *file_list_name, const TString & path = "myMiniTreeProducer"); //for more than one files
   
   MyEvent *GetNewEvent(unsigned int ientry);
   MyEvent *GetNewEventFromList(unsigned int ientry); //for more than one files
 
   Long64_t LoadTree(Long64_t entry);
+  vector<MyJet> getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData);
+  vector<MyJet> getJetsNoCorr(MyEvent* ev, const string & algo);
+  vector<MyElectron> getElectrons(MyEvent* ev, const string & algo);
+  vector<MyMuon> getMuons(MyEvent* ev, const string & algo);
+  MyMET getMET(MyEvent* ev, const string & algo);
 
-  vector<MyJet> getJets(MyEvent* ev, string algo);
-  vector<MyElectron> getElectrons(MyEvent* ev, string algo);
-  vector<MyMuon> getMuons(MyEvent* ev, string algo);
-  MyMET getMET(MyEvent* ev, string algo);
-
+  double getJERSF(const double & eta, const int & jer);
+  double DeltaR(const MyLorentzVector & aV, const MyLorentzVector & bV);
  private :
   TTree *myTree;
   //TChain *chain;

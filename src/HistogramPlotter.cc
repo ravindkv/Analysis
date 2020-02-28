@@ -5,7 +5,7 @@
  
 ClassImp(HistogramPlotter) 
 
-void HistogramPlotter::addHisto(TString name, TString dirname, int range, double min, double max)
+void HistogramPlotter::addHisto(const TString & name, const TString & dirname, const int & range, const double & min, const double & max)
 {
   //TString fullname = name+"_"+dirname; 
   TString fullname = dirname+"/"+name;
@@ -14,7 +14,7 @@ void HistogramPlotter::addHisto(TString name, TString dirname, int range, double
   histos1_[fullname]->Sumw2();
 }
 
-void HistogramPlotter::initTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[]){
+void HistogramPlotter::initTProfile(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & nXBin, Float_t xBin_array[]){
   std::string histPath;
   histPath = std::string(dir+"/"+subdir);
   TDirectory *d = file->GetDirectory(histPath.c_str());
@@ -23,7 +23,7 @@ void HistogramPlotter::initTProfile(TFile *file, TString dir, TString subdir, TS
   addTProfile(histName, histPath, nXBin, xBin_array);
 }
 
-void HistogramPlotter::addTProfile(TString name, TString dirname, int nXBin, Float_t xBin_array[]){
+void HistogramPlotter::addTProfile(const TString & name, const TString & dirname, const int & nXBin, Float_t xBin_array[]){
   //TString fullname = name+"_"+dirname;
   TString fullname = dirname+"/"+name;
   std::string hname(fullname); 
@@ -32,7 +32,7 @@ void HistogramPlotter::addTProfile(TString name, TString dirname, int nXBin, Flo
   tprofile_[fullname]->SetErrorOption("s");
 }
 
-void HistogramPlotter::fillTProfile(TFile *file, TString dir, TString subdir, TString histName, int nXBin, Float_t xBin_array[], double value1, double value2, double weight)
+void HistogramPlotter::fillTProfile(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & nXBin, Float_t xBin_array[], const double & value1, const double & value2, const double & weight)
 {
   TString fullname = dir+"/"+subdir+"/"+histName;
   if(!tprofile_[fullname]){
@@ -42,7 +42,7 @@ void HistogramPlotter::fillTProfile(TFile *file, TString dir, TString subdir, TS
   tprofile_[fullname]->Fill(value1, value2, weight);
 }
 
-void HistogramPlotter::addHisto2D(TString name, TString dirname, int nBin1, double min1, double max1, int nBin2, double min2, double max2)
+void HistogramPlotter::addHisto2D(const TString & name, const TString & dirname, const int & nBin1, const double & min1, const double & max1, const int & nBin2, const double & min2, const double & max2)
 {
   //TString fullname = name+"_"+dirname;
   TString fullname = dirname+"/"+name;
@@ -51,7 +51,7 @@ void HistogramPlotter::addHisto2D(TString name, TString dirname, int nBin1, doub
   histos2_[fullname]->Sumw2();
 }
 
-void HistogramPlotter::initHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max){
+void HistogramPlotter::initHisto(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & Nbin, const double & min, const double & max){
   std::string histPath;
   histPath = std::string(dir+"/"+subdir);
   TDirectory *d = file->GetDirectory(histPath.c_str());
@@ -60,7 +60,7 @@ void HistogramPlotter::initHisto(TFile *file, TString dir, TString subdir, TStri
   addHisto(histName, histPath, Nbin, min, max);
   }
 
-void HistogramPlotter::initHisto2D(TFile *file, TString dir, TString subdir, TString histName, int nBin1, double min1, double max1, int nBin2, double min2, double max2){
+void HistogramPlotter::initHisto2D(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & nBin1, const double & min1, const double & max1, const int & nBin2, const double & min2, const double & max2){
   std::string histPath;
   histPath = std::string(dir+"/"+subdir);
   TDirectory *d = file->GetDirectory(histPath.c_str());
@@ -69,7 +69,7 @@ void HistogramPlotter::initHisto2D(TFile *file, TString dir, TString subdir, TSt
   addHisto2D(histName, histPath, nBin1, min1, max1, nBin2, min2, max2);
 }
 
-void HistogramPlotter::fillHisto(TFile *file, TString dir, TString subdir, TString histName, int Nbin, double min, double max, double value, double weight)
+void HistogramPlotter::fillHisto(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & Nbin, const double & min, const double & max, const double & value, const double & weight)
 {
   TString fullname = dir+"/"+subdir+"/"+histName;
   if(!histos1_[fullname]){
@@ -79,7 +79,7 @@ void HistogramPlotter::fillHisto(TFile *file, TString dir, TString subdir, TStri
   histos1_[fullname]->Fill(value, weight);
 }
 
-void HistogramPlotter::fillHisto2D(TFile *file, TString dir, TString subdir, TString histName, int nBin1, double min1, double max1, double value1, int nBin2, double min2, double max2, double value2, double weight)
+void HistogramPlotter::fillHisto2D(TFile *file, const TString & dir, const TString & subdir, const TString & histName, const int & nBin1, const double & min1, const double & max1, const double & value1, const int & nBin2, const double & min2, const double & max2, const double & value2, const double & weight)
 {
   TString fullname = dir+"/"+subdir+"/"+histName;
   if(!histos2_[fullname]){
@@ -90,7 +90,7 @@ void HistogramPlotter::fillHisto2D(TFile *file, TString dir, TString subdir, TSt
 }
 
 
-TH2* HistogramPlotter::getHisto2d(TString name, TString dirname)
+TH2* HistogramPlotter::getHisto2d(const TString & name, const TString & dirname)
 {
   TString fullname = dirname+"/"+name;
   TH2 * h = 0;
@@ -98,7 +98,7 @@ TH2* HistogramPlotter::getHisto2d(TString name, TString dirname)
   return h;
 }
 
-TH1* HistogramPlotter::getHisto(TString name, TString dirname)
+TH1* HistogramPlotter::getHisto(const TString & name, const TString & dirname)
 {
   //TString fullname = name+"_"+dirname;
   TString fullname = dirname+"/"+name;

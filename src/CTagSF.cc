@@ -2,7 +2,7 @@
 
 ClassImp(CTagSF)
 
-double CTagSF::getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, bool isCTag){
+double CTagSF::getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const bool & isCTag){
   //double pMC = 1.0; 
   double pMC = 1.0; 
   if(isCTag) pMC = getCTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
@@ -10,7 +10,7 @@ double CTagSF::getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, doubl
   return pMC;
 }
 
-double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTag, int jetFlavor, int cTagSys){
+double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv, const bool & isCTag, const int & jetFlavor, const int & cTagSys){
   double pData = 1.0; 
   double sf = 1.0;
   double eff = 1.0;
@@ -29,7 +29,7 @@ double CTagSF::getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_N
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
 //https://twiki.cern.ch/twiki/pub/CMS/BtagRecommendation80XReReco/CSVv2_Moriond17_B_H.csv
-double CTagSF::getCTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int cTagSys){
+double CTagSF::getCTagSF(BTagCalibrationReader &reader, const double & eta, const double & pt, const double & csv, const double & jetFlavor, const int & cTagSys){
   double sf=1.0;
   if(abs(jetFlavor) ==5){
     if(cTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
@@ -50,7 +50,7 @@ double CTagSF::getCTagSF(BTagCalibrationReader &reader, double eta, double pt, d
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
-double CTagSF::getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, double eta, double pt){
+double CTagSF::getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, const double & eta, const double & pt){
   double eff = 1.0;
   double bin_num = h2_CTagEff_Num->FindBin(pt, double(eta));
   double bin_denom = h2_CTagEff_Denom->FindBin(pt, double(eta));

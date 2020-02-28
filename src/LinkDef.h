@@ -4,7 +4,6 @@
 #include "interface/HistogramPlotter.hh"
 #include "interface/BTagSF.hh"
 #include "interface/CTagSF.hh"
-#include "interface/SVEffUnc.hh"
 #include "interface/UncertaintyComputer.hh"
 #ifdef __CINT__
 
@@ -37,7 +36,6 @@
 #pragma link C++ class HistogramPlotter+;
 #pragma link C++ class BTagSF+;
 #pragma link C++ class CTagSF+;
-#pragma link C++ class SVEffUnc+;
 #pragma link C++ class UncertaintyComputer+;
 #endif
 

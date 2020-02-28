@@ -2,7 +2,7 @@
 
 ClassImp(BTagSF)
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods#1a)%20Event%20reweighting%20using%20scal
-double BTagSF::getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv){
+double BTagSF::getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv){
   double csvM = 0.8484; //0.5426, 0.9535
   double pMC = 1.0; 
   if(csv> csvM) pMC = getBTagEff(h2_qTagEff_Num, h2_qTagEff_Denom, eta, pt);
@@ -10,7 +10,7 @@ double BTagSF::getBTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double e
   return pMC;
 }
 
-double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, int jetFlavor, int bTagSys){
+double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv, const int & jetFlavor, const int & bTagSys){
   double csvM = 0.8484; //0.5426, 0.9535
   double csvOP = csvM;
   double pData = 1.0; 
@@ -31,7 +31,7 @@ double BTagSF::getBTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num,
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Additional_scripts
 //https://twiki.cern.ch/twiki/pub/CMS/BTagRecommendation80XReReco/CSVv2_Moriond17_B_H.csv
-double BTagSF::getBTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetFlavor, int bTagSys){
+double BTagSF::getBTagSF(BTagCalibrationReader &reader, const double & eta, const double & pt, const double & csv, const double & jetFlavor, const int & bTagSys){
   double sf=1.0;
   if(abs(jetFlavor) ==5){
     if(bTagSys==0) sf = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, eta, pt,csv);
@@ -51,7 +51,7 @@ double BTagSF::getBTagSF(BTagCalibrationReader &reader, double eta, double pt, d
   return sf;
 }
 //https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods
-double BTagSF::getBTagEff(TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, double eta, double pt){
+double BTagSF::getBTagEff(TH2D *h2_BTagEff_Num, TH2D *h2_BTagEff_Denom, const double & eta, const double & pt){
   double eff = 0.0;
   double bin_num = h2_BTagEff_Num->FindBin(pt, double(eta));
   double bin_denom = h2_BTagEff_Denom->FindBin(pt, double(eta));

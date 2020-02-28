@@ -71,7 +71,7 @@ bool ObjectSelector::cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron 
   return passID;
 }
 
-void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, bool isPFlow){
+void ObjectSelector::preSelectElectrons(vector<int> * e_i, const vector<MyElectron> & vE , MyVertex & vertex, const bool & isPFlow){
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
   for(unsigned int i=0;i<vE.size();i++){
     const MyElectron * e    = &vE[i];
@@ -109,7 +109,7 @@ bool ObjectSelector::isMediumMuonGH(const MyMuon * m){
   return isMedium; 
 }
 
-void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, bool isData, double random_u1, double random_u2, int err_member, int err_set){
+void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, const bool & isData, const double & random_u1, const double & random_u2, const int & err_member, const int & err_set){
   for( int i=0;i< (int) vM.size();i++){
     const MyMuon * m = &vM[i];
     double mEta     = TMath::Abs(m->p4.eta());
@@ -130,13 +130,12 @@ void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector
   }
 }
 
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer, bool isData){
+void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, const int & jes, const int & jer, const bool & isData){
   //https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
   for(unsigned int i=0;i<vJ.size();i++){
-    const MyJet *jet = &vJ[i];
-    double jetEta     = TMath::Abs(jet->p4.eta());
-    //double jetPt    = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer, isData); 
+    const MyJet *jet= &vJ[i];
+    double jetEta   = TMath::Abs(jet->p4.eta());
+    double jetPt    = TMath::Abs(jet->p4.pt());
     double NHF      = jet->neutralHadronEnergyFraction;
     double NEMF     = jet->neutralEmEnergyFraction;
     double CHF      = jet->chargedHadronEnergyFraction;
@@ -147,27 +146,8 @@ void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vec
     if(looseJetID && jetPt > 25.0) j_i->push_back(i);
   }
 }
-/*
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, int jes, int jer){
-  for(unsigned int i=0;i<vJ.size();i++){
-    const MyJet *jet = &vJ[i];
-    double jetEta     = TMath::Abs(jet->p4.eta());
-    //double jetPt      = TMath::Abs(jet->p4.pt());
-    double jetPt      = jetPtWithJESJER(vJ[i], jes, jer); 
-    double neutralHadEnFrac = jet->neutralHadronEnergyFraction;
-    double neutralEmEnFrac = jet->neutralEmEnergyFraction;
-    double chargedHadEnFrac = jet->chargedHadronEnergyFraction;
-    if(jetPt > 25.0000 && jetEta < 2.4000000
-      && neutralHadEnFrac < 0.990
-      && neutralEmEnFrac  < 0.990
-      && chargedHadEnFrac > 0.00
-      ){
-      j_i->push_back(i);
-    }
-  }
-}
-*/
-bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM, bool isPFlow){
+
+bool ObjectSelector::looseMuonVeto( const int & selectedMuon, const vector<MyMuon> & vM, const bool & isPFlow){
   bool looseVeto(false);
   for(int i=0;i< (int)vM.size();i++){
     if( i==selectedMuon ){continue;}
@@ -182,7 +162,7 @@ bool ObjectSelector::looseMuonVeto( int selectedMuon, const vector<MyMuon> & vM,
   return looseVeto;
 }
 
-bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, bool isPFlow){
+bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vector<MyElectron> & vE, MyVertex & vertex, const bool & isPFlow){
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Offline_selection_criteria
   bool looseVeto(false);
   for(unsigned long i=0;i<vE.size();i++){
@@ -197,7 +177,7 @@ bool ObjectSelector::looseElectronVeto(unsigned long selectedElectron, const vec
   return looseVeto;
 }
 
-void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, double DR ){
+void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vector<MyMuon> & vM, vector<int> * e_old, vector<int> * e_new, vector<int> * mu, const double & DR ){
   for(size_t i = 0; i < e_old->size(); i++){
     int iele = (*e_old)[i];
     double delR2Mu = 5.0;
@@ -210,7 +190,7 @@ void ObjectSelector::ElectronCleaning( const vector<MyElectron> & vE, const vect
   }
 }
 
-void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> & vM, const vector<MyElectron> & vE,vector<int> * j_old, vector<int> * j_new, vector<int> * mu, vector<int> * el, double DR){
+void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> & vM, const vector<MyElectron> & vE,vector<int> * j_old, vector<int> * j_new, vector<int> * mu, vector<int> * el, const double & DR){
   for(size_t i = 0; i < j_old->size(); i++){
     int ijet = (*j_old)[i];
     double delR2Mu = 5.0, delR2Ele = 5.0;
@@ -231,7 +211,7 @@ void ObjectSelector::JetCleaning(const vector<MyJet> & vJ, const vector<MyMuon> 
     }
 }
 
-double ObjectSelector::DeltaR(MyLorentzVector aV, MyLorentzVector bV){
+double ObjectSelector::DeltaR(const MyLorentzVector & aV, const MyLorentzVector & bV){
   double deta = TMath::Abs(aV.eta() - bV.eta());
   double dphi = TMath::Abs(aV.phi() - bV.phi());
   if(dphi > M_PI) dphi = 2*M_PI - dphi;
