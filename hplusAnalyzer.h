@@ -137,8 +137,8 @@ public :
   void CutFlowProcessor(TString url,  string myKey="PFlow", TString cutflowType="base", TFile *outFile_=0);
   //void CreateAnalHistos(TString flowType, TFile* outFile_);
   void processEvents();
-  float reweightHEPNUPWJets(int hepNUP);
-  float reweightHEPNUPDYJets(int hepNUP);
+  float reweightHEPNUPWJets(const int & hepNUP);
+  float reweightHEPNUPDYJets(const int & hepNUP);
 private :
   double DRMIN_JET, DRMIN_ELE, METCUT_;
   Reader *evR;
@@ -153,15 +153,13 @@ private :
   std::map<string, double> lumiMC;
   ofstream outfile_;
   BTagCalibrationReader myReadCSV(const std::string &filename,const std::string &tagger, BTagEntry::OperatingPoint op, const std::string & measurementType, const std::string & sysType, const std::vector<std::string> & otherSysTypes, BTagEntry::JetFlavor jf);
-  Double_t getMuonSF(TH2D *h2, double eta, double pt, double maxPt);
-  Double_t getMuonTrackSF(TGraphAsymmErrors *tg, double eta);
-  Double_t getEleSF(TH2D *h2, double etaSC, double pt, double maxPt);
-  Double_t getEleTrigSF(TH2D *h2, double pt, double etaSC, double maxPt);
-  double deltaPhi12(double phi1, double phi2);
-  double phi0to2pi(double phi);
+  Double_t getMuonSF(TH2D *h2, const double & eta, const double & pt, const double & maxPt);
+  Double_t getMuonTrackSF(TGraphAsymmErrors *tg, const double & eta);
+  Double_t getEleSF(TH2D *h2, const double & etaSC, const double & pt, const double & maxPt);
+  Double_t getEleTrigSF(TH2D *h2, const double & pt, const double & etaSC, const double & maxPt);
 };
 
-float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
+float hplusAnalyzer::reweightHEPNUPWJets(const int & hepNUP) {
   int nJets = hepNUP-5;
   if(nJets==0)      return 2.11;
   else if(nJets==1) return 0.23;
@@ -171,7 +169,7 @@ float hplusAnalyzer::reweightHEPNUPWJets(int hepNUP) {
   else return 1 ;
 }
 
-float hplusAnalyzer::reweightHEPNUPDYJets(int hepNUP){
+float hplusAnalyzer::reweightHEPNUPDYJets(const int & hepNUP){
   int nJets = hepNUP-5;
   if(nJets==0)      return 0.120;
   else if(nJets==1) return 0.0164;
@@ -196,7 +194,7 @@ BTagCalibrationReader hplusAnalyzer::myReadCSV(const std::string &filename, cons
 }
 
 //https://twiki.cern.ch/twiki/bin/view/CMS/MuonWorkInProgressAndPagResults
-Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt, double maxPt){
+Double_t hplusAnalyzer::getMuonSF(TH2D *h2, const double & eta, const double & pt, const double & maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   double sf = 1.0;
@@ -212,7 +210,7 @@ Double_t hplusAnalyzer::getMuonSF(TH2D *h2, double eta, double pt, double maxPt)
   return sf;
 }
 
-Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
+Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, const double & eta){
   Double_t *eta_array = tg->GetX();
   Double_t *sf_array = tg->GetY();
   Int_t n_points = tg->GetN();
@@ -225,7 +223,7 @@ Double_t hplusAnalyzer::getMuonTrackSF(TGraphAsymmErrors *tg, double eta){
   return SF;
 }
 
-Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt, double maxPt){
+Double_t hplusAnalyzer::getEleSF(TH2D *h2, const double & etaSC, const double & pt, const double & maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   double sf = 1.0;
@@ -239,7 +237,7 @@ Double_t hplusAnalyzer::getEleSF(TH2D *h2, double etaSC, double pt, double maxPt
   return sf;
 }
 
-Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC, double maxPt){
+Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, const double & pt, const double & etaSC, const double & maxPt){
   TAxis *xaxis = h2->GetXaxis();
   TAxis *yaxis = h2->GetYaxis();
   double sf = 1.0;
@@ -251,22 +249,6 @@ Double_t hplusAnalyzer::getEleTrigSF(TH2D *h2, double pt, double etaSC, double m
   //double err = 1.0;
   //err = h2->GetBinError(binX, binY);
   return sf;
-}
-double hplusAnalyzer::phi0to2pi(double phi){
-    double pi = 3.1415926535;
-    while (phi >= 2.*pi) phi -= 2.*pi;
-    while (phi < 0.) phi += 2.*pi;
-    return phi;
-}
-
-double hplusAnalyzer::deltaPhi12(double phi1_, double phi2_){
-    // build the delta Phi angle between the two vectors
-    double pi = 3.1415926535;
-    double phi1 = phi0to2pi(phi1_);
-    double phi2 = phi0to2pi(phi2_);
-    double dPhi = phi0to2pi(phi1 - phi2);
-    dPhi = (dPhi > (2*pi - dPhi)) ? 2*pi - dPhi : dPhi;
-    return dPhi;
 }
 
 //---------------------------------------------------//

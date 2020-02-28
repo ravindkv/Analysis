@@ -226,7 +226,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     ev = evR->GetNewEvent(i);
     if(ev==0) continue;
     if(i%1000==0) cout<<"\033[01;32mEvent number = \033[00m"<< i << endl;
-    if(i > 1000) break;
+    //if(i > 1000) break;
     //---------------------------------------------------//
     //apply lumi, k factor and pileup weight
     //---------------------------------------------------//
@@ -319,7 +319,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<int> j_init; j_init.clear();
     preSelectJets(jAlgo, &j_init, pfJets, jes, jer);
     vector<int> jNoCorr_init; jNoCorr_init.clear();
-    preSelectJets(jAlgo, &jNoCorr_init, pfJets, jes, jer);
+    preSelectJets(jAlgo, &jNoCorr_init, pfJetsNoCorr, jes, jer);
 
     // clean objects //
     vector<int> e_final; e_final.clear();
@@ -491,12 +491,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType, "SF", "Iso", 100, 0, 2, muSFiso, 1 );
     fillHisto(outFile_, cutflowType, "SF", "Track", 100, 0, 2, muSFtrack, 1 );
     fillHisto(outFile_, cutflowType, "SF", "Lepton", 100, 0, 2, muSF, 1 );
-    double metPt = 0;
-    metPt = metWithJESJER(pfJets, &j_final, met, jes, jer, ev->isData);
-    double metPt2 = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData);
-    cout<<"Event ----------------: "<<i<<endl;
-    cout<<"MET1 = "<<metPt<<endl;
-    cout<<"MET2 = "<<metPt2<<endl;
+    double metPt = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData);
     Float_t xBinIso_array[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
     fillHisto(outFile_, cutflowType, "", "RelIso_1Mu", 50, 0, 3, tmp_iso, evtWeight);
     fillHisto(outFile_, cutflowType, "", "pt_met_1Mu", 100, 0, 1000, metPt, evtWeight );

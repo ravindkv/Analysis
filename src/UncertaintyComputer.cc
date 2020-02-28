@@ -76,8 +76,6 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
 { 
   double metX = MET.p4.px(); 
   double metY = MET.p4.py(); 
-  cout<<"Before metX = "<<metX<<endl;
-  cout<<"Before metY = "<<metY<<endl;
   //get JER uncert.
   for(size_t i = 0; i < j->size(); i++){ 
     int j_ind = j->at(i); 
@@ -88,35 +86,21 @@ double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> 
     double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
     double rCone = 0.4;
     if(!isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
-    //if(gen_pt <= 0) continue; 
-    MyLorentzVector rawJet = vJ[j_ind].p4; 
-    metX += rawJet.px(); 
-    metY += rawJet.py(); 
-    double jet_pt = vJ[j_ind].p4.pt(); 
-    double SF = getJERSF(vJ[j_ind].p4.eta(), jer); 
-    //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
-    double ptscale = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt); 
-    rawJet *= ptscale; 
-    metX -= rawJet.px(); 
-    metY -= rawJet.py();
-    cout<<"------"<<endl;
-    cout<<"jet_pt      = "<<jet_pt<<endl;
-    cout<<"jet_px      = "<<rawJet.px()<<endl;
-    cout<<"jet_py      = "<<rawJet.py()<<endl;
-    cout<<"SF          = "<<SF<<endl;
-    cout<<"ptscale     = "<<ptscale<<endl;
-    cout<<"During metX = "<<metX<<endl;
-    cout<<"During metY = "<<metY<<endl;
+      MyLorentzVector rawJet = vJ[j_ind].p4; 
+      metX += rawJet.px(); 
+      metY += rawJet.py(); 
+      double jet_pt = vJ[j_ind].p4.pt(); 
+      double SF = getJERSF(vJ[j_ind].p4.eta(), jer); 
+      //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
+      double jerF = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/jet_pt); 
+      metX -= jerF*rawJet.px(); 
+      metY -= jerF*rawJet.py();
+      //apply JES scaling
+      double jesF = vJ[j_ind].JECUncertainty*double(jes);
+      metX -= jesF*rawJet.px(); 
+      metY -= jesF*rawJet.py();
     } 
   }  
-  //get JES unc.
-  for(size_t i = 0; i < j->size(); i++){  
-    int j_ind = j->at(i);  
-    metX -= (vJ[j_ind].p4.px()*(vJ[j_ind].JECUncertainty*double(jes))); 
-    metY -= (vJ[j_ind].p4.py()*(vJ[j_ind].JECUncertainty*double(jes))); 
-  } 
-  cout<<"After metX = "<<metX<<endl;
-  cout<<"After metY = "<<metY<<endl;
   return sqrt(metX*metX + metY*metY); 
 }
 

@@ -25,12 +25,12 @@ public:
   ///~CTagSF() {delete randm;};
   
   //For inclusive scale factors
-  double getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, bool isCTag);
-  double getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, double eta, double pt, double csv, bool isCTag, int jetFlavor, int cTagSys);
+  double getIncCTagPmc(TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const bool & isCTag);
+  double getIncCTagPdata(BTagCalibrationReader &reader, TH2D *h2_qTagEff_Num, TH2D *h2_qTagEff_Denom, const double & eta, const double & pt, const double & csv, const bool & isCTag, const int & jetFlavor, const int & cTagSys);
   
   // For both
-  double getCTagSF(BTagCalibrationReader &reader, double eta, double pt, double csv, double jetflavor, int CTagSys);
-  double getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, double eta, double pt);
+  double getCTagSF(BTagCalibrationReader &reader, const double & eta, const double & pt, const double & csv, const double & jetflavor, const int & CTagSys);
+  double getCTagEff(TH2D *h2_CTagEff_Num, TH2D *h2_CTagEff_Denom, const double & eta, const double & pt);
   
 private:
  

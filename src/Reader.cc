@@ -4,7 +4,7 @@ ClassImp(Reader)
 
 using namespace std;
 
-unsigned int Reader::AssignEventTreeFrom(TFile *f, TString path)
+unsigned int Reader::AssignEventTreeFrom(TFile *f, const TString & path)
 {
   
   if(f==0) return 0;
@@ -24,7 +24,7 @@ unsigned int Reader::AssignEventTreeFrom(TFile *f, TString path)
   return nEntries;
 }
 
-unsigned int Reader::AssignEventTreeFromList(const char *file_list_name, TString path)
+unsigned int Reader::AssignEventTreeFromList(const char *file_list_name, const TString & path)
 {
   int nfiles;
   char tex[200], list_name[100];
@@ -103,7 +103,7 @@ Long64_t Reader::LoadTree(Long64_t entry)
    return centry;
 }
 
-vector<MyElectron> Reader::getElectrons(MyEvent* ev, string algo)
+vector<MyElectron> Reader::getElectrons(MyEvent* ev, const string & algo)
 {
   vector<MyElectron> selElectrons;
   selElectrons.clear();
@@ -114,7 +114,7 @@ vector<MyElectron> Reader::getElectrons(MyEvent* ev, string algo)
   return selElectrons;
 }
 
-vector<MyMuon> Reader::getMuons(MyEvent* ev, string algo)
+vector<MyMuon> Reader::getMuons(MyEvent* ev, const string & algo)
 {
   vector<MyMuon> selMuons;
   selMuons.clear();
@@ -125,7 +125,7 @@ vector<MyMuon> Reader::getMuons(MyEvent* ev, string algo)
   return selMuons;
 }
 
-vector<MyJet> Reader::getJets(MyEvent* ev, string algo, int jes, int jer, bool isData)
+vector<MyJet> Reader::getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData)
 {
   vector<MyJet> selJets;
   selJets.clear();
@@ -156,7 +156,7 @@ vector<MyJet> Reader::getJets(MyEvent* ev, string algo, int jes, int jer, bool i
   }
   return selJets;
 }
-vector<MyJet> Reader::getJetsNoCorr(MyEvent* ev, string algo)
+vector<MyJet> Reader::getJetsNoCorr(MyEvent* ev, const string & algo)
 {
   vector<MyJet> selJets;
   selJets.clear();
@@ -167,7 +167,7 @@ vector<MyJet> Reader::getJetsNoCorr(MyEvent* ev, string algo)
   return selJets;
 }
 
-MyMET Reader::getMET(MyEvent* ev, string algo) 
+MyMET Reader::getMET(MyEvent* ev, const string & algo) 
 { 
   MyMET selmet;
   vector<MyMET> allMETs = ev->mets; 
@@ -177,7 +177,7 @@ MyMET Reader::getMET(MyEvent* ev, string algo)
   return selmet; 
 } 
 
-double Reader::getJERSF(double eta, int jer){
+double Reader::getJERSF(const double & eta, const int & jer){
   //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
   //New SF with stat + sys unc
   //https://github.com/cms-jet/JRDatabase/blob/master/textFiles/Spring16_25nsV10a_MC/Spring16_25nsV10a_MC_SF_AK4PFchs.txt
@@ -224,7 +224,7 @@ double Reader::getJERSF(double eta, int jer){
   }
   return SF;
 }
-double Reader::DeltaR(MyLorentzVector aV, MyLorentzVector bV){
+double Reader::DeltaR(const MyLorentzVector & aV, const MyLorentzVector & bV){
   double deta = TMath::Abs(aV.eta() - bV.eta());
   double dphi = TMath::Abs(aV.phi() - bV.phi());
   if(dphi > M_PI) dphi = 2*M_PI - dphi;
