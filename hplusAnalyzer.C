@@ -219,6 +219,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
   //---------------------------------------------------//
   TRandom3* random1seed = new TRandom3(65509);
   TRandom3* random2seed = new TRandom3(65507);
+  int seed = 65509;
   int  kfCount = 0;
   for(int i=0; i<nEntries; ++i){
     Long64_t ientry = evR->LoadTree(i);
@@ -303,7 +304,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     }
     vector<MyMuon> pfMuons = evR->getMuons(ev, mAlgo);
     vector<MyElectron> pfElectrons = evR->getElectrons(ev, eAlgo);
-    vector<MyJet> pfJets = evR->getJets(ev, jAlgo, jes, jer, ev->isData);
+    vector<MyJet> pfJets = evR->getJets(ev, jAlgo, jes, jer, ev->isData, seed);
     vector<MyJet> pfJetsNoCorr = evR->getJetsNoCorr(ev, jAlgo);
     MyMET met = evR->getMET(ev, metAlgo);
 
@@ -317,9 +318,9 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     vector<int> e_init; e_init.clear();
     preSelectElectrons(&e_init, pfElectrons, Vertices[0], isPFlow);
     vector<int> j_init; j_init.clear();
-    preSelectJets(jAlgo, &j_init, pfJets, jes, jer);
+    preSelectJets(jAlgo, &j_init, pfJets);
     vector<int> jNoCorr_init; jNoCorr_init.clear();
-    preSelectJets(jAlgo, &jNoCorr_init, pfJetsNoCorr, jes, jer);
+    preSelectJets(jAlgo, &jNoCorr_init, pfJetsNoCorr);
 
     // clean objects //
     vector<int> e_final; e_final.clear();
@@ -491,7 +492,7 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     fillHisto(outFile_, cutflowType, "SF", "Iso", 100, 0, 2, muSFiso, 1 );
     fillHisto(outFile_, cutflowType, "SF", "Track", 100, 0, 2, muSFtrack, 1 );
     fillHisto(outFile_, cutflowType, "SF", "Lepton", 100, 0, 2, muSF, 1 );
-    double metPt = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData);
+    double metPt = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData, seed);
     Float_t xBinIso_array[] = {0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410, 420, 430, 440, 450, 460, 470, 480, 490, 500};
     fillHisto(outFile_, cutflowType, "", "RelIso_1Mu", 50, 0, 3, tmp_iso, evtWeight);
     fillHisto(outFile_, cutflowType, "", "pt_met_1Mu", 100, 0, 1000, metPt, evtWeight );

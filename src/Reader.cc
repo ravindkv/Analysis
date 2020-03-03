@@ -125,33 +125,43 @@ vector<MyMuon> Reader::getMuons(MyEvent* ev, const string & algo)
   return selMuons;
 }
 
-vector<MyJet> Reader::getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData)
+vector<MyJet> Reader::getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData, const int & seed)
 {
   vector<MyJet> selJets;
   selJets.clear();
   vector<MyJet> allJets = ev->Jets;
+  //https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_25/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h
+  std::mt19937 m_random_generator;
+  m_random_generator = std::mt19937(seed);
   for(size_t ijet=0; ijet < allJets.size(); ++ijet){
     MyJet jet = allJets[ijet];
-    double jesPt = 1.0;
+    double jesF = 1.0;
+    double jerF = 1.0;
     //apply JES uncert scaling 
-    jesPt = (1+(jet.JECUncertainty*double(jes)));
+    jesF = (1+(jet.JECUncertainty*double(jes)));
     //calculate JER sf
-    double gen_pt = jet.Genp4.pt();  
-    double jet_pt = jet.p4.pt();
-    double sigmaJER = jet.resolution ;
-    //apply JER uncert, scaling
-    double delR = DeltaR(jet.Genp4, jet.p4);
-    double rCone = 0.4;
-    double jerP4 = 1.0;
-    if(!isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+    if(!isData){
+      double gen_pt = jet.Genp4.pt();  
+      double jet_pt = jet.p4.pt();
+      double sigmaJER = jet.resolution ;
+      //apply JER uncert, scaling
+      double delR = DeltaR(jet.Genp4, jet.p4);
+      double rCone = 0.4;
       double SF = getJERSF(jet.p4.eta(), jer);
-      jerP4   = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt);
+      std::normal_distribution<> d(0, sigmaJER);
+      double N0sigma = d(m_random_generator);
+      if(delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+        jerF   = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/ jet_pt);
+      }
+      else{
+        jerF   = 1+ N0sigma* sqrt(max(SF*SF -1, 0.0));
+      }
+      double newPx = jesF*jerF*jet.p4.px();
+      double newPy = jesF*jerF*jet.p4.py();
+      double newPz = jesF*jerF*jet.p4.pz();
+      double newE  = jesF*jerF*jet.p4.E();
+      jet.p4.SetCoordinates(newPx, newPy, newPz, newE);
     }
-    double newPx = jerP4*jet.p4.px()*jesPt;
-    double newPy = jerP4*jet.p4.py()*jesPt;
-    double newPz = jerP4*jet.p4.pz();
-    double newE  = jerP4*jet.p4.E();
-    jet.p4.SetCoordinates(newPx, newPy, newPz, newE);
     selJets.push_back(jet);
   }
   return selJets;

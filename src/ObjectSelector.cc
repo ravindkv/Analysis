@@ -130,7 +130,7 @@ void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector
   }
 }
 
-void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ, const int & jes, const int & jer, const bool & isData){
+void ObjectSelector::preSelectJets( string jetAlgo, vector<int> * j_i, const vector<MyJet> & vJ){
   //https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
   for(unsigned int i=0;i<vJ.size();i++){
     const MyJet *jet= &vJ[i];

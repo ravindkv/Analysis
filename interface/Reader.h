@@ -29,6 +29,7 @@
 #include "TClonesArray.h"
 #include "TVectorD.h"
 #include "TFractionFitter.h"
+#include <random>
 
 #ifdef _STANDALONE
 #include "MyEvent.h"
@@ -53,7 +54,7 @@ class Reader
   MyEvent *GetNewEventFromList(unsigned int ientry); //for more than one files
 
   Long64_t LoadTree(Long64_t entry);
-  vector<MyJet> getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData);
+  vector<MyJet> getJets(MyEvent* ev, const string & algo, const int & jes, const int & jer, const bool & isData, const int & seed);
   vector<MyJet> getJetsNoCorr(MyEvent* ev, const string & algo);
   vector<MyElectron> getElectrons(MyEvent* ev, const string & algo);
   vector<MyMuon> getMuons(MyEvent* ev, const string & algo);

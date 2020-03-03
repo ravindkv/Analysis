@@ -72,27 +72,36 @@ double UncertaintyComputer::getJERSF(double eta, int jer){
 }
 //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETRun2Corrections
-double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes, int jer, bool isData) 
+double UncertaintyComputer::metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes, int jer, bool isData, const int & seed) 
 { 
   double metX = MET.p4.px(); 
   double metY = MET.p4.py(); 
-  //get JER uncert.
-  for(size_t i = 0; i < j->size(); i++){ 
-    int j_ind = j->at(i); 
-    double gen_pt = vJ[j_ind].Genp4.pt(); 
-    double jet_pt = vJ[j_ind].p4.pt();
-    double sigmaJER = vJ[j_ind].resolution;
-    //apply JER uncert, scaling
-    double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
-    double rCone = 0.4;
-    if(!isData && delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+  if(!isData){
+    std::mt19937 m_random_generator;
+    m_random_generator = std::mt19937(seed);
+    for(size_t i = 0; i < j->size(); i++){ 
+      int j_ind = j->at(i); 
+      double gen_pt = vJ[j_ind].Genp4.pt(); 
+      double jet_pt = vJ[j_ind].p4.pt();
+      double sigmaJER = vJ[j_ind].resolution;
+      //apply JER uncert, scaling
+      double delR = DeltaR(vJ[j_ind].Genp4, vJ[j_ind].p4);
+      double rCone = 0.4;
+      //https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_25/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h
       MyLorentzVector rawJet = vJ[j_ind].p4; 
       metX += rawJet.px(); 
       metY += rawJet.py(); 
-      double jet_pt = vJ[j_ind].p4.pt(); 
       double SF = getJERSF(vJ[j_ind].p4.eta(), jer); 
+      double jerF = 1.0;
+      std::normal_distribution<> d(0, sigmaJER);
+      double N0sigma = d(m_random_generator);
       //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
-      double jerF = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/jet_pt); 
+      if(delR<rCone/2 && abs(jet_pt -gen_pt)<3*sigmaJER*jet_pt ){
+        jerF = max(0.0, 1.0 + (SF - 1)*(jet_pt - gen_pt)/jet_pt); 
+      }
+      else{
+        jerF   = 1+ N0sigma* std::sqrt(std::max(SF*SF -1, 0.0));
+      }
       metX -= jerF*rawJet.px(); 
       metY -= jerF*rawJet.py();
       //apply JES scaling

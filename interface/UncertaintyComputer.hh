@@ -40,7 +40,7 @@ public :
      delete ctsf;
   }
   double muPtWithRochCorr(const MyMuon *mu, bool isData=false, double u1=0.5, double u2=0.4, int s=0, int m=0); 
-  double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0, bool isData = false);
+  double metWithJESJER(const vector<MyJet> & vJ, vector<int> *j, MyMET MET, int jes=0, int jer=0, bool isData = false, const int & seed=1);
   void  openCSVfile(const std::string &filename); 
   double getJERSF(double eta, int jer);
   double DeltaR(MyLorentzVector aV, MyLorentzVector bV);
