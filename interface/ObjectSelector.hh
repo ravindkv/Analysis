@@ -45,7 +45,7 @@ public :
   
   //Medium muon ID
   bool isMediumMuon(const MyMuon * m);
-  bool isMediumMuonGH(const MyMuon * m);
+  bool isTightMuon(const MyMuon * m);
   //egmGsfElectronIDs: https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
   bool cutBasedElectronID_Summer16_80X_V1_veto(const MyElectron *e); 
   bool cutBasedElectronID_Summer16_80X_V1_medium(const MyElectron *e, MyVertex & vertex); 

@@ -264,13 +264,17 @@ TH2D *h2_trigSF_GH 		= (TH2D*)f_trigSF_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/a
 //Identification SF
 TFile *f_idSF_BCDEF 	= new TFile("stack/muonSF/idSF_BCDEF.root");
 TFile *f_idSF_GH 		= new TFile("stack/muonSF/idSF_GH.root");
-TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
-TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+//TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+//TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
 //Isolation SF
 TFile *f_isoSF_BCDEF	= new TFile("stack/muonSF/isoSF_BCDEF.root");
 TFile *f_isoSF_GH 		= new TFile("stack/muonSF/isoSF_GH.root");
-TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
-TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+//TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+//TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_TightID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_TightID_pt_eta/abseta_pt_ratio");
 //Tracking SF
 TFile *f_trackSF_BCDEF 	= new TFile("stack/muonSF/trackingSF_BCDEF.root");
 TFile *f_trackSF_GH 	= new TFile("stack/muonSF/trackingSF_GH.root");

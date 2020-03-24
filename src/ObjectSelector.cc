@@ -96,17 +96,17 @@ bool ObjectSelector::isMediumMuon(const MyMuon * m){
   return isMedium; 
 }
 
-bool ObjectSelector::isMediumMuonGH(const MyMuon * m){
-  bool isMedium(false);
-  bool goodGlob = m->isGlobalMuon && 
-      m->normChi2 <3 && 
-      m->chi2LocalPosition < 12 && 
-      m->trkKink < 20; 
-  bool isLooseMuon = m->isPFMuon && (m->isGlobalMuon || m->isTrackerMuon);
-  isMedium =  isLooseMuon &&  
-        m->validFraction > 0.49 && 
-        m->segmentCompatibility >(goodGlob ? 0.303 : 0.451); 
-  return isMedium; 
+bool ObjectSelector::isTightMuon(const MyMuon * m){
+  bool isTight(false);
+  isTight = 
+      m->isGlobalMuon && 
+      m->isPFMuon &&
+      m->normChi2 <10 &&
+      m->nMuonHits > 0 &&
+      m->nMatchedStations >1 &&
+      m->nPixelHits >0 && 
+      m->nTrackerLayers >5;
+  return isTight; 
 }
 
 void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector<MyMuon> & vM , MyVertex & vertex, const bool & isData, const double & random_u1, const double & random_u2, const int & err_member, const int & err_set){
@@ -118,13 +118,10 @@ void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector
     double dxy = abs(m->D0);
     double dz = abs(m->Dz);
     bool passID = false;
-    /*
-    if(url.Contains("RunG") || url.Contains("RunH")) passID = isMediumMuonGH(m);
-    else passID = isMediumMuon(m);
-    */
-    passID = isMediumMuon(m);
-    //if(passID && mPt > 26.0 && mEta < 2.1 && dxy < 0.2 && dz <0.5){ 
-    if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.05 && dz <0.2){ 
+    //passID = isMediumMuon(m);
+    //if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.05 && dz <0.2){ mediumID
+    passID = isTightMuon(m);
+    if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.2 && dz <0.5){ 
       m_i->push_back(i);
     }
   }
