@@ -1,4 +1,3 @@
-
 ///////////////////////
 // Muon Channel
 ///////////////////////
@@ -396,40 +395,13 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
         }
       }
     }
-
-    //------------ Orthogonality ------------------------//
-    int count_bjet = 0;
-    for(size_t ijet = 0; ijet < j_final.size(); ijet++){
-      int ind_jet = j_final[ijet];
-      double pfCISV1 = pfJets[ind_jet].bDiscriminator["pfCombinedInclusiveSecondaryVertexV2BJetTags"];
-      if(pfCISV1 > 0.8484){
-        count_bjet++;
-      }
-    }
-    double metPt1 = metWithJESJER(pfJetsNoCorr, &jNoCorr_final, met, jes, jer, ev->isData, seed);
-    if(m_init.size() ==1
-            && pfMuons[m_init[0]].pfRelIso < 0.15
-            && j_final.size() >= 4
-            && metPt1 >= 20
-            && count_bjet >=2){
-    fillHisto(outFile_, cutflowType, "", "ortho", 10, 0.5, 10.5, 1, 1.0);
-    }
-    if(m_init.size() ==2
-            && pfMuons[m_init[0]].pfRelIso < 0.15
-            && pfMuons[m_init[1]].pfRelIso < 0.15
-            && j_final.size() >= 2
-            && metPt1 >= 40
-            && count_bjet >=2){
-    fillHisto(outFile_, cutflowType, "", "ortho", 10, 0.5, 10.5, 2, 1.0);
-    }
-    //-----------------------------
-
     //---------------------------------------------------//
     //apply selection cuts on leptons
     //---------------------------------------------------//
     int nMuon = m_init.size();
     double pri_vtxs = Vertices[0].totVtx;
     if(nMuon != 1)continue;
+
     int m_i = m_init[0];
     //veto additional muon
     if(looseMuonVeto( m_i, pfMuons, isPFlow) ) continue;
@@ -689,8 +661,6 @@ void hplusAnalyzer::CutFlowProcessor(TString url,  string myKey, TString cutflow
     for(size_t ijet = 0; ijet < j_final.size(); ijet++){
       int ind_jet = j_final[ijet];
       double jetPt = pfJets[ind_jet].p4.pt();
-      double sfJESJER = 1.0;
-      fillHisto(outFile_, cutflowType, "SF", "JESJER", 100, 0, 2, sfJESJER, 1 );
       fillHisto(outFile_, cutflowType_, "BTag","pt_jet", 100, 0, 1000, jetPt, evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag","eta_jet", 50, -5, 5, pfJets[ind_jet].p4.eta(), evtWeight );
       fillHisto(outFile_, cutflowType_, "BTag","phi_jet", 50, -5, 5, pfJets[ind_jet].p4.phi(), evtWeight );
@@ -1144,6 +1114,8 @@ void hplusAnalyzer::processEvents(){
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200307_MuMC/MuMC_20200307/TTJetsP_MuMC_20200307/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TTJetsP_MuMC_20200307/200307_100856/0000/TTJetsP_MuMC_20200307_Ntuple_10.root", "PF", "");
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200307_MuMC/MuMC_20200307/HplusM80_MuMC_20200307/ChargedHiggsToCS_M080_13TeV-madgraph/HplusM80_MuMC_20200307/200307_100254/0000/HplusM80_MuMC_20200307_Ntuple_1.root", "PF", "");
+  //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200307_MuMC/MuMC_20200307/ST_s_MuMC_20200307/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/ST_s_MuMC_20200307/200307_100706/0000/ST_s_MuMC_20200307_Ntuple_1.root", "PF", "");
+
 
   //CutFlowAnalysis("root://se01.indiacms.res.in:1094//cms/store/user/rverma/NTuple_HIG-18-021_20200225_MuData/MuData_20200225/MuRunB2v2_MuData_20200225/SingleMuon/MuRunB2v2_MuData_20200225/200225_163035/0000/MuRunB2v2_MuData_20200225_Ntuple_1.root", "PF", "");
   //====================================

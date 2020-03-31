@@ -96,9 +96,11 @@ public :
     xss["QCD_Pt-300toInf_EM"]=  1350;          evtDBS["QCD_Pt-300toInf_EM"]=  7373633;
 
     //single top and ttbar
-    xss["ST_s"]              =  10.32;         evtDBS["ST_s"]              =  2989199;
-    xss["ST_t"]              =  80.95;         evtDBS["ST_t"]              =  38811017;
-    xss["ST_tW"]             =  71.7;          evtDBS["ST_tW"]             =  6933094;
+    xss["ST_sChannel_incl"]     =  10.32;      evtDBS["ST_sChannel_incl"]     =  2989199;
+    xss["ST_tChannel_top"]      =  136.02;     evtDBS["ST_tChannel_top"]      =  67240808;
+    xss["ST_tChannel_antitop"]  =  80.95;      evtDBS["ST_tChannel_antitop"]  =  38811017;
+    xss["ST_tWChannel_top"]     =  35.85;      evtDBS["ST_tWChannel_top"]     =  6952830;
+    xss["ST_tWChannel_antitop"] =  35.85;      evtDBS["ST_tWChannel_antitop"] =  6933094;
     xss["TTJetsM"]           =  831.76;        evtDBS["TTJetsM"]           =  10139950;
     xss["TTJetsP"]           =  831.76;        evtDBS["TTJetsP"]           =  77081156;
 
@@ -110,7 +112,7 @@ public :
     xss["TTJetsP_hdampUP"]   =  831.76;        evtDBS["TTJetsP_hdampUP"]   =  29689380;
     xss["TTJetsP_hdampDOWN"] =  831.76;        evtDBS["TTJetsP_hdampDOWN"] =  29117820;
 
-    //DY + jets and W + jets 
+    //DY + jets and W + jets
     xss["DY1JetsToLL"]       =  1016;          evtDBS["DY1JetsToLL"]       =  62627174;
     xss["DY2JetsToLL"]       =  331.3;         evtDBS["DY2JetsToLL"]       =  19970551;
     xss["DY3JetsToLL"]       =  96.6;          evtDBS["DY3JetsToLL"]       =  5856110;
@@ -264,17 +266,13 @@ TH2D *h2_trigSF_GH 		= (TH2D*)f_trigSF_GH->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/a
 //Identification SF
 TFile *f_idSF_BCDEF 	= new TFile("stack/muonSF/idSF_BCDEF.root");
 TFile *f_idSF_GH 		= new TFile("stack/muonSF/idSF_GH.root");
-//TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
-//TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
-TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
-TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_BCDEF 	= (TH2D*)f_idSF_BCDEF->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+TH2D *h2_idSF_GH 		= (TH2D*)f_idSF_GH->Get("MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
 //Isolation SF
 TFile *f_isoSF_BCDEF	= new TFile("stack/muonSF/isoSF_BCDEF.root");
 TFile *f_isoSF_GH 		= new TFile("stack/muonSF/isoSF_GH.root");
-//TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
-//TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
-TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_TightID_pt_eta/abseta_pt_ratio");
-TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_TightID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_BCDEF	= (TH2D*)f_isoSF_BCDEF->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
+TH2D *h2_isoSF_GH 		= (TH2D*)f_isoSF_GH->Get("TightISO_MediumID_pt_eta/abseta_pt_ratio");
 //Tracking SF
 TFile *f_trackSF_BCDEF 	= new TFile("stack/muonSF/trackingSF_BCDEF.root");
 TFile *f_trackSF_GH 	= new TFile("stack/muonSF/trackingSF_GH.root");

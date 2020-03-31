@@ -118,10 +118,8 @@ void ObjectSelector::preSelectMuons(TString url, vector<int> * m_i, const vector
     double dxy = abs(m->D0);
     double dz = abs(m->Dz);
     bool passID = false;
-    //passID = isMediumMuon(m);
-    //if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.05 && dz <0.2){ mediumID
-    passID = isTightMuon(m);
-    if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.2 && dz <0.5){ 
+    passID = isMediumMuon(m);
+    if(passID && mPt > 26.0 && mEta < 2.4 && dxy < 0.05 && dz <0.2){
       m_i->push_back(i);
     }
   }
